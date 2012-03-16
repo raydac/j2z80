@@ -1,0 +1,12 @@
+; 161 IF_ICMPLT value1 value2 -> (value1 < value2) (s!=p/v)
+    CLRLOC
+    POP BC
+    POP HL
+    AND A
+    SBC HL,BC
+    JP P,@IF_ICMPLT_NOS
+    JP PO,%address%
+    JR @IF_ICMPLT_END
+@IF_ICMPLT_NOS:
+    JP PE,%address%
+@IF_ICMPLT_END:

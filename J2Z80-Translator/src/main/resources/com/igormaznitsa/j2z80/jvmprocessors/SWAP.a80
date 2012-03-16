@@ -1,0 +1,5 @@
+; 095 SWAP
+    POP HL
+    POP BC
+    PUSH HL
+    PUSH BC

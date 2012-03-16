@@ -1,0 +1,4 @@
+; 42,43,44,45 ALOAD -> ref
+    LD C,(IX-%index%)
+    LD B,(IX-%index%+1)
+    PUSH BC

@@ -1,0 +1,5 @@
+; 198 IFNULL
+    POP BC
+    LD A,C
+    OR B
+    JP Z,%address%

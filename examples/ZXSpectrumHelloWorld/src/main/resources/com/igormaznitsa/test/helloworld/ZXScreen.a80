@@ -1,0 +1,32 @@
+BORDCR: EQU #5C48
+ATTR_P: EQU #5C8D
+
+com.igormaznitsa.test.helloworld.ZXScreen.setBorderColor#[I]V:
+    LD A,(IX-0)
+    AND 7
+    OUT (#FE),A
+    RET
+
+com.igormaznitsa.test.helloworld.ZXScreen.setTextColor#[II]V:
+    LD B,(IX-0) ; ink color
+    LD C,(IX-2) ; paper color
+    LD A,C
+    AND 7
+    RLCA
+    RLCA
+    RLCA
+    LD C,A
+    LD A,B
+    AND 7
+    OR C
+    LD (ATTR_P),A
+    LD (BORDCR),A
+    RET
+
+com.igormaznitsa.test.helloworld.ZXScreen.clearWholeScreen#[]V:
+    CALL #0D6B
+    RET
+
+com.igormaznitsa.test.helloworld.ZXScreen.clearServiceScreen#[]V:
+    CALL #0D6E
+    RET

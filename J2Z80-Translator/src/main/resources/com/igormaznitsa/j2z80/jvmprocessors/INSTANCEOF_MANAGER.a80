@@ -1,0 +1,100 @@
+;-----------------------------------------------------------
+___INSTANCE_OF: ; BC - object to be checked, DE - class id for check compatibility, BC is 0 if false and 1 if true
+    CLRLOC
+    PUSH DE
+    PUSH AF
+    PUSH HL
+
+    LD A,B
+    OR C
+    JP NZ,@INSTANCEOF_NOTNULL
+    LD BC,0
+    JP @INSTANCEOF_END
+
+@INSTANCEOF_NOTNULL:
+    LD HL,___INSTANCEOF_TABLE
+
+    CALL ___GET_OBJECT_CLASS_ID ; now in BC  the class ID
+    
+    PUSH BC ; save the checking object class id on the stack
+
+    LD B,(HL) ; load the number of "instanceof" records into B
+    INC HL
+
+@INSTANCEOF_FIND_CLASSID_LOOP:
+    ; find the class id in the compatibility table
+    LD A,(HL)
+    INC HL
+    CP E
+    JP Z,@INSTANCE_ROWS_CHECKD
+    INC HL ; skip the next byte
+    JP @INSTANCEOF_NOT_SAME_ID
+
+@INSTANCE_ROWS_CHECKD:
+    LD A,(HL)
+    INC HL
+    CP D
+    JP Z,@INSTANCEOF_RIGHT_ID
+
+@INSTANCEOF_NOT_SAME_ID:
+    ; skip records from the row
+    LD A,(HL) ; A contains column number
+    INC HL
+    PUSH DE
+    LD D,0
+    LD E,A
+    SLA E
+    RL D 
+    ADD HL,DE ; now HL points to the next row
+    POP DE
+    
+    DJNZ @INSTANCEOF_FIND_CLASSID_LOOP
+    
+    ; we have not found the class id, so it false
+    POP BC ; remove the class id from the stack
+    LD BC,#0000 ; make result false
+    JP @INSTANCEOF_END ; to the end
+    
+@INSTANCEOF_RIGHT_ID: ; we found the row for th class id in DE, now we must sequently check all cells
+    POP DE ; now DE contains the Class ID  of checked object
+    LD B,(HL) ; number of columns into B
+    INC HL
+
+@INSTANCEOF_FIND_CLASSID_CELL:
+    LD A,(HL)
+    INC HL
+    CP E
+    JP Z,@INSTANCEOF_FIND_CLASSID_CELL_CHECKD
+    INC HL ; skip the next byte
+    JP @INSTANCEOF_FIND_CLASSID_CELL_ENDLOOP
+
+@INSTANCEOF_FIND_CLASSID_CELL_CHECKD:
+    LD A,(HL)
+    INC HL
+    CP D
+    JP Z,@INSTANCEOF_SUCH_CELL_FOUND 
+    
+@INSTANCEOF_FIND_CLASSID_CELL_ENDLOOP:
+    DJNZ @INSTANCEOF_FIND_CLASSID_CELL
+ 
+   ; such cell is not found
+    LD BC,0
+    JP @INSTANCEOF_END
+
+@INSTANCEOF_SUCH_CELL_FOUND:
+    LD BC,1
+
+@INSTANCEOF_END:
+    POP HL
+    POP AF
+    POP DE
+    RET
+;--------------------------------------------------
+; records about class compatibilities, 
+; byte number of records 
+; record []{
+;   byte number_of_ancestors   
+;   word [] class_id 
+; }
+___INSTANCEOF_TABLE: 
+    %instanceoftable%

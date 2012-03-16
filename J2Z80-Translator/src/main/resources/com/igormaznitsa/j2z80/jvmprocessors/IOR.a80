@@ -1,0 +1,10 @@
+; 128 IOR a1 a2 -> result
+    POP BC
+    POP HL
+    LD A,B
+    OR H
+    LD B,A
+    LD A,C
+    OR L
+    LD C,A
+    PUSH BC

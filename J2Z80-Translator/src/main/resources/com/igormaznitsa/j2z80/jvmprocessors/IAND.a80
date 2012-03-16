@@ -1,0 +1,11 @@
+; 126 IAND val1 val2 -> result
+    POP BC
+    POP HL
+    LD A,B
+    AND H
+    LD B,A
+    LD A,C
+    AND L
+    LD C,A
+    PUSH BC
+

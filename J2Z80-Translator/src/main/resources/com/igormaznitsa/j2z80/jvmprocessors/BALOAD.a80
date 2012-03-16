@@ -1,0 +1,8 @@
+; 51 BALOAD arrayref,index -> value
+    POP BC ; index
+    POP HL ; array pointer
+    ADD HL,BC ; make the cell address
+    LD A,(HL); data
+    LD C,A
+    LD B,0
+    PUSH BC; place the data on stack

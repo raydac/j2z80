@@ -1,0 +1,2 @@
+; The stack must contains the address of the code which is throwing the exception
+___ATHROW_PROCESSING_CODE_ADDRESS: DEFW #0000 ; address of processing code, in ZX-Spectrum it will work like RESET

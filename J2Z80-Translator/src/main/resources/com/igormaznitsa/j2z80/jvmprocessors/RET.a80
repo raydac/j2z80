@@ -1,0 +1,4 @@
+; 169 RET
+    LD L,(IX-%index%)
+    LD H,(IX-%index%+1)
+    JP (HL)

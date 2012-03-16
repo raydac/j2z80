@@ -1,0 +1,5 @@
+; 192 CHECKCAST objref -> objref
+    POP BC
+    LD DE,%id%
+    CALL %address%
+    PUSH BC

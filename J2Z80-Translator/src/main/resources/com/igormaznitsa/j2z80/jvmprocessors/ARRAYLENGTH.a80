@@ -1,0 +1,5 @@
+; 190 ARRAYLENGTH arrayref -> length
+    POP BC
+    CALL %address% ; get length of the array and place it in BC
+    PUSH BC
+

@@ -1,0 +1,8 @@
+; 158 IFLE value ->
+    POP BC
+    BIT 7,B
+    JP NZ,%address%
+    LD A,B
+    OR C
+    JP Z,%address%
+

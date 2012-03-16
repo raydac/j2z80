@@ -1,0 +1,4 @@
+; 156 IFGE value ->
+    POP BC
+    BIT 7,B
+    JP Z,%address%

@@ -1,0 +1,2 @@
+; 195 MONITOREXIT objref ->
+    POP BC ; just drop the ref from the stack because single thread model

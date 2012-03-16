@@ -1,0 +1,2 @@
+    ORG 6000
+SOME_LABEL:

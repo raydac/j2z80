@@ -1,0 +1,3 @@
+; 01 ACONST_NULL  ->  null
+    LD BC,0
+    PUSH BC

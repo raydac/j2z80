@@ -1,0 +1,18 @@
+___CHECKCAST:  ; check that object in BC can be cast to the class whose id in DE, if it is impossible then an exception will be thrown
+    CLRLOC
+    PUSH BC
+    CALL ___INSTANCE_OF
+    LD A,C
+    OR A
+    JP Z,@CHECKCAST_THROWEXCEPTION
+    POP BC
+    RET
+
+@CHECKCAST_THROWEXCEPTION:
+    POP BC ; remove BC from stack, the return address has been left on the stack
+    POP HL
+    PUSH BC
+    PUSH HL
+    LD HL,(___ATHROW_PROCESSING_CODE_ADDRESS)
+    JP (HL)
+

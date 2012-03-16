@@ -1,0 +1,26 @@
+; 182 INVOKEVIRTUAL
+    CLRLOC
+
+    ; get class id for the objectref
+    LD HL,%objrefoffset%
+    ADD HL,SP ; the objref address in HL
+
+    LD C,(HL) ; load the objref into BC
+    INC HL
+    LD B,(HL)
+
+    CALL ___GET_OBJECT_CLASS_ID ; get the class id into BC
+
+    LD HL,%recordaddress%
+    CALL __PREPAREINVOKEVIRTUAL ; HL contains record address start, BC contains object class id
+
+    ; HL contains address and BC contains the full frame size in bytes
+    LD (@INVOKE_JMP+1),HL
+    LD A,%argumentarealen% ; load argument area length in bytes
+
+    CALL ___BEFORE_INVOKE ; prepare the frame
+
+@INVOKE_JMP:
+    CALL 0
+    CALL ___AFTER_INVOKE ; restore the previous frame
+    %postfix%

@@ -1,0 +1,6 @@
+; 84 BASTORE  arrayref, index, value ->
+    POP DE ; value
+    POP BC ; index
+    POP HL ; array pointer
+    ADD HL,BC ; make the cell address
+    LD (HL),E; write data

@@ -1,0 +1,3 @@
+; 178 GETSTATIC
+    LD BC,(%address%)
+    PUSH BC

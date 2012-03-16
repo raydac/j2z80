@@ -1,0 +1,242 @@
+___INT_MATH_MUL: ;in BC and DE, out BC, BC = BC*DE
+    CLRLOC
+    PUSH AF
+    PUSH HL
+    PUSH DE
+
+    ; check for zero
+    LD A,D
+    OR E
+    JP Z,@MUL_IS_ZERO
+    LD A,B
+    OR C
+    JP Z,@MUL_IS_ZERO
+    JP @RECOGNIZE_RESULT_SIGN
+
+@MUL_IS_ZERO:
+    LD BC,0
+    JP @MUL_END
+
+@RECOGNIZE_RESULT_SIGN:    ; recognize the result sign 
+    XOR A ; result sign into A
+    BIT 7,B
+    JP Z,@CHECK_SIGN_DL
+    LD A,#FF ; save the negative sign into A    
+
+    CALL ___INT_MATH_NEG ; BC is negative, make it positive
+
+@CHECK_SIGN_DL:
+
+    BIT 7,D
+    JP Z,@CHECK_BIGGER
+    XOR #FF 
+    PUSH BC ; DE is negative
+    PUSH DE
+    POP BC
+    CALL ___INT_MATH_NEG
+    PUSH BC
+    POP DE
+    POP BC
+
+@CHECK_BIGGER:
+    CALL ___INT_MATH_UNSIGNED_SORT2 ; bigger in BC, smaller in DE
+
+    PUSH AF
+    LD HL,0
+@MUL_LOOP:
+    ADD HL,BC
+
+    DEC DE
+    LD A,D
+    OR E
+
+    JP NZ,@MUL_LOOP
+
+    LD B,H ; HL to BC
+    LD C,L
+
+    POP AF
+    ; set sign to the result
+    OR A
+    JP Z,@MUL_END ; result is positive
+    CALL ___INT_MATH_NEG ; negative result
+
+@MUL_END:
+    POP DE
+    POP HL
+    POP AF
+    RET
+;--------------------------------------------------------------
+___INT_MATH_DIV: ;BC - divident, DE - divisor
+    PUSH AF
+    PUSH HL
+
+    LD A,D
+    OR E
+    JP Z,@DIVISOR_IS_ZERO
+
+    LD A,B
+    OR C
+    JP Z, @DIV_END
+    
+; recognize the result sign
+    XOR A
+    BIT 7,B
+    JR Z,@CHECK_DIVISOR_SIGN
+    LD A,#FF
+    CALL ___INT_MATH_NEG ; NEG BC
+
+@CHECK_DIVISOR_SIGN:
+    BIT 7,D
+    JR Z,@CALC_DIV
+    XOR #FF
+
+    PUSH BC ; NEG DE
+    PUSH DE
+    POP BC
+    CALL ___INT_MATH_NEG 
+    PUSH BC
+    POP DE
+    POP BC
+
+@CALC_DIV:
+    LD L,C
+    LD H,B
+    CALL ___INT_MATH_UNSIGNED_DIV
+
+    ; correct the result sign
+    OR A
+    JP Z,@DIV_END
+    CALL ___INT_MATH_NEG
+    JP @DIV_END
+
+@DIVISOR_IS_ZERO:
+    ; arithmetic exception
+    POP AF ; clear stack
+    LD HL,(___ATHROW_PROCESSING_CODE_ADDRESS)
+    JP (HL)
+
+@DIV_END:
+    POP HL
+    POP AF
+    RET
+
+;--------------------------------------------------------------
+___INT_MATH_REM:
+    CLRLOC
+    PUSH AF
+    PUSH HL
+
+    LD A,D
+    OR E
+    JP Z,@DIVISOR_IS_ZERO
+
+    LD A,B
+    OR C
+    JP Z, @REM_END
+    
+; recognize the result sign
+    XOR A
+    BIT 7,B
+    JR Z,@CHECK_DIVISOR_SIGN
+    LD A,#FF
+    CALL ___INT_MATH_NEG ; NEG BC
+
+@CHECK_DIVISOR_SIGN:
+    BIT 7,D
+    JR Z,@CALC_REM
+
+    PUSH BC ; NEG DE
+    PUSH DE
+    POP BC
+    CALL ___INT_MATH_NEG 
+    PUSH BC
+    POP DE
+    POP BC
+
+@CALC_REM:
+    LD L,C
+    LD H,B
+    CALL ___INT_MATH_UNSIGNED_DIV
+    LD B,H
+    LD C,L
+
+    ; correct the result sign
+    OR A
+    JP Z,@REM_END
+    CALL ___INT_MATH_NEG
+    JP @REM_END
+
+@DIVISOR_IS_ZERO:
+    ; arithmetic exception
+    POP AF ; clear stack
+    LD HL,(___ATHROW_PROCESSING_CODE_ADDRESS)
+    JP (HL)
+
+@REM_END:
+    POP HL
+    POP AF
+    RET
+;--------------------------------------------------------------
+___INT_MATH_UNSIGNED_DIV: ;in HL - divident, DE - divisor, out BC - result,HL - remain
+    CLRLOC
+    PUSH AF
+
+    XOR A
+    LD B,A
+    LD C,A
+
+@INSIDE_UDIV_LOOP:
+    SBC HL,DE
+    INC BC
+    JP NC,@INSIDE_UDIV_LOOP
+    DEC BC
+    ADD HL,DE
+    
+    POP AF
+
+    RET
+
+;--------------------------------------------------------------
+
+___INT_MATH_NEG: ;in BC, out BC
+    PUSH AF
+    LD A,B
+    CPL
+    LD B,A
+    LD A,C
+    CPL
+    LD C,A
+    INC BC
+    POP AF
+    RET
+;--------------------------------------------------------------
+
+___INT_MATH_UNSIGNED_SORT2: ;in BC and DE, bigger in BC smaller in DE
+    CLRLOC
+    PUSH AF
+    
+    LD A,B
+    CP D
+    JR C,@BC_LESS_THAN_DE
+    LD A,D
+    CP B
+    JR C,@DE_LESS_THAN_BC
+
+    LD A,C
+    CP E
+    JR C,@BC_LESS_THAN_DE
+    LD A,E
+    CP C
+    JR C,@DE_LESS_THAN_BC
+
+    JP @DE_LESS_THAN_BC
+
+@BC_LESS_THAN_DE:
+    PUSH DE
+    PUSH BC
+    POP DE
+    POP BC
+@DE_LESS_THAN_BC:
+    POP AF
+    RET

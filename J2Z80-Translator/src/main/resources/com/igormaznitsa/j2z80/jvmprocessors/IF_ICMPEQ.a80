@@ -1,0 +1,6 @@
+; 159 IF_ICMPEQ value1, value2 -> (value1 == value2)
+    POP BC
+    POP HL
+    OR A
+    SBC HL,BC
+    JP Z,%address%

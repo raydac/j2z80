@@ -1,0 +1,19 @@
+    ORG #1000
+    CLRLOC
+    POP HL
+    LD (@RETADDR),HL
+    POP HL
+    LD (@TMPTXT),HL
+    POP HL
+    LD (@TMPCH),HL
+    LD A,(@TMPCH)
+    CALL 5633
+    LD DE,(@TMPTXT)
+    LD BC,10
+    CALL 8252
+    LD HL,(@RETADDR)
+    PUSH HL
+    RET
+@RETADDR: DEFW 0 
+@TMPCH: DEFW 0 
+@TMPTXT: DEFW 0 

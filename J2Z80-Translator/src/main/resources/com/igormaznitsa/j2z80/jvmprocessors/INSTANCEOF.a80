@@ -1,0 +1,6 @@
+; 193 INSTANCEOF objref -> result [0|1]
+    POP BC
+    LD DE,%id%
+    CALL ___INSTANCE_OF
+    PUSH BC
+

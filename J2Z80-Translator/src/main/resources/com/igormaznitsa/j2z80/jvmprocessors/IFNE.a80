@@ -1,0 +1,5 @@
+; 154 IFNE value -> 
+    POP BC
+    LD A,B
+    OR C
+    JP NZ,%address%

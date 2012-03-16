@@ -1,0 +1,9 @@
+; 145 I2B int -> byte
+   CLRLOC
+    POP HL
+    XOR A
+    LD H,A
+    BIT 7,L
+    JR Z,@BACK
+    LD H,#FF
+@BACK: PUSH HL

@@ -1,0 +1,4 @@
+; 184 INVOKESTATIC
+    %prefix%
+    CALL %address%
+    %postfix%

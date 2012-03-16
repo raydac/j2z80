@@ -1,0 +1,3 @@
+; 176 ARETURN objref ->
+    POP BC
+    RET

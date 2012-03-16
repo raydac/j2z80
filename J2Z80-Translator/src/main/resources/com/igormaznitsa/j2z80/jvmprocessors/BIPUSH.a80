@@ -1,0 +1,3 @@
+; 16 BIPUSH -> value
+    LD BC,%value%
+    PUSH BC

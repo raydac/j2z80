@@ -1,0 +1,30 @@
+; 185 INVOKEINTERFACE
+    CLRLOC
+
+    ; get class id for the objectref
+    LD HL,%objrefoffset%
+    ADD HL,SP ; the objref address in HL
+
+    LD C,(HL) ; load the objref into BC
+    INC HL
+    LD B,(HL)
+
+    CALL ___GET_OBJECT_CLASS_ID ; get the class id into BC
+
+    LD H,B
+    LD L,C
+    LD DE,%id%
+    CALL __PREPAREINVOKEINTERFACE ; HL contains class id, DE contains interface method id
+
+    ; HL contains address and DE contains the full frame size in bytes
+    LD (@INVOKE_JMP+1),HL
+    LD C,E
+    LD B,D
+    LD A,%value%
+
+    CALL ___BEFORE_INVOKE ; prepare the frame
+
+@INVOKE_JMP:
+    CALL 0
+    CALL ___AFTER_INVOKE ; restore the previous frame
+    %postfix%

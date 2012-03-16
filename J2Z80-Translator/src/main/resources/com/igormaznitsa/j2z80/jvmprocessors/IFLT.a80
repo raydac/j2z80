@@ -1,0 +1,5 @@
+; 155 IFLT value ->
+    POP BC
+    BIT 7,B
+    JP NZ,%address%
+

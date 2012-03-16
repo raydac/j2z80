@@ -1,0 +1,18 @@
+com.igormaznitsa.memory.MemoryAccessor.writeWordToMemory#[II]V:
+    LD H,(IX-0+1) ; address into HL
+    LD L,(IX-0)
+    LD B,(IX-2+1) ; value into BC
+    LD C,(IX-2)
+    
+    LD (HL),C ; write value into the cells
+    INC HL
+    LD (HL),B
+    RET
+
+com.igormaznitsa.memory.MemoryAccessor.readWordFromMemory#[I]I:
+    LD H,(IX-0+1)
+    LD L,(IX-0)
+    LD C,(HL)
+    INC HL
+    LD B,(HL)
+    RET

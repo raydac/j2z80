@@ -1,0 +1,8 @@
+; 181 PUTFIELD objref, value ->
+    POP BC ; value into BC
+    POP HL ; objref into HL
+    LD DE,%address% ; offset into DE
+    ADD HL,DE
+    LD (HL),C
+    INC HL
+    LD (HL),B

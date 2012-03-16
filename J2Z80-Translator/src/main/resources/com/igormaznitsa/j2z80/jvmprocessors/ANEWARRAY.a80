@@ -1,0 +1,6 @@
+; 189 ANEWARRAY count -> arrayref
+    POP BC ; element number in BC pair
+    CALL %address%
+    PUSH BC ; place the reference to the first array element
+
+

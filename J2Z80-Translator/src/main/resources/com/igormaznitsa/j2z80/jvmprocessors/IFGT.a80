@@ -1,0 +1,10 @@
+; 157 IFGT value ->
+    CLRLOC
+    POP BC
+    BIT 7,B
+    JP NZ,@IFGTNOT
+    LD A,B
+    OR C
+    JP NZ,%address%
+@IFGTNOT:
+    

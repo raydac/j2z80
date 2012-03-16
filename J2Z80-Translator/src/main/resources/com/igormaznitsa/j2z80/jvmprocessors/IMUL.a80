@@ -1,0 +1,6 @@
+; 104 IMUL val1, val2 -> result
+    POP BC
+    POP DE
+    CALL %address%
+    PUSH BC
+

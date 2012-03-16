@@ -1,0 +1,9 @@
+; 180 GETFIELD objref -> value
+    POP HL ; objref into HL
+    LD DE,%address% ; offset into DE
+    ADD HL,DE
+    LD C,(HL)
+    INC HL
+    LD B,(HL)
+    PUSH BC
+

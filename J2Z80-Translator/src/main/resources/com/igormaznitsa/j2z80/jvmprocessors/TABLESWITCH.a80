@@ -1,0 +1,47 @@
+; 170 TABLESWITCH index ->
+    CLRLOC
+    POP BC
+; check low index
+    LD HL,%lowindex%
+    LD E,C
+    LD D,B
+    EX DE,HL
+    AND A
+    SBC HL,DE
+    JP P,@___TABLESWITCH_SSET0
+    JP PO,%default%
+    JR @___TABLESWITCH_CHECKHIGH
+@___TABLESWITCH_SSET0:
+    JP PE,%default%
+
+; check high index
+@___TABLESWITCH_CHECKHIGH:
+    LD HL,%highindex%
+    AND A
+    SBC HL,BC
+    JP P,@___TABLESWITCH_SSET1
+    JP PO,%default%
+    JR @___TABLESWITCH_PROCESS
+@___TABLESWITCH_SSET1:
+    JP PE,%default%
+
+@___TABLESWITCH_PROCESS:
+    ; calculate address cell
+    LD DE,%lowindex%
+    LD H,B
+    LD L,C
+    AND A
+    SBC HL,DE
+    EX DE,HL
+    LD HL,@___TABLESWITCH_ADDRTABLE 
+    SLA E
+    RL D
+    ADD HL,DE
+    LD E,(HL)
+    INC HL
+    LD D,(HL)
+    EX DE,HL
+    JP (HL)
+
+@___TABLESWITCH_ADDRTABLE:
+

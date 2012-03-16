@@ -1,0 +1,35 @@
+; 171 LOOKUPSWITCH index -->
+    CLRLOC
+    POP BC
+    LD HL,@___LOOKUPSWITCHTABLE
+    LD A,%value%
+@___LOOKUPSWITCHLOOP:
+    
+    LD E,(HL)
+    INC HL
+    LD D,(HL)
+    INC HL
+
+    EX DE,HL
+    OR A
+    SBC HL,BC
+    JR NZ,@___LOOKUPSWITCHNOEQU
+    
+    EX DE,HL
+    LD E,(HL)
+    INC HL
+    LD D,(HL)
+    EX DE,HL
+
+    JP (HL)
+@___LOOKUPSWITCHNOEQU:
+    EX DE,HL
+    INC HL
+    INC HL
+
+    DEC A
+    JP NZ,@___LOOKUPSWITCHLOOP
+    JP %address%
+
+@___LOOKUPSWITCHTABLE:
+    

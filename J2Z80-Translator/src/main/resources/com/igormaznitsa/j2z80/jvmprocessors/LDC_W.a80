@@ -1,0 +1,3 @@
+; 19 LDC_W
+    LD BC,%address%
+    PUSH BC

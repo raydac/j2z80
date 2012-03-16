@@ -1,0 +1,18 @@
+___BREAKPOINT_PROCESSING_CODE_ADDRESS: DEFW ___BREAKPOINT_PROCESSING_STUB ; address of breakpoint processing code
+___BREAKPOINT_PROCESSING_STUB : RET
+___BREAKPOINT_PROCESSING_MANAGER : 
+        PUSH BC
+        PUSH HL
+        LD BC,(___BREAKPOINT_PROCESSING_CODE_ADDRESS)
+        LD (@CALL_BREAK_PROCESSOR+1),BC
+@CALL_BREAK_PROCESSOR:
+        CALL 0 ; dynamic modifying call address
+        POP HL
+        POP BC
+        INC HL
+        INC HL
+        INC HL
+        INC HL
+        INC HL
+        INC HL
+        JP (HL) ; jump to the next command after the break block

@@ -1,0 +1,6 @@
+; 187 NEW -> objref
+    LD BC,%value% ; place the object cell number into BC
+    LD DE,%id% ; place the object class id into DE
+    CALL %address% ; create byte array with the size
+    PUSH BC ; place the array reference on the stack
+

@@ -1,0 +1,5 @@
+; 153 IFEQ value ->
+    POP BC
+    LD A,B
+    OR C
+    JP Z,%address%

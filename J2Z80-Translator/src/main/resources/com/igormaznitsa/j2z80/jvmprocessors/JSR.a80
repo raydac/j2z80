@@ -1,0 +1,5 @@
+; 168 JSR --> address
+    LD BC,$+3
+    PUSH BC
+    JP %address%
+

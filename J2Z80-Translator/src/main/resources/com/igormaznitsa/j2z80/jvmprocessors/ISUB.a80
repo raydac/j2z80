@@ -1,0 +1,6 @@
+; 100 ISUB val1 val2 -> result
+    POP BC
+    POP HL
+    XOR A
+    SBC HL,BC
+    PUSH HL

@@ -1,0 +1,6 @@
+; 096 IADD val1 val2 -> result
+    POP BC
+    POP HL
+    ADD HL,BC
+    PUSH HL
+

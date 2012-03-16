@@ -1,0 +1,5 @@
+; 75,76,77,78 ASTORE objref ->
+    POP BC
+    LD (IX-%index%),C
+    LD (IX-%index%+1),B
+

@@ -1,0 +1,5 @@
+; 59,60,61,62 ISTORE int ->
+    POP BC
+    LD (IX-%index%),C
+    LD (IX-%index%+1),B
+

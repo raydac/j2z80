@@ -1,0 +1,4 @@
+; 089 DUP value -> value,value
+    POP BC
+    PUSH BC
+    PUSH BC

@@ -1,0 +1,7 @@
+; 092 DUP2 value1,value2 -> value1, value2, value1, value2
+    POP BC
+    POP HL
+    PUSH HL
+    PUSH BC
+    PUSH HL
+    PUSH BC

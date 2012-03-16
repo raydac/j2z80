@@ -1,0 +1,4 @@
+; 179 PUTSTATIC value ->
+    POP BC
+    LD (%address%),BC
+

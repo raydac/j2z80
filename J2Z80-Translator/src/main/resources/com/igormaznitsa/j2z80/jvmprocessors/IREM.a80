@@ -1,0 +1,6 @@
+; 112 IREM val1, val2 -> result
+    POP DE
+    POP BC
+    CALL %address%
+    PUSH BC
+

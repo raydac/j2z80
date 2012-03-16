@@ -1,0 +1,5 @@
+; 199 IFNONNULL
+   POP BC
+   LD A,C
+   OR B
+   JP NZ,%address%

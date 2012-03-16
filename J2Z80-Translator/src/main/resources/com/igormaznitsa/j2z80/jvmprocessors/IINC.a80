@@ -1,0 +1,7 @@
+; 132 IINC
+    LD L,(IX-%index%)
+    LD H,(IX-%index%+1)
+    LD BC,%value%
+    ADD HL,BC
+    LD (IX-%index%),L
+    LD (IX-%index%+1),H

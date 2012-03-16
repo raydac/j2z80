@@ -1,0 +1,127 @@
+    CLRLOC
+
+__PREPAREINVOKEINTERFACE: ; (in) HL has the class id, DE has the interface method id -> (out) HL - method address, DE - frame size in bytes, exception will be thrown if not found
+    PUSH BC
+    PUSH AF
+    
+    JP @FIND_METHOD_IN_TABLE
+
+@FIND_EXIT: ; BC and A changed, HL has address id DE has frame size
+    LD A,H ; check that the method address is not null
+    OR L
+    JP Z,@THROW_EXCEPTION
+
+    POP AF
+    POP BC
+
+    RET
+
+@THROW_EXCEPTION: ; address on the stack already   
+    POP AF
+    POP BC
+    LD HL,(___ATHROW_PROCESSING_CODE_ADDRESS)
+    JP (HL)
+
+@FIND_METHOD_IN_TABLE: ; BC and A in changing, (in)HL - class id, DE - interface-method id -> (out) HL - method address (0 if not found), (out) DE - frame size in bytes
+    PUSH HL
+    
+    LD HL,___INVOKEINTERFACE_DATA_TABLE
+    
+    LD B,(HL) ; B contains number of interfaces
+    INC HL
+
+@FIND_INTERFACEMETHOD:
+    LD A,(HL) ; check the interface method id
+    INC HL  
+    CP E
+    JP Z, @CHECK_INTERFACEMETHOD2
+    INC HL ; skip the rest
+    JP @SKIP_INTERFACEMETHOD
+
+@CHECK_INTERFACEMETHOD2:    
+    LD A,(HL)
+    INC HL
+    CP D
+    JP Z, @INTERFACEMETHOD_FOUND
+    
+@SKIP_INTERFACEMETHOD:
+    LD A,B
+    
+    LD B,0
+    LD C,(HL)
+    SLA C
+    RL B
+    INC HL
+
+    ADD HL,BC ; skip all data for the interface
+    ADD HL,BC
+    ADD HL,BC
+
+    LD B,A
+
+    DJNZ @FIND_INTERFACEMETHOD
+
+    ; interface is not found
+    POP HL ; drop the stack top
+    LD HL,0
+    JP @FIND_EXIT
+
+@INTERFACEMETHOD_FOUND:
+    POP DE ; class id into DE
+
+    LD B,(HL)
+    INC HL
+
+@FIND_METHODADDR:
+    
+    LD A,(HL)
+    INC HL
+    CP E
+    JP Z,@CHECK_METHOD2
+    INC HL
+    JP @SKIP_METHOD_DATA
+
+@CHECK_METHOD2:
+    LD A,(HL)
+    INC HL
+    CP D
+    JP Z,@METHOD_FOUND
+
+@SKIP_METHOD_DATA:
+    INC HL
+    INC HL
+    INC HL
+    INC HL
+
+    DJNZ @FIND_METHODADDR
+
+@METHOD_NOT_FOUND:
+    LD HL,0
+    JP @FIND_EXIT
+
+@METHOD_FOUND:
+    LD E,(HL)
+    INC HL
+    LD D,(HL)
+    INC HL
+    LD C,(HL)
+    INC HL
+    LD B,(HL)
+    
+    EX DE,HL
+    LD D,B
+    LD E,C
+    
+    JP @FIND_EXIT
+
+
+; The table contains all addresses for each interface implementing method 
+; of each class which can be called through INVOKEINTERFACE
+; (byte) number_of_records
+; (word) interface_method_id
+; (byte) number_of_records for the interface
+; triplet [number_of_records]
+; triplet { (word) class_id (word) method_adress (word) max_locals_for_method }
+  
+___INVOKEINTERFACE_DATA_TABLE:
+    %invokeinterfacetable%

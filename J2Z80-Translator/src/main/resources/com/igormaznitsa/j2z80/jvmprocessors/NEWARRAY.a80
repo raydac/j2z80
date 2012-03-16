@@ -1,0 +1,5 @@
+; 188 NEWARRAY elements -> address
+    POP BC
+    CALL %address%
+    PUSH BC
+

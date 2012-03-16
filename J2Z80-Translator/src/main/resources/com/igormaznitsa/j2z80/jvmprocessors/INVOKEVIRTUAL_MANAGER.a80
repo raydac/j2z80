@@ -1,0 +1,54 @@
+    CLRLOC
+
+__PREPAREINVOKEVIRTUAL: ; (in) HL has the record start address, BC has the object class id -> (out) HL - method address, BC - frame size in bytes, exception will be thrown if not found
+    PUSH DE
+    PUSH BC ; put the object class id onto the stack
+    POP DE  ; now DE contains the object class id
+
+    LD B,(HL)
+    INC HL
+    
+@FIND_LOOP:
+    LD A,(HL)
+    INC HL
+    CP E
+    JP Z,@CHECKPART2
+    INC HL ; skip the rest
+    JP @ENDCHECK
+    
+@CHECKPART2:
+    LD A,(HL)
+    INC HL
+    CP D
+    JP Z,@FOUND
+
+@ENDCHECK:
+    INC HL ; skip the record rest
+    INC HL
+    INC HL
+    INC HL
+    DJNZ @FIND_LOOP
+
+@FOREWER_LOOP_IF_NOT_FOUND: JR @FOREWER_LOOP_IF_NOT_FOUND ; it's an error situation shows that the compiler works by a wrong way
+
+@FOUND:
+    LD E,(HL) ; load the method address into DE
+    INC HL
+    LD D,(HL)
+    INC HL
+    LD C,(HL) ; load frame size into BC
+    INC HL
+    LD B,(HL)
+    EX DE,HL ; HL contains the method address
+    
+    POP DE ; restore DE from the stack
+
+    RET
+
+; The table contains all addresses for each interface implementing method 
+; of each class which can be called through INVOKEVIRTUAL
+; (byte) number_of_records for the method
+; triplet [number_of_records]
+; triplet { (word) class_id (word) method_address (word) max_locals_for_method }
+  
+    %invokevirtualtable%

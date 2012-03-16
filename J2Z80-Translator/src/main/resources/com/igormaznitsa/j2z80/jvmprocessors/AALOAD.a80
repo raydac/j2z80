@@ -1,0 +1,12 @@
+; 50 AALOAD (arrayref, index -> value)
+    POP BC ; index
+    POP HL ; array pointer
+    SLA C  ; BC<<1
+    RL B
+    ADD HL,BC ; make the cell address
+    LD A,(HL); low byte
+    LD C,A 
+    INC HL
+    LD  A,(HL); high byte
+    LD B,A
+    PUSH BC; place the cell data on stack

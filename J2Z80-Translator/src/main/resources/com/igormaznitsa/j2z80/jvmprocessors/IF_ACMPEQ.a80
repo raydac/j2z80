@@ -1,0 +1,6 @@
+; 165 IF_ACMPEQ ref1 ref2 -> (ref1 == ref2)
+    POP BC
+    POP HL
+    OR A
+    SBC HL,BC
+    JP Z,%address%

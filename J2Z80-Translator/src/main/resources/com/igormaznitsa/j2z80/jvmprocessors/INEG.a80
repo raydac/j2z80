@@ -1,0 +1,11 @@
+; 116 INEG x -> y (y = ~x+1)
+    POP BC
+    LD A,B
+    CPL
+    LD B,A
+    LD A,C
+    CPL
+    LD C,A
+    INC BC
+    PUSH BC
+   

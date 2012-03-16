@@ -1,0 +1,6 @@
+; 160 IF_ICMPNE val1 val2 -> (val1 != val2)
+    POP BC
+    POP HL
+    OR A
+    SBC HL,BC
+    JR NZ,%address%

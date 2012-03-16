@@ -1,0 +1,5 @@
+; 191 ATHROW objref -> objref
+    LD HL,$
+    PUSH HL
+    LD HL,(%address%)
+    JP (HL)

@@ -1,0 +1,14 @@
+; 120 ISHL val1 val2 -> result (result = val1 << val2)
+   CLRLOC
+    POP BC
+    POP HL
+    LD A,C
+    OR A
+    JR Z,@ISHLOOPEND
+    LD B,A
+@ISHLLOOP:
+    SLA L
+    RL H
+    DJNZ @ISHLLOOP
+@ISHLOOPEND:
+    PUSH HL

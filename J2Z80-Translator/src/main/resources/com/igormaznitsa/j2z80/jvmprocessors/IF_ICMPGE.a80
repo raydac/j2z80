@@ -1,0 +1,12 @@
+; 162 IF_ICMPGE value1, value2 -> (value1>=value2)
+    CLRLOC
+    POP BC
+    POP HL
+    AND A
+    SBC HL,BC
+    JP M,@IF_ICMPGE_S
+    JP PO,%address%
+    JR @IF_ICMPGE_END
+@IF_ICMPGE_S:
+    JP PE,%address%
+@IF_ICMPGE_END:

@@ -1,0 +1,303 @@
+___BEFORE_INVOKE: ; (in) A - arguments length in bytes, (in)BC - needed full stack frame size in bytes, (out) IX - the start of the frame
+    LD HL,0
+    ADD HL,SP ; HL equ SP
+
+    LD D,0
+    LD E,A
+    ADD HL,DE ; HL is the first argument
+    
+    LD D,H ; DE contains the first element address
+    LD E,L
+    
+    AND A
+    SBC HL,BC ; HL shows on the first not used cell after frame
+    POP BC ; return address in BC
+
+    LD SP,HL ; load the SP by the new value
+    PUSH IX ; place the old IX value on the stack
+
+    PUSH DE ; load IX the new frame top address
+    POP IX 
+
+    PUSH BC ; place the return address on the stack
+    RET
+;-----------------------------------------------------------
+___AFTER_INVOKE: ; restore IX
+    POP DE ; the return address in DE
+    POP HL ; the old IX in the HL
+    LD SP,IX ; write in SP the first cell
+    
+    INC SP
+    INC SP
+
+    PUSH HL
+    POP IX ; the old IX restored
+    
+    PUSH DE ; the return address restored
+    RET
+;-----------------------------------------------------------
+___MEMORY_ALLOCATE_OBJECT: ; BC - size in cells, DE - class id, the address in BC
+    PUSH HL
+    PUSH DE
+
+    LD HL,(___MEMORY_MANAGER_TOP_POINTER) ; the first two bytes is the size in cells (each cell takes two bytes)
+    LD (HL),C
+    INC HL
+    LD (HL),B
+    INC HL
+
+    LD (HL),E ; the second two bytes contain the class ID
+    INC HL
+    LD (HL),D
+    INC HL
+
+    LD D,H ; save the first cell address of the new object into DE
+    LD E,L
+
+    SLA C ; allocate memory area for object fields
+    RL B
+    ADD HL,BC
+    LD (___MEMORY_MANAGER_TOP_POINTER),HL ; save the new memory top address into the system variable
+
+    LD B,D ; save the first cell address into BC
+    LD C,E
+
+    POP DE
+    POP HL
+    RET
+;-----------------------------------------------------------
+___GET_OBJECT_CLASS_ID: ; the object address (the first cell address) in BC, the Class ID in BC
+    PUSH HL
+    LD H,B
+    LD L,C
+    DEC HL
+    LD B,(HL)
+    DEC HL
+    LD C,(HL)
+    POP HL
+    RET
+;-----------------------------------------------------------
+___GET_OBJECT_SIZE: ; the object address (the first cell address) in BC, the size in BC
+    PUSH HL
+    LD H,B
+    LD L,C
+    DEC HL
+    DEC HL
+    DEC HL
+    LD B,(HL)
+    DEC HL
+    LD C,(HL)
+    POP HL
+    RET
+;-----------------------------------------------------------
+___MEMORY_ALLOCATE_WORDARRAY: ; BC element number, first byte size (2), second word is length, then data, the address in BC
+    PUSH HL
+    PUSH DE
+
+    LD HL,(___MEMORY_MANAGER_TOP_POINTER)
+    LD (HL),2
+    INC HL
+
+    LD (HL),C
+    INC HL
+    LD (HL),B
+    INC HL
+
+    LD E,L ; save the first element address into DE
+    LD D,H
+
+    SLA C
+    RL B
+    ADD HL,BC
+
+    LD (___MEMORY_MANAGER_TOP_POINTER),HL
+
+    LD C,E
+    LD B,D
+
+    POP DE
+    POP HL
+    RET
+;-----------------------------------------------------------
+___MEMORY_ALLOCATE_BYTEARRAY: ; BC element number, first byte size (1), second word is length, then data, the address in BC
+    PUSH HL
+    PUSH DE
+
+    LD HL,(___MEMORY_MANAGER_TOP_POINTER)
+    LD (HL),2
+    INC HL
+
+    LD (HL),C
+    INC HL
+    LD (HL),B
+    INC HL
+
+    LD E,L
+    LD D,H
+
+    ADD HL,BC
+
+    LD (___MEMORY_MANAGER_TOP_POINTER),HL
+
+    LD C,E
+    LD B,D
+
+    POP DE
+    POP HL
+    RET
+;-----------------------------------------------------------
+___MEMORY_MAKE_WORD_MULTIARRAY: ; BC - number of dimensions on the stack, when return BC contains the array address
+    CLRLOC
+    
+    POP HL ; save the return address into the local memory cell
+    LD (@___RETURN_ADDRESS_SAVE),HL
+
+    LD B,C ; no more than 128 dimensions
+    
+    DEC C ; calculate offset in words to the first dimension
+    SLA C 
+
+    XOR A  ; load the C into DE
+    LD D,A
+    LD E,C
+
+    LD HL,0
+    ADD HL,SP ; SP in HL
+    XOR A
+    ADD HL,DE ; get the first dimension count address on the stack into HL
+
+    CALL ___RECURSIVE_MAKEARRAYS ; make the root array, HL points to the first dimension cell, B contains number of dimensions (>=1)
+    
+    LD DE,(@___RETURN_ADDRESS_SAVE) ; restore the return address into the first dimension describing cell to drop all data from the stack
+    INC HL
+    INC HL
+    LD SP,HL
+    PUSH DE
+    RET
+
+@___RETURN_ADDRESS_SAVE:
+    DEFW 0
+
+___RECURSIVE_MAKEARRAYS: ; HL dimensions pointer, B number of dimensions, (out)BC contains the array tree address
+    PUSH AF
+    PUSH DE
+    PUSH HL
+
+    LD E,(HL) ; load the dimension size into DE
+    INC HL
+    LD D,(HL)
+    DEC HL  ; correct HL  because we work with stack pointer which grows to lower addresses
+    DEC HL
+    DEC HL
+
+    PUSH DE ; save the dimension size on the stack
+    PUSH BC ; save the dimensions number on the stack
+    
+    LD C,E  ; place dimension size into BC
+    LD B,D
+    
+    CALL ___MEMORY_ALLOCATE_WORDARRAY ; allocate new array
+
+    LD D,B ; save the array address of the new array into DE
+    LD E,C
+
+    POP BC ; if there is not any child (B == 0) then end
+    DEC B
+    JR NZ,@FILL_BY_CHILDREN
+    
+    ; it is the last dimension and we should break recursion
+    LD B,D ; array address into BC
+    LD C,E
+    POP DE ; drop array size from the stack
+    JR @END
+
+@FILL_BY_CHILDREN: ; fill the array by its children
+    LD A,B ; save current dimension index into A
+    POP BC ;  load current dimension size into BC
+    PUSH DE ; save the array address on the stack to avoid its change
+    PUSH DE ; save the array address on the stack one more time, it will be changed
+    
+    PUSH BC ; place the array size on the stack
+    POP DE  ; load the array size into DE, the array address on the stack
+
+@MAKE_LOOP: ; A contains the current dimension index
+    LD B,A ; restore the dimension index into B, HL already contains the cell address
+    CALL ___RECURSIVE_MAKEARRAYS ; create a child array, the result address in BC
+    
+    EX (SP),HL ; the current address into HL
+
+    LD (HL),C ; save generated array address into the array cell
+    INC HL
+    LD (HL),B
+    INC HL
+
+    EX (SP),HL ; the address saved on the stack top, the dimension address in the HL again
+
+    DEC DE ; decrease number of cells to be filled by new arrays
+    
+    INC D
+    DEC D
+    JR NZ,@MAKE_LOOP
+    INC E
+    DEC E
+    JR NZ,@MAKE_LOOP
+    
+    POP BC ; remove the end array address from the stack
+    POP BC ; get the array address into BC
+
+@END:
+    POP HL
+    POP DE
+    POP AF
+    RET
+
+;-----------------------------------------------------------
+___MEMORY_GET_ARRAY_LENGTH: ; BC - first array element address, element number in BC
+    PUSH HL
+    LD L,C
+    LD H,B
+    DEC HL
+    LD B,(HL)
+    DEC HL
+    LD C,(HL)
+    POP HL
+    RET
+;-----------------------------------------------------------
+___MEMORY_GET_ARRAY_SIZE: ; BC - first array element address, size in bytes in BC
+    PUSH IX
+    PUSH AF
+    PUSH BC
+    POP IX
+    
+    LD B,(IX-1)
+    LD C,(IX-2)
+    
+    LD A,1
+    CP (IX-3)
+    JP Z,___MEMORY_GET_ARRAY_SIZE_IN_BYTES_BYTEARRAY
+    SLA C
+    SLA B
+___MEMORY_GET_ARRAY_SIZE_IN_BYTES_BYTEARRAY:
+
+    POP AF
+    POP IX
+    RET
+
+___MEMORY_GET_FREE_MEMORY: ; get the free memory size in bytes, the result in BC
+    PUSH HL
+    PUSH DE
+    LD HL,0
+    ADD HL,SP
+    LD DE,(___MEMORY_HEAP_START_AREA)
+    AND A
+    SBC HL,DE
+    LD C,L
+    LD B,H
+    POP DE
+    POP HL
+    RET
+;-----------------------------------------------------------
+___MEMORY_MANAGER_TOP_POINTER:
+    DEFW ___MEMORY_HEAP_START_AREA
+
+___MEMORY_HEAP_START_AREA: EQU $ ; the area where we will place new objects

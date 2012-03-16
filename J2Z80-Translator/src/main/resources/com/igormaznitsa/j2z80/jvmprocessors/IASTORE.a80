@@ -1,0 +1,10 @@
+; 79 IASTORE arrayref index value ->
+    POP DE ; value
+    POP BC ; index
+    POP HL ; array pointer
+    SLA C  ; BC<<1
+    RL B
+    ADD HL,BC ; make the cell address
+    LD (HL),E; low byte
+    INC HL
+    LD  (HL),D; high byte

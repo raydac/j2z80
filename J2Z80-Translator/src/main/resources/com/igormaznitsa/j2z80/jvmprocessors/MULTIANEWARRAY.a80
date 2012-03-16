@@ -1,0 +1,5 @@
+; 197 MULTIANEWARRAY dim1, dim2, dim3 .. dimN -> address
+    LD BC, %value%
+    CALL %address%
+    PUSH BC
+

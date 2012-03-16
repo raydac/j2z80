@@ -1,0 +1,6 @@
+; 146 I2C int -> char (int is 16 bit, char is 8 bit)
+    POP HL
+    XOR A
+    LD H,A
+    PUSH HL
+

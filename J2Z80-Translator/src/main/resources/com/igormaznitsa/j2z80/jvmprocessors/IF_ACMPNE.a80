@@ -1,0 +1,6 @@
+; 166 IF_ACMPNE ref1 ref2 -> (ref1 != ref2)
+    POP BC
+    POP HL
+    OR A
+    SBC HL,BC
+    JP NZ,%address%

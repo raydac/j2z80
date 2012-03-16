@@ -1,0 +1,4 @@
+; 17 SIPUSH -> short
+    LD BC,%value%
+    PUSH BC
+

@@ -1,0 +1,10 @@
+; 130 IXOR a1 a2 -> res
+    POP BC
+    POP HL
+    LD A,B
+    XOR H
+    LD B,A
+    LD A,C
+    XOR L
+    LD C,A
+    PUSH BC

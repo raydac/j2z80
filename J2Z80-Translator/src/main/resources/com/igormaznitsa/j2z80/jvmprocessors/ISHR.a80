@@ -1,0 +1,14 @@
+; 122 ISHR
+  CLRLOC
+    POP BC
+    POP HL
+    LD A,C
+    OR A
+    JR Z,@ISHRLOOPEND
+    LD B,A
+@ISHRLOOP:
+    SRA H
+    RR L
+    DJNZ @ISHRLOOP
+@ISHRLOOPEND:
+    PUSH HL

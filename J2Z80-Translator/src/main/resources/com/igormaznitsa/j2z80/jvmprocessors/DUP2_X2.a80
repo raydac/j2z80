@@ -1,0 +1,11 @@
+; 094 DUP2_X2 value4, value3, value2, value1 -> value2, value1, value4, value3, value2, value1
+    POP BC
+    POP HL
+    POP DE
+    POP AF
+    PUSH HL
+    PUSH BC
+    PUSH AF
+    PUSH DE
+    PUSH HL
+    PUSH BC
