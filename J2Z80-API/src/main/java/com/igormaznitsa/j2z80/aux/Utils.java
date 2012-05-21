@@ -18,23 +18,34 @@
  */
 package com.igormaznitsa.j2z80.aux;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import org.springframework.util.AntPathMatcher;
 
 public final class Utils {
 
-    private Utils(){
+    private Utils() {
     }
-       
-    public static final String NEXT_LINE = "\r\n";    
-        
-    public static void silentlyClose(final Closeable closeableOne){
+    public static final String NEXT_LINE = "\r\n";
+
+    public static void silentlyClose(final Closeable closeableOne) {
         try {
             closeableOne.close();
-        }catch(IOException ex){
+        } catch (IOException ex) {
         }
     }
-    
+
     public static String[] readTextFileAsStringArray(final File file, final String charSet) throws IOException {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charSet));
         final List<String> readString = new ArrayList<String>(256);
@@ -52,10 +63,10 @@ public final class Utils {
         return readString.toArray(new String[readString.size()]);
     }
 
-    public static String [] breakToLines(final String text){
+    public static String[] breakToLines(final String text) {
         return text.split("\\n");
     }
-    
+
     public static String readTextResource(final Class<?> thisClass, final String resource) throws IOException {
         final InputStream file = thisClass.getResourceAsStream(resource);
         if (file == null) {
@@ -72,62 +83,94 @@ public final class Utils {
                 builder.append(line).append(NEXT_LINE);
             }
             return builder.toString();
-        }
-        finally {
+        } finally {
             silentlyClose(reader);
         }
 
     }
 
-
-    public static String[] concatStringArrays(final String [] ... arrays) {
+    public static String[] concatStringArrays(final String[]... arrays) {
         Assert.assertNotNull("Concatenated arrays must not contain null", (Object[]) arrays);
         final List<String> result = new ArrayList<String>();
-        for(final String [] arg : arrays) {
-            for(final String s: arg){
+        for (final String[] arg : arrays) {
+            for (final String s : arg) {
                 result.add(s);
             }
         }
-        return result.toArray(new String [result.size()]);
+        return result.toArray(new String[result.size()]);
     }
 
     public static String intToString(final int value) {
         final StringBuilder result = new StringBuilder();
-        
+
         result.append(value).append("(#").append(Integer.toHexString(value).toUpperCase()).append(')');
-        
+
         return result.toString();
     }
-    
+
     public static String longToString(final long value) {
         final StringBuilder result = new StringBuilder();
-        
+
         result.append(value).append("(#").append(Long.toHexString(value).toUpperCase()).append(')');
-        
+
         return result.toString();
     }
-    
+
     public static String arrayToHexString(final byte[] machineCode) {
         final StringBuilder result = new StringBuilder();
         result.append('[');
         boolean space = false;
-        for(final byte b : machineCode){
-            if (space){
+        for (final byte b : machineCode) {
+            if (space) {
                 result.append(' ');
             } else {
                 space = true;
             }
-            
+
             final String byteAsHex = Integer.toHexString(b & 0xFF).toUpperCase();
-            
+
             result.append('#');
-            if (byteAsHex.length()==1){
+            if (byteAsHex.length() == 1) {
                 result.append('0');
             }
             result.append(byteAsHex);
         }
         result.append(']');
-        
+
         return result.toString();
+    }
+
+    public static String[] byteArrayToAsm(final String firstLine, final byte[] array, final int maxNumbersPerString) {
+
+        final StringBuilder buffer = new StringBuilder(firstLine == null ? "" : firstLine);
+        if (firstLine!=null){
+            buffer.append("\n");
+        }
+        final int maxPerString = maxNumbersPerString <= 0 ? 32 : maxNumbersPerString;
+        int len = array.length;
+        int index = 0;
+        while (len > 0) {
+            int stringIntemCounter = 0;
+            buffer.append("DEFB ");
+            while (len > 0 && stringIntemCounter < maxPerString) {
+                if (stringIntemCounter > 0) {
+                    buffer.append(',');
+                }
+                buffer.append('#').append(Integer.toHexString(array[index++] & 0xFF).toUpperCase(Locale.ENGLISH));
+
+                stringIntemCounter++;
+                len--;
+            }
+            buffer.append('\n');
+        }
+
+        return breakToLines(buffer.toString());
+    }
+    
+    private static final AntPathMatcher ANT_MATCHER = new AntPathMatcher();
+    
+    public static boolean checkPathForAntPattern(final String path, final String antPattern){
+        String newPath = path.startsWith("/") ? path : '/'+path;   
+        return ANT_MATCHER.match(antPattern.toLowerCase(Locale.ENGLISH), newPath.toLowerCase(Locale.ENGLISH));
     }
 }

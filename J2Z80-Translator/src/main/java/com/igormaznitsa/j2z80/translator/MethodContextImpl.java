@@ -39,7 +39,7 @@ class MethodContextImpl implements MethodContext {
 
         final List<MethodID> methodsToProcess = new ArrayList<MethodID>();
 
-        for (final ClassGen c : theTranslator.workingArchive.getClasses().values()) {
+        for (final ClassGen c : theTranslator.workingClassPath.getAllClasses().values()) {
             for (final Method m : c.getMethods()) {
                 final MethodID methodId = new MethodID(c, m);
                 methodIds.put(methodId, new ClassMethodInfo(c, m, methodIdCounter));
@@ -89,11 +89,11 @@ class MethodContextImpl implements MethodContext {
     
     public ClassMethodInfo findInheritedMethod(final MethodID method) {
         final String className = method.getClassName();
-        ClassGen cgen = theTranslator.workingArchive.findClassForName(className);
+        ClassGen cgen = theTranslator.workingClassPath.findClassForName(className);
         if (cgen == null) {
             return null;
         }
-        cgen = theTranslator.workingArchive.findClassForName(cgen.getSuperclassName());
+        cgen = theTranslator.workingClassPath.findClassForName(cgen.getSuperclassName());
 
         while (cgen != null) {
             final Method compatibleMethod = method.findCompatibleMethod(cgen);
@@ -101,7 +101,7 @@ class MethodContextImpl implements MethodContext {
                 final MethodID thatMethodId = new MethodID(cgen, compatibleMethod);
                 return methodIds.get(thatMethodId);
             }
-            cgen = theTranslator.workingArchive.findClassForName(cgen.getSuperclassName());
+            cgen = theTranslator.workingClassPath.findClassForName(cgen.getSuperclassName());
         }
         return null;
     }

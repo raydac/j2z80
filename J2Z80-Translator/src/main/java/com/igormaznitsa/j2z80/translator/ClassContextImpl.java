@@ -1,9 +1,15 @@
 package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.ClassContext;
-import com.igormaznitsa.j2z80.ids.*;
-import java.util.*;
+import com.igormaznitsa.j2z80.ids.ClassID;
+import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 
@@ -20,7 +26,7 @@ class ClassContextImpl implements ClassContext {
     void init(){
         int classIdCounter = 0;
 
-        for (final ClassGen c : theTranslator.workingArchive.getClasses().values()) {
+        for (final ClassGen c : theTranslator.workingClassPath.getAllClasses().values()) {
             final ClassID classId = new ClassID(c);
             final ClassMethodInfo classInfo = new ClassMethodInfo(c, null, classIdCounter);
             classIds.put(classId, classInfo);
@@ -62,7 +68,7 @@ class ClassContextImpl implements ClassContext {
         final ClassGen classGen = findClassForID(new ClassID(interfaceName));
         if (classGen.isInterface()) {
 
-            for (final ClassGen cgen : theTranslator.workingArchive.getClasses().values()) {
+            for (final ClassGen cgen : theTranslator.workingClassPath.getAllClasses().values()) {
                 for (final String name : cgen.getInterfaceNames()) {
                     if (interfaceName.equals(name)) {
                         if (cgen.isInterface()) {
@@ -111,7 +117,7 @@ class ClassContextImpl implements ClassContext {
                 return true;
             }
 
-            tmpClassGen = theTranslator.workingArchive.findClassForName(superCName);
+            tmpClassGen = theTranslator.workingClassPath.findClassForName(superCName);
         }
         return false;
     }
@@ -135,7 +141,7 @@ class ClassContextImpl implements ClassContext {
     @Override
     public List<String> findAllClassSuccessors(final String className) {
         final List<String> result = new ArrayList<String>();
-        for (final ClassGen cls : theTranslator.workingArchive.getClasses().values()) {
+        for (final ClassGen cls : theTranslator.workingClassPath.getAllClasses().values()) {
             if (className.equals(cls.getClassName())) {
                 continue;
             }

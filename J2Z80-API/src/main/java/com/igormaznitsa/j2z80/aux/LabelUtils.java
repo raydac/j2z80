@@ -18,10 +18,16 @@
  */
 package com.igormaznitsa.j2z80.aux;
 
-import com.igormaznitsa.j2z80.ids.*;
+import com.igormaznitsa.j2z80.ids.ClassID;
+import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
+import com.igormaznitsa.j2z80.ids.MethodID;
 import java.util.jar.JarEntry;
 import org.apache.bcel.classfile.JavaClass;
-import org.apache.bcel.generic.*;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.FieldGen;
+import org.apache.bcel.generic.MethodGen;
+import org.apache.bcel.generic.ObjectType;
+import org.apache.bcel.generic.Type;
 
 public enum LabelUtils {
 
@@ -67,6 +73,9 @@ public enum LabelUtils {
         final StringBuilder result = new StringBuilder(str.length());
         for (final char chr : str.toCharArray()) {
             switch (chr) {
+                case '/':
+                    result.append('.');
+                    break;
                 case '(':
                     result.append('[');
                     break;
@@ -158,5 +167,9 @@ public enum LabelUtils {
 
     public static int calculateFrameSizeForMethod(final int argNumber, final int maxLocals, final boolean isStatic) {
         return (Math.max(argNumber, maxLocals) + (isStatic ? 0 : 1)) << 1;
+    }
+    
+    public static String makeLabelForBinaryResource(final String path){
+        return "BINDATA_"+normalizeString(path);
     }
 }

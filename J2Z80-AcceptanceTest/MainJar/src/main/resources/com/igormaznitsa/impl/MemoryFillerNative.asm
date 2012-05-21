@@ -1,4 +1,4 @@
-com.igormaznitsa.impl.MemoryFillerNative.fillArea#[Lcom/igormaznitsa/j2z80test/MainSAbstractTemplateGenjII]V:
+com.igormaznitsa.impl.MemoryFillerNative.fillArea#[Lcom.igormaznitsa.j2z80test.MainSAbstractTemplateGenjII]V:
     CLRLOC
 
     LD D,(IX-2+1) ; address of the AbstractTemplateGenerator object

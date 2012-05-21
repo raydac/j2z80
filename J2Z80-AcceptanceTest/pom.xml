@@ -5,74 +5,19 @@
     <parent>
         <groupId>com.igormaznitsa.j2z80</groupId>
         <artifactId>J2Z80-Project</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <asmFile>${project.build.directory}/source.a80</asmFile>
-    </properties>
-
     <artifactId>J2Z80-AcceptanceTest</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>The Acceptance Test for the J2Z80 Translator</name>
     <description>The Acceptance Test to check work of the J2Z80 translator in a real environment</description>
     
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>J2Z80-Translator</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>translate2z80</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <startAddress>29000</startAddress>
-                    <stackTop>60000</stackTop>
-                    <logAsmText>true</logAsmText>
-                    <asmOutFile>${asmFile}</asmOutFile>
-                </configuration>
-            </plugin>
- 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12</version>
-                <configuration>
-                    <excludes>
-                        <exclude>*/**/*ITCase.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin> 
- 
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.12</version>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <systemPropertyVariables>
-                        <translatedBinFile>${project.build.directory}/${project.artifactId}-${project.version}.bin</translatedBinFile>
-                        <asmFile>${asmFile}</asmFile>
-                    </systemPropertyVariables>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            
-        </plugins>
-    </build>
+    <modules>
+        <module>MainJar</module>
+        <module>ExtJar</module>
+    </modules>        
     
 </project>

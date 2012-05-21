@@ -1,10 +1,23 @@
 package com.igormaznitsa.j2z80;
 
-import com.igormaznitsa.j2z80.aux.*;
+import com.igormaznitsa.j2z80.aux.Assert;
+import com.igormaznitsa.j2z80.aux.Utils;
 import com.igormaznitsa.j2z80.translator.TranslatorImpl;
 import com.igormaznitsa.z80asm.Z80Asm;
-import java.io.*;
-import org.apache.maven.plugin.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -14,7 +27,8 @@ import org.apache.maven.project.MavenProject;
  * @phase install 
  * @threadSafe 
  * @requiresProject
- *
+ * @requiresDependencyResolution compile
+ * 
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
@@ -27,6 +41,16 @@ public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
      * @readonly
      */
     private MavenProject project;
+
+    /**
+     * Local Maven repository where artifacts are cached during the build process.
+     *
+     * @parameter default-value="${localRepository}"
+     * @required
+     * @readonly
+     */
+    private ArtifactRepository localRepository;
+
     /**
      * JAR File
      *
@@ -77,6 +101,29 @@ public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
      */
     private File asmOutFile;
 
+    /**
+     * Patterns to be used to exclude binary resources from result compilation. Patterns use ANT style.
+     *
+     * @parameter name="excludeResources"
+     */
+    private String [] excludeResources;
+    
+    public void setExcludeResources(final String [] resources){
+        this.excludeResources = resources;
+    }
+    
+    public String [] getExcludeResources(){
+        return this.excludeResources;
+    }
+    
+    public ArtifactRepository getLocalRepository() {
+        return localRepository;
+    }
+
+    public void setLocalRepository(final ArtifactRepository localRepository) {
+        this.localRepository = localRepository;
+    }
+
     public void setLogAsmText(final boolean flag){
         this.logAsmText = flag;
     }
@@ -110,11 +157,16 @@ public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
+            File [] classPath = getCompilationDependencies();
+            
+            classPath = Arrays.copyOf(classPath, classPath.length+1);
+            classPath[classPath.length-1] = jarFile;
+            
             logInfo("The result file format : " + format);
             logInfo("The result file name : " + resultFile.getName());
 
-            final TranslatorContext translator = new TranslatorImpl(jarFile, this);
-            final String[] translatedAsmText = translator.translate(null, startAddress, stackTop);
+            final TranslatorContext translator = new TranslatorImpl(this, classPath);
+            final String[] translatedAsmText = translator.translate(null, startAddress, stackTop, getExcludeResources());
 
             if (logAsmText) {
                 int lineIndex = 1;
@@ -153,6 +205,19 @@ public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
         }
     }
 
+    private File [] getCompilationDependencies(){
+        final List<File> dependencyList = new ArrayList<File>();
+        for(final Artifact arty : project.getDependencyArtifacts()){
+                if ("z80".equalsIgnoreCase(arty.getClassifier())){
+                    final Artifact art = localRepository.find(arty);
+                    logInfo("Detected Z80 dependency :"+art.getFile().getAbsolutePath());
+                    dependencyList.add(art.getFile());
+                }
+        }
+        
+        return dependencyList.toArray(new File[dependencyList.size()]);
+    }
+    
     private void saveResultAsBin(final byte[] data) throws IOException {
         logInfo("Save the binary result as BIN file");
         final OutputStream out = new FileOutputStream(resultFile);

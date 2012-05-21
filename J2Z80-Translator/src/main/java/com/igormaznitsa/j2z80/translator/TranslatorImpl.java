@@ -18,26 +18,50 @@
  */
 package com.igormaznitsa.j2z80.translator;
 
-import com.igormaznitsa.j2z80.*;
-import com.igormaznitsa.j2z80.api.additional.*;
-import com.igormaznitsa.j2z80.aux.*;
+import com.igormaznitsa.j2z80.ClassContext;
+import com.igormaznitsa.j2z80.MethodContext;
+import com.igormaznitsa.j2z80.TranslatorContext;
+import com.igormaznitsa.j2z80.TranslatorLogger;
+import com.igormaznitsa.j2z80.api.additional.AdditionPath;
+import com.igormaznitsa.j2z80.api.additional.J2ZAdditionalBlock;
+import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEINTERFACEManager;
+import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEVIRTUALManager;
+import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
+import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
+import com.igormaznitsa.j2z80.aux.Assert;
+import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.Utils;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
-import com.igormaznitsa.j2z80.ids.*;
-import com.igormaznitsa.j2z80.jvmprocessors.*;
-import com.igormaznitsa.j2z80.translator.aux.*;
-import com.igormaznitsa.j2z80.translator.jar.ZJarArchive;
-import java.io.*;
+import com.igormaznitsa.j2z80.ids.ClassID;
+import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
+import com.igormaznitsa.j2z80.ids.MethodID;
+import com.igormaznitsa.j2z80.jvmprocessors.AbstractJvmCommandProcessor;
+import com.igormaznitsa.j2z80.jvmprocessors.Processor_INVOKESTATIC;
+import com.igormaznitsa.j2z80.translator.aux.ClassUtils;
+import com.igormaznitsa.j2z80.translator.aux.InstanceofTable;
+import com.igormaznitsa.j2z80.translator.aux.InvokeinterfaceTable;
+import com.igormaznitsa.j2z80.translator.aux.InvokevirtualTable;
+import com.igormaznitsa.j2z80.translator.aux.MethodUtils;
+import com.igormaznitsa.j2z80.translator.jar.ZClassPath;
+import com.igormaznitsa.j2z80.translator.jar.ZParsedJar;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.*;
-import java.util.jar.JarEntry;
-import org.apache.bcel.classfile.*;
-import org.apache.bcel.generic.*;
+import org.apache.bcel.classfile.Constant;
+import org.apache.bcel.classfile.ConstantInteger;
+import org.apache.bcel.classfile.ConstantUtf8;
+import org.apache.bcel.classfile.Field;
+import org.apache.bcel.classfile.Method;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.INVOKESTATIC;
+import org.apache.bcel.generic.MethodGen;
 
 @SuppressWarnings("serial")
 public class TranslatorImpl implements TranslatorContext{
 
-    final ZJarArchive workingArchive;
-
+    final ZClassPath workingClassPath;
+    
     private final ClassContextImpl classContext = new ClassContextImpl(this);
     private final MethodContextImpl methodContext = new MethodContextImpl(this);
     
@@ -49,9 +73,11 @@ public class TranslatorImpl implements TranslatorContext{
     private final Set<AbstractBootClass> usedBootstrapClassese = new HashSet<AbstractBootClass>();
     private final Map<String, Constant> classPoolConstants = new HashMap<String, Constant>();
     private final Set<ClassID> classesForCheckcast = new HashSet<ClassID>();
-
+    private String [] excludeResourcePatterns;
+    
+    
     public ClassGen findOverridenMethodOnPath(final String className, final String superClassName, final MethodGen method) {
-        ClassGen classGen = workingArchive.findClassForName(className);
+        ClassGen classGen = workingClassPath.findClassForName(className);
         while (classGen != null) {
             if (superClassName.equals(classGen.getClassName())) {
                 return null;
@@ -61,21 +87,29 @@ public class TranslatorImpl implements TranslatorContext{
                     return classGen;
                 }
             }
-            classGen = workingArchive.findClassForName(classGen.getSuperclassName());
+            classGen = workingClassPath.findClassForName(classGen.getSuperclassName());
         }
         return null;
     }
 
-    public TranslatorImpl(final File jarFile, final TranslatorLogger logger) throws IOException {
-        this.messageLogger = logger == null ? new DefaultTranslatorLogger() : logger;
-        workingArchive = new ZJarArchive(jarFile, Z80_MAIN_METHOD_NAME, Z80_MAIN_METHOD_SIGNATURE);
-
-        if (workingArchive.getClasses().isEmpty()) {
-            throw new IllegalArgumentException("The archive doesn't contain any class");
+    private ZParsedJar [] parseJars(final File ... jarFiles) throws IOException {
+        final ZParsedJar [] result = new ZParsedJar[jarFiles.length];
+        
+        int index=0;
+        for(final File jarFile : jarFiles){
+            result[index++] = new ZParsedJar(jarFile);
         }
+        
+        return result;
+    }
+    
+    public TranslatorImpl(final TranslatorLogger logger, final File ... jarArchives) throws IOException {
+        this.messageLogger = logger == null ? new DefaultTranslatorLogger() : logger;
+        
+        workingClassPath = new ZClassPath(this, parseJars(jarArchives));
 
-        if (workingArchive.getMainMethods().isEmpty()) {
-            throw new IllegalArgumentException("There is not any main-class in the archive");
+        if (workingClassPath.getAllClasses().isEmpty()) {
+            throw new IllegalArgumentException("The Class path doesn't have any class");
         }
 
         classContext.init();
@@ -100,7 +134,7 @@ public class TranslatorImpl implements TranslatorContext{
     }
 
     @Override
-    public String[] translate(final String mainClassName, final int startAddress, final int stackTop) throws IOException {
+    public String[] translate(final String mainClassName, final int startAddress, final int stackTop, final String [] patternsExcludeBinResources) throws IOException {
         reset();
 
         Assert.assertAddress(startAddress);
@@ -109,6 +143,8 @@ public class TranslatorImpl implements TranslatorContext{
         getLogger().logInfo("The Start address for translation :"+Utils.intToString(startAddress));
         getLogger().logInfo("The Stack Top address :"+Utils.intToString(stackTop));
         
+        
+        this.excludeResourcePatterns = patternsExcludeBinResources;
         
         final MethodID mainMethodID = findMainMethod(mainClassName);
 
@@ -144,6 +180,7 @@ public class TranslatorImpl implements TranslatorContext{
         processConstantPool(result);
         processJNIClasses(result);
         processIDs(result);
+        processBinaryData(result);
         processAdditionals(result);
 
         result.addAll(makeClassSizeArray());
@@ -210,8 +247,8 @@ public class TranslatorImpl implements TranslatorContext{
     }
 
     private void processClassFields(final List<String> out) {
-        for (final ClassGen currentClass : workingArchive.getClasses().values()) {
-            final List<Field> fieldList = ClassUtils.findAllFields(workingArchive,currentClass);
+        for (final ClassGen currentClass : workingClassPath.getAllClasses().values()) {
+            final List<Field> fieldList = ClassUtils.findAllFields(workingClassPath,currentClass);
             final String className = currentClass.getClassName();
             int offset = 0;
             for (final Field f : fieldList) {
@@ -253,11 +290,11 @@ public class TranslatorImpl implements TranslatorContext{
 
     private List<String> makeClassSizeArray() {
         final List<String> result = new ArrayList<String>();
-        for (final ClassGen curClass : workingArchive.getClasses().values()) {
+        for (final ClassGen curClass : workingClassPath.getAllClasses().values()) {
             if (curClass.isAbstract() || curClass.isInterface()) {
                 continue;
             }
-            result.add(LabelUtils.makeLabelForClassSizeInfo(curClass.getClassName()) + ": EQU " + ClassUtils.calculateNeededAreaForClassInstance(workingArchive,curClass));
+            result.add(LabelUtils.makeLabelForClassSizeInfo(curClass.getClassName()) + ": EQU " + ClassUtils.calculateNeededAreaForClassInstance(workingClassPath,curClass));
         }
 
         return result;
@@ -276,6 +313,42 @@ public class TranslatorImpl implements TranslatorContext{
         }
     }
 
+    private void processBinaryData(final List<String> text) throws IOException {
+        getLogger().logInfo("----PROCESS BINARY DATA----");
+        
+        for (final Entry<String, byte []> binaryData : workingClassPath.getAllBinaryResources().entrySet()) {
+           final String path = binaryData.getKey();
+           
+           // check for exclusion
+           if (excludeResourcePatterns!=null && excludeResourcePatterns.length>0){
+               String matchedPattern = null;
+               for(final String pattern : excludeResourcePatterns){
+                   if (Utils.checkPathForAntPattern(path, pattern)){
+                       matchedPattern = pattern;
+                       break;
+                   }
+               }
+               
+               if (matchedPattern!=null){
+                   getLogger().logWarning("Excluded "+path+" for "+matchedPattern+" pattern");
+                   continue;
+               }
+           }
+           
+           
+           final byte [] data = binaryData.getValue();
+           final String label = LabelUtils.makeLabelForBinaryResource(path);
+           
+           getLogger().logInfo("Added the binary resource "+path+" as "+label);
+           
+           final String[] asmtext = Utils.byteArrayToAsm(label + ": ; binary resource " + path, data, -1);
+           for(final String str : asmtext){
+               text.add(str);
+           }
+        }
+        
+    }
+    
     private void processAdditionals(final List<String> text) throws IOException {
         getLogger().logInfo("----PROCESS ADDITIONS----");
         boolean needMemoryManager = false;
@@ -346,34 +419,21 @@ public class TranslatorImpl implements TranslatorContext{
     }
 
     private MethodID findMainMethod(final String mainClassName) {
-        MethodID result = null;
-
-        final Map<ClassGen, Method> mainMethods = workingArchive.getMainMethods();
-        getLogger().logInfo("----FOUND MAIN METHODS---");
-        for (final Entry<ClassGen, Method> m : mainMethods.entrySet()) {
-            getLogger().logInfo("Main method at " + m.getKey().getClassName());
-        }
-
-        if (mainClassName == null) {
-            if (workingArchive.getMainMethods().size() == 1) {
-                for (final Entry<ClassGen, Method> entry : workingArchive.getMainMethods().entrySet()) {
-                    result = new MethodID(entry.getKey(), entry.getValue());
-                }
-            } else {
-                throw new IllegalStateException("The archive contains more than one main class so it must be defined explicitly");
-            }
+        if (mainClassName == null){
+            getLogger().logInfo("Use the first meet main-class");
         } else {
-            for (final Entry<ClassGen, Method> entry : workingArchive.getMainMethods().entrySet()) {
-                if (mainClassName.equals(entry.getKey().getClassName())) {
-                    result = new MethodID(entry.getKey(), entry.getValue());
-                    break;
-                }
-            }
-            if (result == null) {
-                throw new IllegalArgumentException("Can't find any main class for the name [" + mainClassName + ']');
-            }
+            getLogger().logInfo("Use the "+mainClassName+" as the main class");
         }
-        return result;
+        
+        if (workingClassPath.findMainClass(mainClassName, Z80_MAIN_METHOD_NAME, Z80_MAIN_METHOD_SIGNATURE) == null){
+            getLogger().logError("Can't find the main class");
+            throw new IllegalStateException("Can't find the main class");
+        }
+        
+        final ClassGen mainClass = workingClassPath.getMainClass();
+        final Method mainMethod = workingClassPath.getMainMethod();
+        
+        return new MethodID(mainClass, mainMethod);
     }
 
     @Override
@@ -406,12 +466,7 @@ public class TranslatorImpl implements TranslatorContext{
 
     @Override
     public byte[] loadResourceForPath(final String path) throws IOException {
-        final String normalizePath = path.replace('\\', '/');
-        final JarEntry entry = workingArchive.findEntryForPath(normalizePath);
-        if (entry != null && !entry.isDirectory()) {
-            return workingArchive.extractEntry(entry);
-        }
-        return null;
+        return workingClassPath.findNonClassForPath(path);
     }
 
     @Override

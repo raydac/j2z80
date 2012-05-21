@@ -19,7 +19,8 @@
 package com.igormaznitsa.j2z80;
 
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
-import com.igormaznitsa.j2z80.ids.*;
+import com.igormaznitsa.j2z80.ids.ClassID;
+import com.igormaznitsa.j2z80.ids.MethodID;
 import java.io.IOException;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.generic.Type;
@@ -28,7 +29,7 @@ public interface TranslatorContext {
     public static final String Z80_MAIN_METHOD_NAME = "mainz";
     public static final String Z80_MAIN_METHOD_SIGNATURE = Type.getMethodSignature(Type.VOID, new Type[0]);
 
-    String[] translate(String mainClassName, int startAddress, int stackTopAddress) throws IOException; 
+    String[] translate(String mainClassName, int startAddress, int stackTopAddress, String [] excludeBinResPatterns) throws IOException; 
 
     ClassContext getClassContext();
     MethodContext getMethodContext();

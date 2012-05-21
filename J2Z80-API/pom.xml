@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.igormaznitsa.j2z80</groupId>
         <artifactId>J2Z80-Project</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -18,4 +18,12 @@
 
     <name>API for the JVM To Z80 translator</name>
     <description>API for the Translator of JVM byte-codes into Z80 machine commands</description>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>3.1.1.RELEASE</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
 </project>

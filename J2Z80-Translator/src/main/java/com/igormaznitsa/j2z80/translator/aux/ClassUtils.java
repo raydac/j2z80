@@ -3,8 +3,11 @@ package com.igormaznitsa.j2z80.translator.aux;
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.api.additional.J2ZAdditionalBlock;
 import com.igormaznitsa.j2z80.ids.ClassID;
-import com.igormaznitsa.j2z80.translator.jar.ZJarArchive;
-import java.util.*;
+import com.igormaznitsa.j2z80.translator.jar.ZClassPath;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Field;
 import org.apache.bcel.generic.ClassGen;
@@ -13,13 +16,32 @@ public class ClassUtils {
     private ClassUtils(){
     }
 
-    public static List<Field> findAllFields(final ZJarArchive archive, final ClassGen classGen) {
+    public static final String [] ALLOWED_JNI_ASM_EXTENSIONS = new String[]{".z80",".a80",".asm"};
+    public static final String [] ALLOWED_JNI_BIN_EXTENSIONS = new String[]{".bin"};
+    
+    public static boolean isAllowedNativeSourceCodeName(final String name){
+        for(final String ext : ALLOWED_JNI_ASM_EXTENSIONS){
+            if (name.endsWith(ext)) return true;
+        }
+        return false;
+    }
+    
+    public static boolean isAllowedCompiledNativeCodeName(final String name){
+        for (final String ext : ALLOWED_JNI_BIN_EXTENSIONS) {
+            if (name.endsWith(ext)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static List<Field> findAllFields(final ZClassPath archive, final ClassGen classGen) {
         final List<Field> result = new ArrayList<Field>();
         _fillAllFields(archive, classGen, result);
         return result;
     }
     
-    private static void _fillAllFields(final ZJarArchive archive, final ClassGen classGen, final List<Field> result){
+    private static void _fillAllFields(final ZClassPath archive, final ClassGen classGen, final List<Field> result){
         for (final Field f : classGen.getFields()) {
             if (!f.isStatic()) {
                 result.add(f);
@@ -72,7 +94,7 @@ public class ClassUtils {
     }
 
 
-    public static int calculateNeededAreaForClassInstance(final ZJarArchive archive, final ClassGen classGen) {
+    public static int calculateNeededAreaForClassInstance(final ZClassPath classPath, final ClassGen classGen) {
         if (classGen.isInterface() || classGen.isEnum() || classGen.isAnnotation() || classGen.isAbstract()) {
             return 0;
         }
@@ -105,12 +127,12 @@ public class ClassUtils {
             return (fieldNumber << 1);
         }
 
-        final ClassGen superClassGen = archive.findClassForName(superClass);
+        final ClassGen superClassGen = classPath.findClassForName(superClass);
         if (superClassGen == null) {
             throw new IllegalStateException("Not found superclass " + superClass + " for " + classGen.getClassName());
         }
 
-        return (fieldNumber << 1) + calculateNeededAreaForClassInstance(archive,superClassGen);
+        return (fieldNumber << 1) + calculateNeededAreaForClassInstance(classPath,superClassGen);
     }
 
 }
