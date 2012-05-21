@@ -19,8 +19,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import java.io.*;
-import org.apache.bcel.generic.*;
+import java.io.IOException;
+import java.io.Writer;
+import org.apache.bcel.generic.AASTORE;
+import org.apache.bcel.generic.Instruction;
+import org.apache.bcel.generic.InstructionHandle;
 
 // class to process AASTORE with code 83
 public class Processor_AASTORE extends AbstractJvmCommandProcessor {

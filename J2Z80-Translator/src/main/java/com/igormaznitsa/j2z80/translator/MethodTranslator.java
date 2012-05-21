@@ -20,13 +20,22 @@ package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.Utils;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.jvmprocessors.AbstractJvmCommandProcessor;
-import com.igormaznitsa.j2z80.aux.Utils;
-import java.io.*;
-import java.util.*;
-import org.apache.bcel.classfile.*;
-import org.apache.bcel.generic.*;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.bcel.classfile.Constant;
+import org.apache.bcel.classfile.ConstantString;
+import org.apache.bcel.classfile.ConstantUtf8;
+import org.apache.bcel.generic.ConstantPoolGen;
+import org.apache.bcel.generic.Instruction;
+import org.apache.bcel.generic.InstructionHandle;
+import org.apache.bcel.generic.InstructionList;
+import org.apache.bcel.generic.InstructionTargeter;
+import org.apache.bcel.generic.MethodGen;
 
 public class MethodTranslator {
 

@@ -18,12 +18,22 @@
  */
 package com.igormaznitsa.j2z80.translator.aux;
 
-import com.igormaznitsa.j2z80.*;
+import com.igormaznitsa.j2z80.ClassContext;
+import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.aux.LabelUtils;
-import com.igormaznitsa.j2z80.ids.*;
-import java.util.*;
+import com.igormaznitsa.j2z80.ids.ClassID;
+import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
+import com.igormaznitsa.j2z80.ids.MethodID;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.bcel.classfile.Method;
-import org.apache.bcel.generic.*;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.MethodGen;
 
 public class InvokevirtualTable {
 

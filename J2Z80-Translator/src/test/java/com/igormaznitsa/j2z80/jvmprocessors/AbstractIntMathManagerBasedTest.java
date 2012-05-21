@@ -20,9 +20,12 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
 import com.igormaznitsa.j2z80.aux.Utils;
-import java.io.*;
-import org.apache.bcel.generic.*;
-import static org.junit.Assert.*;
+import java.io.IOException;
+import java.io.StringWriter;
+import org.apache.bcel.generic.Instruction;
+import org.apache.bcel.generic.InstructionHandle;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 public abstract class AbstractIntMathManagerBasedTest extends AbstractJvmCommandProcessorTest {

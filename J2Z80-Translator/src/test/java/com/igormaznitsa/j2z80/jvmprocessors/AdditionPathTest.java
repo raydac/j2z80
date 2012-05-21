@@ -18,7 +18,8 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.api.additional.*;
+import com.igormaznitsa.j2z80.api.additional.AdditionPath;
+import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 

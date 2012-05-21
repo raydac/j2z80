@@ -18,11 +18,18 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.*;
+import com.igormaznitsa.j2z80.aux.Assert;
+import com.igormaznitsa.j2z80.aux.Utils;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import java.io.*;
-import java.util.*;
-import org.apache.bcel.generic.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.bcel.generic.Instruction;
+import org.apache.bcel.generic.MethodGen;
 
 public abstract class AbstractJvmCommandProcessor {
 

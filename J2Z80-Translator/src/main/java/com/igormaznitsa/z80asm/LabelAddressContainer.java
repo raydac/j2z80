@@ -19,8 +19,10 @@
 package com.igormaznitsa.z80asm;
 
 import com.igormaznitsa.j2z80.aux.Assert;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.*;
+import java.util.Set;
 
 public class LabelAddressContainer {
     private boolean flagAllowReplace;

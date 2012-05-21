@@ -18,10 +18,14 @@
  */
 package com.igormaznitsa.j2z80.translator.aux;
 
-import com.igormaznitsa.j2z80.*;
+import com.igormaznitsa.j2z80.ClassContext;
+import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.aux.LabelUtils;
-import com.igormaznitsa.j2z80.ids.*;
-import java.util.*;
+import com.igormaznitsa.j2z80.ids.ClassID;
+import com.igormaznitsa.j2z80.ids.MethodID;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import org.apache.bcel.generic.MethodGen;
 
 @SuppressWarnings("serial")

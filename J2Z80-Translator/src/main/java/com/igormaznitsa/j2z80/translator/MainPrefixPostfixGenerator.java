@@ -18,8 +18,8 @@
  */
 package com.igormaznitsa.j2z80.translator;
 
-import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 
 public class MainPrefixPostfixGenerator {
     private final ClassMethodInfo method;

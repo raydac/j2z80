@@ -18,10 +18,14 @@
  */
 package com.igormaznitsa.j2z80.translator.aux;
 
-import com.igormaznitsa.j2z80.*;
+import com.igormaznitsa.j2z80.ClassContext;
+import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.aux.LabelUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.bcel.generic.ClassGen;
 
 public final class InstanceofTable {

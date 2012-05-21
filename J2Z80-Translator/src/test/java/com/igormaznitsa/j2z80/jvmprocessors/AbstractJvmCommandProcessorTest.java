@@ -18,19 +18,30 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.*;
-import com.igormaznitsa.j2z80.ids.*;
+import com.igormaznitsa.j2z80.ClassContext;
+import com.igormaznitsa.j2z80.MethodContext;
+import com.igormaznitsa.j2z80.TranslatorContext;
+import com.igormaznitsa.j2z80.TranslatorLogger;
+import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
+import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.z80asm.Z80Asm;
 import j80.cpu.Z80;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import javassist.bytecode.AccessFlag;
 import junit.framework.Assert;
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.*;
-import org.apache.bcel.generic.*;
-import static org.junit.Assert.*;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.ConstantPoolGen;
+import org.apache.bcel.generic.InstructionList;
+import org.apache.bcel.generic.MethodGen;
+import org.apache.bcel.generic.Type;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;

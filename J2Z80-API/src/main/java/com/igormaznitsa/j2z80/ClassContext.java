@@ -19,7 +19,8 @@
 package com.igormaznitsa.j2z80;
 
 import com.igormaznitsa.j2z80.ids.ClassID;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 import org.apache.bcel.generic.ClassGen;
 
 public interface ClassContext {

@@ -18,10 +18,12 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.api.additional.*;
+import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
+import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.aux.LabelUtils;
 import com.igormaznitsa.j2z80.aux.Utils;
-import java.io.*;
+import java.io.IOException;
+import java.io.StringWriter;
 import org.apache.bcel.generic.Type;
 
 public class AbstractInvokeTest extends AbstractJvmCommandProcessorTest implements NeedsMemoryManager, NeedsInstanceofManager {

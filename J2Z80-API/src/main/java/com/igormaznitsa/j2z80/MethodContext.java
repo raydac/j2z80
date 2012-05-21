@@ -18,7 +18,8 @@
  */
 package com.igormaznitsa.j2z80;
 
-import com.igormaznitsa.j2z80.ids.*;
+import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
+import com.igormaznitsa.j2z80.ids.MethodID;
 import org.apache.bcel.generic.MethodGen;
 
 public interface MethodContext {

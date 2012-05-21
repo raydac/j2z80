@@ -18,7 +18,8 @@
  */
 package com.igormaznitsa.j2z80.aux;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
 public class Assert {
 

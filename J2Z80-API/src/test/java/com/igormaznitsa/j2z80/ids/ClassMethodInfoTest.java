@@ -19,12 +19,17 @@
 package com.igormaznitsa.j2z80.ids;
 
 import org.apache.bcel.Constants;
-import org.apache.bcel.classfile.*;
+import org.apache.bcel.classfile.Attribute;
+import org.apache.bcel.classfile.ConstantPool;
+import org.apache.bcel.classfile.ConstantUtf8;
+import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.anyByte;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ClassMethodInfoTest {
 

@@ -23,8 +23,14 @@ import com.igormaznitsa.j2z80.aux.LabelUtils;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import java.io.*;
-import org.apache.bcel.generic.*;
+import java.io.IOException;
+import java.io.Writer;
+import org.apache.bcel.generic.ConstantPoolGen;
+import org.apache.bcel.generic.INVOKESPECIAL;
+import org.apache.bcel.generic.InvokeInstruction;
+import org.apache.bcel.generic.MethodGen;
+import org.apache.bcel.generic.ObjectType;
+import org.apache.bcel.generic.Type;
 
 public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcessor implements NeedsMemoryManager {
 

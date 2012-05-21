@@ -19,7 +19,8 @@
 package com.igormaznitsa.j2z80.ids;
 
 import org.apache.bcel.classfile.Method;
-import org.apache.bcel.generic.*;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.MethodGen;
 
 public class ClassMethodInfo {
 

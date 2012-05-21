@@ -21,7 +21,8 @@ package com.igormaznitsa.j2z80.aux;
 import java.util.jar.JarEntry;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class LabelUtilsTest {
     

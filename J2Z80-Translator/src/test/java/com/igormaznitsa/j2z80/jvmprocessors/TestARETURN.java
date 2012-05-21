@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import org.apache.bcel.generic.ARETURN;
 import org.apache.bcel.generic.InstructionHandle;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class TestARETURN extends AbstractJvmCommandProcessorTest {
     

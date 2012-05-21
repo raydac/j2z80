@@ -20,7 +20,12 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.aux.LabelUtils;
 import java.io.StringWriter;
-import org.apache.bcel.generic.*;
+import org.apache.bcel.generic.BranchHandle;
+import org.apache.bcel.generic.InstructionHandle;
+import org.apache.bcel.generic.LDC;
+import org.apache.bcel.generic.LOOKUPSWITCH;
+import org.apache.bcel.generic.Select;
+import org.apache.bcel.generic.TABLESWITCH;
 import org.mockito.Mockito;
 import org.powermock.reflect.Whitebox;
 

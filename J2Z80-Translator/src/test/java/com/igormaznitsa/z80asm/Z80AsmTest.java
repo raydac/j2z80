@@ -20,7 +20,8 @@ package com.igormaznitsa.z80asm;
 
 import java.io.File;
 import java.util.Locale;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 public class Z80AsmTest {

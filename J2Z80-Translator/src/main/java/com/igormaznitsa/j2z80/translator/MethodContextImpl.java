@@ -19,11 +19,18 @@
 package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.MethodContext;
-import com.igormaznitsa.j2z80.ids.*;
+import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
+import com.igormaznitsa.j2z80.ids.MethodID;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.*;
+import java.util.Set;
 import org.apache.bcel.classfile.Method;
-import org.apache.bcel.generic.*;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.MethodGen;
 
 class MethodContextImpl implements MethodContext {
     private final TranslatorImpl theTranslator;

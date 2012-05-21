@@ -20,7 +20,10 @@ package com.igormaznitsa.z80asm;
 
 import com.igormaznitsa.j2z80.aux.Assert;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EquDirectiveContainer {
     public static class EquDirectiveRecord {

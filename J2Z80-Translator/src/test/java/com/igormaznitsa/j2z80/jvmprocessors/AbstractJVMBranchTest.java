@@ -20,9 +20,12 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.aux.LabelUtils;
 import java.io.StringWriter;
-import org.apache.bcel.generic.*;
+import org.apache.bcel.generic.BranchHandle;
+import org.apache.bcel.generic.BranchInstruction;
+import org.apache.bcel.generic.InstructionHandle;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.powermock.reflect.Whitebox;
 
 public abstract class AbstractJVMBranchTest extends AbstractJvmCommandProcessorTest {

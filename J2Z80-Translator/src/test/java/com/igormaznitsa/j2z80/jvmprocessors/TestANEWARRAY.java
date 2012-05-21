@@ -18,7 +18,11 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.*;
+import org.apache.bcel.generic.ANEWARRAY;
+import org.apache.bcel.generic.ARRAYLENGTH;
+import org.apache.bcel.generic.Instruction;
+import org.apache.bcel.generic.POP;
+import org.apache.bcel.generic.SIPUSH;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 

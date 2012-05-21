@@ -19,8 +19,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import java.io.*;
-import org.apache.bcel.generic.*;
+import java.io.IOException;
+import java.io.Writer;
+import org.apache.bcel.generic.ALOAD;
+import org.apache.bcel.generic.Instruction;
+import org.apache.bcel.generic.InstructionHandle;
 
 // class to process ALOAD with code 42,43,44,45
 public class Processor_ALOAD extends AbstractJvmCommandProcessor {

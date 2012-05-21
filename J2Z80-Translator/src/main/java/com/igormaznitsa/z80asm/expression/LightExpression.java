@@ -19,8 +19,10 @@
 package com.igormaznitsa.z80asm.expression;
 
 import com.igormaznitsa.j2z80.aux.Assert;
-import com.igormaznitsa.z80asm.*;
-import com.igormaznitsa.z80asm.asmcommands.*;
+import com.igormaznitsa.z80asm.AsmTranslator;
+import com.igormaznitsa.z80asm.LocalLabelExpectant;
+import com.igormaznitsa.z80asm.asmcommands.AbstractAsmCommand;
+import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 
 public class LightExpression {
 

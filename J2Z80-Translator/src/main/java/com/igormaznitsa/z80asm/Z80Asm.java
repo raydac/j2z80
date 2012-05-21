@@ -18,11 +18,22 @@
  */
 package com.igormaznitsa.z80asm;
 
-import com.igormaznitsa.j2z80.aux.*;
-import com.igormaznitsa.z80asm.asmcommands.*;
+import com.igormaznitsa.j2z80.aux.Assert;
+import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.z80asm.asmcommands.AbstractAsmCommand;
+import com.igormaznitsa.z80asm.asmcommands.AsmCommandEND;
+import com.igormaznitsa.z80asm.asmcommands.AsmCommandEQU;
+import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import com.igormaznitsa.z80asm.exceptions.AsmTranslationException;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The class implements a small Z80 assembler translator

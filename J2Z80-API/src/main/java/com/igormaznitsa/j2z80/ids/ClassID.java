@@ -18,7 +18,8 @@
  */
 package com.igormaznitsa.j2z80.ids;
 
-import com.igormaznitsa.j2z80.aux.*;
+import com.igormaznitsa.j2z80.aux.Assert;
+import com.igormaznitsa.j2z80.aux.LabelUtils;
 import org.apache.bcel.generic.ClassGen;
 
 public class ClassID {

@@ -19,7 +19,8 @@
 package com.igormaznitsa.j2z80.bootstrap;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.bcel.generic.Type;
 
 public abstract class AbstractBootClass {
