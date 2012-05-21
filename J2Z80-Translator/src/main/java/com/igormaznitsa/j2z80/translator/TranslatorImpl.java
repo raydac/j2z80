@@ -316,6 +316,10 @@ public class TranslatorImpl implements TranslatorContext{
     private void processBinaryData(final List<String> text) throws IOException {
         getLogger().logInfo("----PROCESS BINARY DATA----");
         
+        text.add("");
+        text.add("; Included binary resources section");
+        text.add("; -------------------------------------");
+        
         for (final Entry<String, byte []> binaryData : workingClassPath.getAllBinaryResources().entrySet()) {
            final String path = binaryData.getKey();
            
@@ -346,7 +350,8 @@ public class TranslatorImpl implements TranslatorContext{
                text.add(str);
            }
         }
-        
+        text.add("; -------------------------------------");
+        text.add("");
     }
     
     private void processAdditionals(final List<String> text) throws IOException {

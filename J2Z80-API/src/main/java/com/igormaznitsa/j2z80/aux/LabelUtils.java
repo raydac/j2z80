@@ -170,6 +170,6 @@ public enum LabelUtils {
     }
     
     public static String makeLabelForBinaryResource(final String path){
-        return "BINDATA_"+normalizeString(path);
+        return "BINRSRC_"+normalizeString(path);
     }
 }
