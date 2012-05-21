@@ -16,8 +16,8 @@
     <description>The Acceptance Test to check work of the J2Z80 translator in a real environment</description>
     
     <modules>
-        <module>MainJar</module>
         <module>ExtJar</module>
+        <module>MainJar</module>
     </modules>        
     
 </project>
