@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.igormaznitsa.j2z80</groupId>
             <artifactId>J2Z80-API</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -63,7 +63,7 @@
             <plugin>
                 <groupId>com.igormaznitsa.j2z80</groupId>
                 <artifactId>J2Z80-Translator</artifactId>
-                <version>0.1-SNAPSHOT</version>
+                <version>0.2-SNAPSHOT</version>
 
                 <executions>
                     <execution>
@@ -84,6 +84,11 @@
                 
                 <configuration>
                     <logAsmText>true</logAsmText>
+                    <excludeResources>
+                        <value>/**/*.xml</value>
+                        <value>/**/*.properties</value>
+                        <value>/**/*.mf</value>
+                    </excludeResources>
                 </configuration>
             </plugin>
         </plugins>

@@ -50,6 +50,11 @@ The Project home page: http://code.google.com/p/j2z80/
 Versions
 ----------------------
 
+0.2-SNAPSHOT (may 2012)
+- added support to process JAR dependencies
+- added support to include binary resources from JAR into compiled block as labeled byte arrays
+- test improvements
+
 0.1-SNAPSHOT (march 2012)
 - the first published sources
 - it contains some examples of usage and mainly working plugin
