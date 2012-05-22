@@ -116,4 +116,33 @@ public class ParsedAsmLineTest {
     public void testLabelLikeCommand() {
         final ParsedAsmLine parsed = new ParsedAsmLine("    JP NC,com.igormaznitsa.j2z80test.App.mainz#__V->15 :");
     }
+
+    @Test
+    public void testToString() {
+        assertEquals("",new ParsedAsmLine("").toString());
+        assertEquals("lAbEl: ",new ParsedAsmLine("   lAbEl:   ").toString());
+        assertEquals("lAbEl: LD A,(HL)",new ParsedAsmLine("   lAbEl:   lD a        ,    (  Hl) ; comment ").toString());
+    }
+    
+    @Test
+    public void testNonParsingConstructor(){
+        assertEquals("", new ParsedAsmLine(null, null).toString());
+        assertEquals("lAbEl: ", new ParsedAsmLine(" lAbEl ", null).toString());
+        assertEquals("lAbEl: HALT ", new ParsedAsmLine(" lAbEl ", " hAlT    ").toString());
+        assertEquals("lAbEl: LD (HL),A", new ParsedAsmLine(" lAbEl ", " ld    ","   (hl)","   a   ").toString());
+    }
+
+    @Test
+    public void testHash(){
+        assertEquals(new ParsedAsmLine("lAbEl: lD    (  hl  ),   a   ").hashCode(), new ParsedAsmLine("  lAbEl  ", "   ld   ","  (hL)","  a ").hashCode());
+    }
+
+    @Test
+    public void testEquals(){
+        assertEquals(new ParsedAsmLine("lAbEl: lD    (  hl  ),   a   "), new ParsedAsmLine("  lAbEl  ", "   ld   ","  (hL)","  a "));
+        assertFalse(new ParsedAsmLine("lAbEl: lD    (  hl  ),   a   ").equals(new ParsedAsmLine("  lAbEl2  ", "   ld   ","  (hL)","  a ")));
+        assertFalse(new ParsedAsmLine("lAbEl: lD    (  hl  ),   a   ").equals(new ParsedAsmLine("  lAbEl  ", "   lda   ","  (hL)","  a ")));
+        assertFalse(new ParsedAsmLine("lAbEl: lD    (  hl  ),   a   ").equals(new ParsedAsmLine("  lAbEl  ", "   ld   ","  (hL )","  a ")));
+        assertFalse(new ParsedAsmLine("lAbEl: lD    (  hl  ),   a   ").equals(new ParsedAsmLine("  lAbEl  ", "   ld   ","  (hL)","  b ")));
+    }
 }

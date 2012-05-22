@@ -21,6 +21,7 @@ package com.igormaznitsa.j2z80;
 import com.igormaznitsa.j2z80.aux.Assert;
 import com.igormaznitsa.j2z80.aux.Utils;
 import com.igormaznitsa.j2z80.translator.TranslatorImpl;
+import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
 import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -125,6 +126,21 @@ public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
      * @parameter name="excludeResources"
      */
     private String [] excludeResources;
+
+    /**
+     * Optimization level. Can be 'none' or 'base'
+     *
+     * @parameter name="optimization" default-value="none"
+     */
+    private String optimization;
+    
+    public void setOptimization(final String value){
+        optimization = value;
+    }
+    
+    public String getOptimization(){
+        return this.optimization;
+    }
     
     public void setExcludeResources(final String [] resources){
         this.excludeResources = resources;
@@ -183,7 +199,9 @@ public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
             logInfo("The result file format : " + format);
             logInfo("The result file name : " + resultFile.getName());
 
-            final TranslatorContext translator = new TranslatorImpl(this, classPath);
+            final OptimizationLevel optimizationLevel = OptimizationLevel.findForTextName(getOptimization());
+            
+            final TranslatorContext translator = new TranslatorImpl(this, optimizationLevel, classPath);
             final String[] translatedAsmText = translator.translate(null, startAddress, stackTop, getExcludeResources());
 
             if (logAsmText) {

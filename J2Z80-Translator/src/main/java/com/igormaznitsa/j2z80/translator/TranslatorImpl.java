@@ -44,6 +44,10 @@ import com.igormaznitsa.j2z80.translator.aux.InvokevirtualTable;
 import com.igormaznitsa.j2z80.translator.aux.MethodUtils;
 import com.igormaznitsa.j2z80.translator.jar.ZClassPath;
 import com.igormaznitsa.j2z80.translator.jar.ZParsedJar;
+import com.igormaznitsa.j2z80.translator.optimizator.OptimizationChain;
+import com.igormaznitsa.j2z80.translator.optimizator.OptimizationChainFactory;
+import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
+import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map.Entry;
@@ -74,7 +78,7 @@ public class TranslatorImpl implements TranslatorContext{
     private final Map<String, Constant> classPoolConstants = new HashMap<String, Constant>();
     private final Set<ClassID> classesForCheckcast = new HashSet<ClassID>();
     private String [] excludeResourcePatterns;
-    
+    private OptimizationLevel optimizationLevel;
     
     public ClassGen findOverridenMethodOnPath(final String className, final String superClassName, final MethodGen method) {
         ClassGen classGen = workingClassPath.findClassForName(className);
@@ -103,7 +107,8 @@ public class TranslatorImpl implements TranslatorContext{
         return result;
     }
     
-    public TranslatorImpl(final TranslatorLogger logger, final File ... jarArchives) throws IOException {
+    public TranslatorImpl(final TranslatorLogger logger, final OptimizationLevel optimization, final File ... jarArchives) throws IOException {
+        this.optimizationLevel = optimization;
         this.messageLogger = logger == null ? new DefaultTranslatorLogger() : logger;
         
         workingClassPath = new ZClassPath(this, parseJars(jarArchives));
@@ -185,7 +190,21 @@ public class TranslatorImpl implements TranslatorContext{
 
         result.addAll(makeClassSizeArray());
 
-        return result.toArray(new String[result.size()]);
+        if (optimizationLevel!=null && optimizationLevel!=OptimizationLevel.NONE){
+            getLogger().logWarning("Make optimization for the level \'"+optimizationLevel.getTextName()+"\'");
+            
+            final List<ParsedAsmLine> asmLines = asParsedLines(result);
+            final OptimizationChain chain = OptimizationChainFactory.getOptimizators(this, optimizationLevel);
+            final List<String> optimizedAsString = asStringLines(chain.processSources(asmLines));
+            
+            optimizedAsString.add(0,"; optimization level is \'"+optimizationLevel.getTextName()+'\'');
+            
+            return optimizedAsString.toArray(new String[optimizedAsString.size()]);
+        } else {
+            getLogger().logInfo("No optimization");
+
+            return result.toArray(new String[result.size()]);
+        }
     }
 
     private String[] processStaticInitializingBlocks() {
@@ -482,5 +501,29 @@ public class TranslatorImpl implements TranslatorContext{
     @Override
     public MethodContext getMethodContext(){
         return methodContext;
+    }
+
+    private static List<ParsedAsmLine> asParsedLines(final List<String> list){
+        if (list == null) {
+            return new ArrayList<ParsedAsmLine>(0);
+        }
+        final List<ParsedAsmLine> result = new ArrayList<ParsedAsmLine>(list.size());
+        for(final String str : list){
+            final ParsedAsmLine line = new ParsedAsmLine(str);
+            if (line.isEmpty()) continue;
+            result.add(line);
+        }
+        return result;
+    }
+
+    private static List<String> asStringLines(final List<ParsedAsmLine> list){
+        if (list == null) {
+            return new ArrayList<String>(0);
+        }
+        final List<String> result = new ArrayList<String>(list.size());
+        for(final ParsedAsmLine asm : list){
+            result.add(asm.toString());
+        }
+        return result;
     }
 }

@@ -19,7 +19,12 @@
 package com.igormaznitsa.z80asm.asmcommands;
 
 import com.igormaznitsa.j2z80.aux.Assert;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 @SuppressWarnings("serial")
 public class ParsedAsmLine {
@@ -36,6 +41,7 @@ public class ParsedAsmLine {
     private final String command;
     private final String[] arguments;
     private final String signature;
+    private final int hashCode;
 
     public String getLabel() {
         return label;
@@ -57,9 +63,30 @@ public class ParsedAsmLine {
         return signature;
     }
 
+    public ParsedAsmLine(final String label, final String command, final String ... args){
+        this.label = label == null ? null : label.trim();
+        if (command!=null){
+            this.command = command.trim().toUpperCase(Locale.ENGLISH);
+        } else {
+            this.command = "";
+        }
+        
+        if (args == null || args.length == 0){
+            this.arguments = EMPTY_ARRAY;
+        } else {
+            this.arguments = args.clone();
+            for(int index = 0; index <this.arguments.length ; index++){
+                this.arguments [index] = this.arguments[index].trim().toUpperCase(Locale.ENGLISH);  
+            }
+        }
+        this.signature = makeSignatureFromNormalizedArgs(this.arguments);
+        this.hashCode = this.command.hashCode() * 31 + signature.hashCode();
+    }
+    
     public ParsedAsmLine(final String asmString) {
         final String trimmed = asmString.trim();
         if (trimmed.isEmpty() || trimmed.charAt(0) == ';') {
+            hashCode = 0;
             command = "";
             label = null;
             arguments = EMPTY_ARRAY;
@@ -84,6 +111,8 @@ public class ParsedAsmLine {
         }
 
         signature = makeSignatureFromNormalizedArgs(arguments);
+
+        hashCode = command.hashCode() * 31 + signature.hashCode();
     }
 
     private static int findLabelPosition(final String line) {
@@ -341,5 +370,61 @@ public class ParsedAsmLine {
 
     public boolean isEmpty() {
         return label == null && command.isEmpty() && arguments.length == 0;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj.getClass() == ParsedAsmLine.class) {
+            final ParsedAsmLine that = (ParsedAsmLine) obj;
+
+            return safeEquals(this.label, that.label) 
+                    && safeEquals(this.command, that.command) 
+                    && Arrays.equals(this.arguments, that.arguments);
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean safeEquals(final Object obj1, final Object obj2) {
+        if (obj1 == null) {
+            return obj2 == null;
+        } else if (obj2 == null) {
+            return obj1 == null;
+        } else {
+            return obj1.equals(obj2);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCode;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder result = new StringBuilder(32);
+        
+        if (label!=null){
+            result.append(label).append(": ");
+        }
+        
+        if (!command.isEmpty())
+          result.append(command).append(" ");
+        
+        for(int index = 0; index<arguments.length; index++){
+            if (index>0){
+                result.append(',');
+            }
+            result.append(arguments[index]);
+        }
+        
+        return result.toString();
     }
 }

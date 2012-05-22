@@ -84,6 +84,7 @@
                 
                 <configuration>
                     <logAsmText>true</logAsmText>
+                    <optimization>base</optimization>
                     <excludeResources>
                         <value>/**/*.xml</value>
                         <value>/**/*.properties</value>
