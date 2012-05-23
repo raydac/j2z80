@@ -24,6 +24,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * The annotation describes the path to the native source file for the addition.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @Target(value={ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

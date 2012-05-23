@@ -18,7 +18,15 @@
  */
 package com.igormaznitsa.j2z80.api.additional;
 
+/**
+ * The addition shows that an implementing class needs to include the ATHROW manager.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @AdditionPath("ATHROW_MANAGER.a80")
 public interface NeedsATHROWManager extends J2ZAdditionalBlock {
+    /**
+     * The label name of the memory cells (two cells) where the exception processing procedure address should be placed
+     */
     public static final String ATHROW_PROCESSING_ADDRESS = "___ATHROW_PROCESSING_CODE_ADDRESS";
 }

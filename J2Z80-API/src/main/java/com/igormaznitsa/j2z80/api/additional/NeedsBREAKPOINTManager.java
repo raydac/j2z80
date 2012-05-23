@@ -18,9 +18,26 @@
  */
 package com.igormaznitsa.j2z80.api.additional;
 
+/**
+ * The addition shows that an implementing class needs to include the BREAKPOINT command
+ * manager.
+ *
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @AdditionPath("BREAKPOINT_MANAGER.a80")
 public interface NeedsBREAKPOINTManager extends J2ZAdditionalBlock {
+    /**
+     * The label of the memory cells containing the current breakpoint processing subroutine address
+     */
     public static final String BREAKPOINT_PROCESSING_SUB_ADDRESS = "___BREAKPOINT_PROCESSING_CODE_ADDRESS";
+
+    /**
+     * The label of the breakpoint processing subroutine stub (it does nothing) 
+     */
     public static final String BREAKPOINT_PROCESSING_STUB = "___BREAKPOINT_PROCESSING_STUB";
+  
+    /**
+     * The label of the breakpoint processing manager subroutine
+     */
     public static final String BREAKPOINT_PROCESSING_MANAGER = "___BREAKPOINT_PROCESSING_MANAGER";
 }

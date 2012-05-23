@@ -22,8 +22,29 @@ import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import org.apache.bcel.generic.MethodGen;
 
+/**
+ * The interface describes a method context to work with methods
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public interface MethodContext {
+    /**
+     * Find a method for its method id
+     * @param methodId the method id, must not be null
+     * @return null if the method is not found or found MethodGen object
+     */
     MethodGen findMethod(MethodID methodId);
+    
+    /**
+     * Find the method info for the method id
+     * @param methodID the method id, must not be null
+     * @return null if the info is not found or a method info object if it is found
+     */
     ClassMethodInfo findMethodInfo(MethodID methodID);
+    
+    /**
+     * Find the method uid
+     * @param methodId the method id to be used for search
+     * @return the method uid as Integer if it is found or null
+     */
     Integer findMethodUID(MethodID methodId);
 }

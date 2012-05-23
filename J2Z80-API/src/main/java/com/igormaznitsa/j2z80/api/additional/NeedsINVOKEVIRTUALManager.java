@@ -18,7 +18,16 @@
  */
 package com.igormaznitsa.j2z80.api.additional;
 
+/**
+ * The addition shows that an implementing class needs to include the INVOKEVIRTUAL manager. 
+ * The manager allows to invoke virtual methods of classes.
+ *
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @AdditionPath("INVOKEVIRTUAL_MANAGER.a80")
 public interface NeedsINVOKEVIRTUALManager extends J2ZAdditionalBlock {
+    /**
+     * The macros name which should be replaced by either label or address of an invoke virtual table
+     */
     public static final String MACROS_INVOKEVIRTUAL_TABLE = "%invokevirtualtable%";
 }

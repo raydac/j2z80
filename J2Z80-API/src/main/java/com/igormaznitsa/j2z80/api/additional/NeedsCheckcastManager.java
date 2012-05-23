@@ -18,7 +18,16 @@
  */
 package com.igormaznitsa.j2z80.api.additional;
 
+/**
+ * The addition shows that an implementing class needs to include the CHECKCAST
+ * command manager.
+ *
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @AdditionPath("CHECKCAST_MANAGER.a80")
 public interface NeedsCheckcastManager extends J2ZAdditionalBlock {
+    /**
+     * The label of the subroutine processing checkast commands
+     */
     public static final String SUB_CHECKCAST = "___CHECKCAST";
 }

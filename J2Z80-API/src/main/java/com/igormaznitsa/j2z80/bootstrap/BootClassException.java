@@ -18,6 +18,12 @@
  */
 package com.igormaznitsa.j2z80.bootstrap;
 
+/**
+ * An Exception to be thrown for problems during boot class processing problems
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ * @see AbstractBootClass
+ */
 public class BootClassException extends RuntimeException {
     private static final long serialVersionUID = 982394812L;
     
@@ -25,6 +31,13 @@ public class BootClassException extends RuntimeException {
     private final String methodOrFieldName;
     private final String signature;
     
+    /**
+     * The Constructor
+     * @param message the message for the exception
+     * @param className the boot class name
+     * @param methodOrFieldName the source method or field
+     * @param signature the method or field signature
+     */
     public BootClassException(final String message, final String className, final String methodOrFieldName, final String signature){
         super(message);
         this.className = className;
@@ -32,14 +45,26 @@ public class BootClassException extends RuntimeException {
         this.signature = signature;
     }
     
+    /**
+     * Get the exception source class name
+     * @return the exception source class name
+     */
     public String getClassName(){
         return this.className;
     }
     
+    /**
+     * Get the exception source method or field name
+     * @return the source method or field name
+     */
     public String getMethodOrFieldName() {
         return this.methodOrFieldName;
     }
     
+    /**
+     * Get the exception source method or field signature
+     * @return the source method or field signature
+     */
     public String getSignature() {
         return this.signature;
     }

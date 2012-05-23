@@ -23,13 +23,59 @@ import java.util.List;
 import java.util.Set;
 import org.apache.bcel.generic.ClassGen;
 
+/**
+ * The interface describes context to work with classes
+ * 
+ * @author Igoe Manzitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public interface ClassContext {
+    /**
+     * Get iterator for all translated java classes
+     * @return an iterator for all translated java classes
+     */
     Iterable<ClassID> getAllClasses();
+    
+    /**
+     * Find all class ancestors
+     * @param className the canonical class name, must not be null
+     * @return the list contains class names of the class ancestors
+     */
     List<String> findAllClassAncestors(final String className);
+    
+    /**
+     * Find all interfaces which are implemented by the class (also it finds interfaces implemented by all class ancestors)
+     * @param className the canonical class name, must not be null
+     * @return the list of interfaces which are implemented by the class or one of its ancestor
+     */
     Set<ClassID> findAllClassesImplementInterface(String className);
+    
+    /**
+     * Find a ClassGen for class id
+     * @param classId the class id object to be used in the search, must not be null
+     * @return found ClassGen or null
+     */
     ClassGen findClassForID(ClassID classId);
+    
+    /**
+     * Find all successors for a class
+     * @param className the canonical class name, must not be null
+     * @return a list contains all found successors of the class
+     */
     List<String> findAllClassSuccessors(String className);
+    
+    /**
+     * Find the class uid for the class id
+     * @param classId a class id object, must not be null
+     * @return found UID as Integer or null
+     */
     Integer findClassUID(ClassID classId);
-    boolean isAccessible(ClassGen classInfo, String className);
+    
+    /**
+     * Check that a super class is accessible from a ClassGen object
+     * @param classInfo the class gen object, must not be null
+     * @param superClassName the canonical class name of the superclass to be checked for accessibility
+     * @return true if the superclass is accessible from the class gen object
+     */
+    boolean isAccessible(ClassGen classInfo, String superClassName);
 
 }

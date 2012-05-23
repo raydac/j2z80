@@ -19,13 +19,18 @@
 package com.igormaznitsa.j2z80.ids;
 
 import com.igormaznitsa.j2z80.aux.Assert;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import java.util.Arrays;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.Type;
 
+/**
+ * The Class describes an identifier for a method
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class MethodID {
     private final String methodId;
     private final String methodLabel;
@@ -35,22 +40,43 @@ public class MethodID {
     private final Type [] argTypes;
     private final ClassID classId;    
     
+    /**
+     * A Constructor
+     * @param m a MethodGen object, must not be null 
+     */
     public MethodID(final MethodGen m){
         this(m.getClassName(),m.getName(),m.getReturnType(),m.getArgumentTypes());
     }
     
+    /**
+     * A Constructor
+     * @param c the ClassGen owns the method, must not be null
+     * @param m  the method, must not be null
+     */
     public MethodID(final ClassGen c, final Method m) {
         this(c.getClassName(),m);
     }
     
-    public MethodID(final String c, final Method m) {
-        this(c,m.getName(),m.getReturnType(),m.getArgumentTypes());
+    /**
+     * A Constructor
+     * @param className the class name, must not be null
+     * @param method the method, must not be null
+     */
+    public MethodID(final String className, final Method method) {
+        this(className,method.getName(),method.getReturnType(),method.getArgumentTypes());
     }
 
+    /**
+     * A Constructor
+     * @param className the class name, must not be null
+     * @param methodName the method name, must not be null
+     * @param returnType the return type signature for the method, must not be null
+     * @param argTypes  the argument type signatures for the method, must not be null
+     */
     public MethodID(final String className, final String methodName, final Type returnType, final Type [] argTypes){
         Assert.assertNotNull("Arguments must not contain null", className, methodName, returnType, argTypes);
         this.methodId = className+'.'+methodName+'.'+Type.getMethodSignature(returnType, argTypes);
-        this.methodLabel = LabelUtils.makeLabelNameForMethod(className, methodName, returnType, argTypes);
+        this.methodLabel = LabelAndFrameUtils.makeLabelNameForMethod(className, methodName, returnType, argTypes);
         this.className = className;
         this.methodName = methodName;
         this.returnType = returnType;
@@ -58,22 +84,42 @@ public class MethodID {
         classId = new ClassID(className);
     }
     
+    /**
+     * Get the class Id for the class owns the method
+     * @return the class id object
+     */
     public ClassID getClassID() {
         return classId;
     }
     
+    /**
+     * Get the class name of the class owns the menthod
+     * @return the class name
+     */
     public String getClassName() {
         return className;
     }
     
+    /**
+     * Get the method name
+     * @return the method name
+     */
     public String getMethodName() {
         return methodName;
     }
     
+    /**
+     * Get the return type signature for the method
+     * @return the return type
+     */
     public Type getReturnType(){
         return returnType;
     }
     
+    /**
+     * Get the argument type signatures for the method
+     * @return the argument types for the method
+     */
     public Type [] getArgs(){
         return argTypes; 
     }
@@ -96,6 +142,10 @@ public class MethodID {
         return false;
     }
 
+    /**
+     * Get the method label
+     * @return the method label as String
+     */
     public String getMethodLabel() {
         return methodLabel;
     }
@@ -105,6 +155,11 @@ public class MethodID {
       return methodId+"("+methodLabel+")";  
     }
 
+    /**
+     * Find compatible method inside a class
+     * @param cgen a class object where the compatible method will be looked for
+     * @return a found compatible method if it is found or null if not found
+     */
     public Method findCompatibleMethod(final ClassGen cgen) {
         Assert.assertNotNull("Class must not be null", cgen);
         for(final Method m : cgen.getMethods()){

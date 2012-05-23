@@ -19,18 +19,32 @@
 package com.igormaznitsa.j2z80.ids;
 
 import com.igormaznitsa.j2z80.aux.Assert;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import org.apache.bcel.generic.ClassGen;
 
+/**
+ * The class describes CLASS ID which is being used by the translator to identify a java class during processing.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class ClassID {
+    // inside storage of the full class name
     private final String className;
     
+    /**
+     * The Constructor creates the new instance based on the full class path name
+     * @param className the full canonical class path name, must not be null
+     */
     public ClassID(final String className){
        Assert.assertNotNull("Class name must not be null", className);
        Assert.assertNotEmpty("Class name must not be empty", className);
        this.className = className;
     }
     
+    /**
+     * The Constructor create the new instance based on a ClassGet object
+     * @param classGen the object to be used for creation, must not be null
+     */
     public ClassID(final ClassGen classGen){
         Assert.assertNotNull("Argument must not be null", classGen);
         className = classGen.getClassName();
@@ -54,12 +68,20 @@ public class ClassID {
         return false;
     }
     
+    /**
+     * Get the full class name
+     * @return the full class name as String
+     */
     public String getClassName(){
         return className;
     }
     
+    /**
+     * Make the label for the class
+     * @return a String contains the label for the class name
+     */
     public String makeClassLabel(){
-        return LabelUtils.makeLabelNameForClass(className);
+        return LabelAndFrameUtils.makeLabelNameForClass(className);
     }
     
     @Override

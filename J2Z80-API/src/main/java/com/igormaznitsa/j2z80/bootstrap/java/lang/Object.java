@@ -30,7 +30,7 @@ public class Object extends AbstractBootClass {
     }
 
     @Override
-    public String[] generateInvokation(final TranslatorContext translator, final String methodName, final Type[] methodArguments, final Type resultType) {
+    public String[] generateInvocation(final TranslatorContext translator, final String methodName, final Type[] methodArguments, final Type resultType) {
         if (methodArguments.length == 0){
             if (resultType.getType() == Type.VOID.getType()){
                 if (methodName.equals("<init>")){
@@ -47,13 +47,13 @@ public class Object extends AbstractBootClass {
     }
 
     @Override
-    public String[] generateGetField(final TranslatorContext translator, final String fieldName, final Type fieldType, final boolean isStatic) {
+    public String[] generateFieldGetter(final TranslatorContext context, final String fieldName, final Type fieldType, final boolean isStatic) {
         throwBootClassExceptionForField(fieldName, fieldType);
         return null;
     }
 
     @Override
-    public String[] generateSetField(final TranslatorContext translator, final String fieldName, final Type fieldType, final boolean isStatic) {
+    public String[] generateFieldSetter(final TranslatorContext context, final String fieldName, final Type fieldType, final boolean isStatic) {
         throwBootClassExceptionForField(fieldName, fieldType);
         return null;
     }

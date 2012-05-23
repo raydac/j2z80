@@ -18,6 +18,11 @@
  */
 package com.igormaznitsa.j2z80.api.additional;
 
+/**
+ * The flag interface shows that the class declaring it is an addition for J2Z80 translator.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public interface J2ZAdditionalBlock {
     
 }

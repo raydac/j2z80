@@ -18,8 +18,26 @@
  */
 package com.igormaznitsa.j2z80;
 
+/**
+ * The interface describes a logger to be used inbound of the translator
+ * @author Igor Maznutsa (igor.maznitsa@igormaznitsa.com)
+ */
 public interface TranslatorLogger {
+    /**
+     * Print an information message
+     * @param str an information message, it can be null
+     */
     void logInfo(String str);
+    
+    /**
+     * Print a warning message
+     * @param str a warning message, it can be null
+     */
     void logWarning(String str);
+    
+    /**
+     * Print an error message
+     * @param str an error message, it can be null
+     */
     void logError(String str);
 }

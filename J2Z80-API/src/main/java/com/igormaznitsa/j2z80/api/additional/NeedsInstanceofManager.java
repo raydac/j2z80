@@ -18,9 +18,23 @@
  */
 package com.igormaznitsa.j2z80.api.additional;
 
+/**
+ * The addition shows that an implementing class needs to include the INSTANCEOF manager. 
+ *
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @AdditionPath("INSTANCEOF_MANAGER.a80")
 public interface NeedsInstanceofManager extends J2ZAdditionalBlock {
+    /**
+     * The macros to be replaced by an instanceof table represented as String.
+     */ 
     public static final String MACRO_INSTANCEOFTABLE = "%instanceoftable%";
+    /**
+     * The label of the memory address where the instanceof table will be placed
+     */
     public static final String INSTANCEOF_TABLE_POINTER = "___INSTANCEOF_TABLE";
+    /**
+     * The label of the subroutine processing the instanceof logic
+     */
     public static final String SUB_INSTANCEOF = "___INSTANCE_OF";
 }
