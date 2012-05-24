@@ -21,17 +21,33 @@ package com.igormaznitsa.j2z80.translator;
 import com.igormaznitsa.j2z80.aux.Utils;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 
+/**
+ * The class generates both the prefix and the postfix code for the main method
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class MainPrefixPostfixGenerator {
     private final ClassMethodInfo method;
     private final int initStack;
     private final int startAddress;
     
-    public MainPrefixPostfixGenerator(final ClassMethodInfo method, final int startAddress, final int stackInitPointer) {
-        this.method = method;
-        this.initStack = stackInitPointer;
+    /**
+     * The Constructor.
+     * 
+     * @param mainMethod the main method to be used in operations, must not be null
+     * @param startAddress the start address of the main method 
+     * @param stackInitAddr the value to init stack just after start
+     */
+    public MainPrefixPostfixGenerator(final ClassMethodInfo mainMethod, final int startAddress, final int stackInitAddr) {
+        this.method = mainMethod;
+        this.initStack = stackInitAddr;
         this.startAddress = startAddress;
     }
     
+    /**
+     * Generate assembler prefix for the main method.
+     * @return array of assembler lines to be used as the prefix for the main method
+     */
     public String [] generatePrefix() {
         final StringBuilder result = new StringBuilder();
         
@@ -47,6 +63,10 @@ public class MainPrefixPostfixGenerator {
         return Utils.breakToLines(result.toString());
     }
     
+    /**
+     * Generate the postfix for the main method.
+     * @return array of assembler lines to be used as the postfix for the main method
+     */
     public String [] generatePostfix() {
         return Utils.breakToLines("___MAINLOOP___: JP ___MAINLOOP___");
     }

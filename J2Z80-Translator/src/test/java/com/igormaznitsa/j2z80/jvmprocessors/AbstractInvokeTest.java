@@ -20,7 +20,7 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.aux.Utils;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -68,7 +68,7 @@ public class AbstractInvokeTest extends AbstractJvmCommandProcessorTest implemen
     }
 
     protected void makePostfixWithBreakPoint(final String breakPoint, final StringWriter out) throws Exception {
-        final String processingLabel = LabelUtils.makeLabelNameForMethod(mockupOfInvokedMethod.getClassName(), mockupOfInvokedMethod.getName(), mockupOfInvokedMethod.getReturnType(), mockupOfInvokedMethod.getArgumentTypes());
+        final String processingLabel = LabelAndFrameUtils.makeLabelNameForMethod(mockupOfInvokedMethod.getClassName(), mockupOfInvokedMethod.getName(), mockupOfInvokedMethod.getReturnType(), mockupOfInvokedMethod.getArgumentTypes());
 
         out.write("JP " + END_LABEL + "\n");
         out.write(processingLabel + ":\n");

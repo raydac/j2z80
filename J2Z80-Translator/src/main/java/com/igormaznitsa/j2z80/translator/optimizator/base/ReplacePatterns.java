@@ -19,14 +19,19 @@
 package com.igormaznitsa.j2z80.translator.optimizator.base;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.translator.optimizator.AsmOptimizator;
+import com.igormaznitsa.j2z80.translator.optimizator.AsmOptimizer;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ReplacePatterns implements AsmOptimizator {
+/**
+ * Optimizer for assembler to replace found patterns
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
+public class ReplacePatterns implements AsmOptimizer {
     private static final String[] NONE = new String[0];
     private static final String[] CLRLOC = new String[]{"CLRLOC"};
 

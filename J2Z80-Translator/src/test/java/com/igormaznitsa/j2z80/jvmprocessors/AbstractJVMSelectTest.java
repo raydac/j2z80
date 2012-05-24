@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import java.io.StringWriter;
 import org.apache.bcel.generic.BranchHandle;
 import org.apache.bcel.generic.InstructionHandle;
@@ -63,12 +63,12 @@ public abstract class AbstractJVMSelectTest extends AbstractJvmCommandProcessorT
         processor.process(CLASS_PROCESSOR_MOCK, instance, mockInstructionHandle, out);
         
         for(int i=0;i<targets.length;i++){
-            final String label = LabelUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, targets[i].getPosition());
+            final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, targets[i].getPosition());
             final String asm = makeAsmStubForIndex(targets[i], allowedIndexes[i], label);
             out.append(asm);
         }
         
-        out.append(makeAsmStubForIndex(defaultTarget, DEFAULT_POSITION, LabelUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, defaultTarget.getPosition())));
+        out.append(makeAsmStubForIndex(defaultTarget, DEFAULT_POSITION, LabelAndFrameUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, defaultTarget.getPosition())));
         
         push(checkValue);
         
@@ -79,7 +79,7 @@ public abstract class AbstractJVMSelectTest extends AbstractJvmCommandProcessorT
     {
         final StringBuilder buffer = new StringBuilder();
         
-            final String jumpLabel = LabelUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, handle.getPosition());
+            final String jumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, handle.getPosition());
             buffer.append(jumpLabel+":\n");
             buffer.append("LD HL,").append(data).append("\n");
             buffer.append("PUSH HL\n");

@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import java.io.StringWriter;
 import org.apache.bcel.generic.*;
 import static org.junit.Assert.assertEquals;
@@ -54,7 +54,7 @@ public class TestJSR_W extends AbstractJvmCommandProcessorTest {
 
     @Override
     public String getAsmPostfix() {
-        final String label = LabelUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, targetHandle.getPosition());
+        final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, targetHandle.getPosition());
 
         return "FLOOP: JR FLOOP\n"+label+":\n";
     }

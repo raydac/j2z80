@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.*;
 import org.apache.bcel.Constants;
@@ -67,7 +67,7 @@ public class TestGETFIELD extends AbstractJvmCommandProcessorTest {
         
         when(CP_MOCK.getConstantString(CP_INDEX_CLASSREF,Constants.CONSTANT_Class)).thenReturn(CLASS_NAME);
         
-        final String staticFieldLabel = LabelUtils.makeLabelNameForField(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
+        final String staticFieldLabel = LabelAndFrameUtils.makeLabelNameForField(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
         
         final GETFIELD testInstruction = new GETFIELD(CP_INDEX_FIELDREF);
         
@@ -85,7 +85,7 @@ public class TestGETFIELD extends AbstractJvmCommandProcessorTest {
 
     @Override
     public String getAsmPostfix() {
-        final String fieldOffset = LabelUtils.makeLabelNameForFieldOffset(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
+        final String fieldOffset = LabelAndFrameUtils.makeLabelNameForFieldOffset(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
         return fieldOffset+": EQU "+FIELD_OFFSET;
     }
     

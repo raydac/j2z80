@@ -127,7 +127,7 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
 
     protected long registerInterfaceMockMethod(final int maxLocals, final Type result, final Type[] types) {
         final Integer classId = TRANSLATOR_MOCK.getClassContext().findClassUID(MOCK_CLASS_ID.get());
-        final int neededFrameSize = LabelUtils.calculateFrameSizeForMethod(types.length,maxLocals,false);
+        final int neededFrameSize = LabelAndFrameUtils.calculateFrameSizeForMethod(types.length,maxLocals,false);
         registerMockMethod(CONSTANT_MOCK_METHOD, MOCK_CLASS_NAME, TEST_METHOD, AccessFlag.PUBLIC, 0, types, result);
         prepareFakeObjectInMemory();
         return (((long) classId & 0xFFFFL) << 32) | ((long) neededFrameSize & 0xFFFFL);
@@ -138,7 +138,7 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
         final Type RESULT_TYPE = Type.VOID;
         final int LOCALS = 0;
         
-        final String LABEL_METHOD_ID = LabelUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, ARGS_NULL));
+        final String LABEL_METHOD_ID = LabelAndFrameUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, ARGS_NULL));
         
         mockupOfInvokedMethod = makeSuccessorMethod(MOCK_METHOD_ID, MOCK_CLASS_ID, LOCALS, RESULT_TYPE, ARGS_NULL);
         final long packedClassFrameInfo = registerInterfaceMockMethod(LOCALS, RESULT_TYPE, ARGS_NULL);
@@ -168,7 +168,7 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
         final Type RESULT_TYPE = Type.VOID;
         final int LOCALS = TEST_LOCALS_NUMBER;
         
-        final String LABEL_METHOD_ID = LabelUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, ARGS_NULL));
+        final String LABEL_METHOD_ID = LabelAndFrameUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, ARGS_NULL));
 
         mockupOfInvokedMethod = makeSuccessorMethod(MOCK_METHOD_ID, MOCK_CLASS_ID, LOCALS, RESULT_TYPE, ARGS_NULL);
         final long packedClassFrameInfo = registerInterfaceMockMethod(LOCALS, RESULT_TYPE, ARGS_NULL);
@@ -191,7 +191,7 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
         final Type RESULT_TYPE = Type.INT;
         final int LOCALS = 0;
         
-        final String LABEL_METHOD_ID = LabelUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, ARGS_NULL));
+        final String LABEL_METHOD_ID = LabelAndFrameUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, ARGS_NULL));
 
         mockupOfInvokedMethod = makeSuccessorMethod(MOCK_METHOD_ID, MOCK_CLASS_ID, LOCALS, RESULT_TYPE, ARGS_NULL);
         final long packedClassFrameInfo = registerInterfaceMockMethod(LOCALS, RESULT_TYPE, ARGS_NULL);
@@ -218,7 +218,7 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
         final Type RESULT_TYPE = Type.INT;
         final int LOCALS = TEST_LOCALS_NUMBER;
         
-        final String LABEL_METHOD_ID = LabelUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, ARGS_NULL));
+        final String LABEL_METHOD_ID = LabelAndFrameUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, ARGS_NULL));
 
         mockupOfInvokedMethod = makeSuccessorMethod(MOCK_METHOD_ID, MOCK_CLASS_ID, LOCALS, RESULT_TYPE, ARGS_NULL);
         final long packedClassFrameInfo = registerInterfaceMockMethod(LOCALS, RESULT_TYPE, ARGS_NULL);
@@ -246,7 +246,7 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
         final int LOCALS = 0;
         final Type[] args = ARGS_FOUR_INT;
         
-        final String LABEL_METHOD_ID = LabelUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, args));
+        final String LABEL_METHOD_ID = LabelAndFrameUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, args));
 
         
         mockupOfInvokedMethod = makeSuccessorMethod(MOCK_METHOD_ID, MOCK_CLASS_ID, LOCALS, RESULT_TYPE, args);
@@ -284,7 +284,7 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
         final int LOCALS = TEST_LOCALS_NUMBER;
         final Type[] args = ARGS_FOUR_INT;
         
-        final String LABEL_METHOD_ID = LabelUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, args));
+        final String LABEL_METHOD_ID = LabelAndFrameUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, RESULT_TYPE, args));
         
         mockupOfInvokedMethod = makeSuccessorMethod(MOCK_METHOD_ID, MOCK_CLASS_ID, LOCALS, RESULT_TYPE, args);
         final long packedClassFrameInfo = registerInterfaceMockMethod(LOCALS, RESULT_TYPE, args);
@@ -394,8 +394,8 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
     }
 
     private String makePostfixWithBreakPoint(final String breakPoint, final String className, final String methodName, final Type[] args, final Type result, final StringWriter out) throws Exception {
-        final String processingLabel = LabelUtils.makeLabelNameForMethod(className, methodName, result, args);
-        final String interfaceIdLabel = LabelUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, result, args));
+        final String processingLabel = LabelAndFrameUtils.makeLabelNameForMethod(className, methodName, result, args);
+        final String interfaceIdLabel = LabelAndFrameUtils.makeLabelForMethodID(new MethodID(MOCK_INTERFACE_NAME, MOCK_INTERFACE_METHOD_NAME, result, args));
 
         out.write("JP " + END_LABEL + "\n");
         out.write(interfaceIdLabel + ": EQU "+ MOCK_INTERFACE_METHOD_ID +"\n");

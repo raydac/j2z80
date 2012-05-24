@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
 import org.apache.bcel.generic.*;
@@ -47,7 +47,7 @@ public class Processor_GETFIELD extends AbstractFieldProcessor {
             final ConstantPoolGen const_pool = methodTranslator.getConstantPool();
             final ObjectType objType = (ObjectType) getfield.getReferenceType(const_pool);
 
-            final String labelOffset = LabelUtils.makeLabelNameForFieldOffset(objType.getClassName(), getfield.getFieldName(const_pool), getfield.getFieldType(const_pool));
+            final String labelOffset = LabelAndFrameUtils.makeLabelNameForFieldOffset(objType.getClassName(), getfield.getFieldName(const_pool), getfield.getFieldType(const_pool));
 
             out.write(template.replace(MACROS_ADDRESS, labelOffset));
             out.write(NEXT_LINE);

@@ -19,7 +19,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.*;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
@@ -52,7 +52,7 @@ public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor implement
             final MethodID interfaceMethodId = new MethodID(invokedMethod);
             methodTranslator.getTranslatorContext().registerInterfaceMethodForINVOKEINTERFACE(interfaceMethodId);
             
-            final String interfaceMethdodId = LabelUtils.makeLabelForMethodID(interfaceMethodId);
+            final String interfaceMethdodId = LabelAndFrameUtils.makeLabelForMethodID(interfaceMethodId);
 
             final int argumentsBlockSize = calculateArgumentBlockSize(invokedMethod);
 

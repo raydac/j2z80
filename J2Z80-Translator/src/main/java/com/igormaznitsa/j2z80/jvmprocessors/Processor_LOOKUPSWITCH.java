@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
 import java.util.Locale;
@@ -48,7 +48,7 @@ public class Processor_LOOKUPSWITCH extends AbstractJvmCommandProcessor {
         final InstructionHandle[] targets = lookupswitch.getTargets();
 
         final InstructionHandle defaultTarget = lookupswitch.getTarget();
-        final String defaultJump = LabelUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), defaultTarget.getPosition());
+        final String defaultJump = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), defaultTarget.getPosition());
                 
         out.write(template
                 .replace(MACROS_ADDRESS, defaultJump)
@@ -59,7 +59,7 @@ public class Processor_LOOKUPSWITCH extends AbstractJvmCommandProcessor {
             for (int branchIndex = 0; branchIndex < matchs.length; branchIndex++) {
                 final int match = matchs[branchIndex];
                 final InstructionHandle target = targets[branchIndex];
-                final String jumpLabel = LabelUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), target.getPosition());
+                final String jumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), target.getPosition());
 
                 out.write("DEFW #"+Integer.toHexString(match & 0xFFFF).toUpperCase(Locale.ENGLISH)+"\n");
                 out.write("DEFW "+jumpLabel+"\n");

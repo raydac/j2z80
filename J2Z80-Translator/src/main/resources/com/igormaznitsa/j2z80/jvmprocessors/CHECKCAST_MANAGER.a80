@@ -1,3 +1,4 @@
+   CLRLOC
 ___CHECKCAST:  ; check that object in BC can be cast to the class whose id in DE, if it is impossible then an exception will be thrown
     CLRLOC
     PUSH BC

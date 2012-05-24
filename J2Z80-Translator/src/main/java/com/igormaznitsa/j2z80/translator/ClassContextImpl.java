@@ -31,11 +31,16 @@ import java.util.Set;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 
+/**
+ * The Class implements a class context handler
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 class ClassContextImpl implements ClassContext {
 
     private final TranslatorImpl theTranslator;
-    private final Map<ClassID, ClassMethodInfo> classIds = new HashMap<ClassID, ClassMethodInfo>();
-    private final Set<ClassID> classesWithJNI = new HashSet<ClassID>();
+    private final Map<ClassID, ClassMethodInfo> mapClassId = new HashMap<ClassID, ClassMethodInfo>();
+    private final Set<ClassID> setClassesWithJNI = new HashSet<ClassID>();
 
     public ClassContextImpl(final TranslatorImpl translator) {
         this.theTranslator = translator;
@@ -44,15 +49,16 @@ class ClassContextImpl implements ClassContext {
     void init(){
         int classIdCounter = 0;
 
+        // map all classes from the translator and generate their ids
         for (final ClassGen c : theTranslator.workingClassPath.getAllClasses().values()) {
             final ClassID classId = new ClassID(c);
             final ClassMethodInfo classInfo = new ClassMethodInfo(c, null, classIdCounter);
-            classIds.put(classId, classInfo);
+            mapClassId.put(classId, classInfo);
 
             if (!c.isInterface()){
                 for(final Method m : c.getMethods()){
                     if (m.isNative()){
-                        classesWithJNI.add(classId);
+                        setClassesWithJNI.add(classId);
                         break;
                     }
                 }
@@ -63,16 +69,16 @@ class ClassContextImpl implements ClassContext {
     }
     
     Set<ClassID> getClassesWithDetectedJNI(){
-        return classesWithJNI;
+        return setClassesWithJNI;
     }
     
     Set<Entry<ClassID,ClassMethodInfo>> getAllRegisteredClasses() {
-        return classIds.entrySet();
+        return mapClassId.entrySet();
     }
     
     @Override
     public Integer findClassUID(final ClassID classId) {
-        final ClassMethodInfo info = classIds.get(classId);
+        final ClassMethodInfo info = mapClassId.get(classId);
         if (info != null) {
             return Integer.valueOf(info.getUID());
         }
@@ -111,18 +117,19 @@ class ClassContextImpl implements ClassContext {
  
     @Override
     public Iterable<ClassID> getAllClasses() {
-        return classIds.keySet();
+        return mapClassId.keySet();
     }
 
     ClassMethodInfo findClassInfoForID(final ClassID classID){
-        return classIds.get(classID);
+        return mapClassId.get(classID);
     }
     
     @Override
     public ClassGen findClassForID(final ClassID classID) {
-        final ClassMethodInfo classMethodInfo = classIds.get(classID);
+        final ClassMethodInfo classMethodInfo = mapClassId.get(classID);
         return classMethodInfo == null ? null : classMethodInfo.getClassInfo();
     }
+    
     @Override
     public boolean isAccessible(final ClassGen classGen, final String superClassName) {
         ClassGen tmpClassGen = classGen;

@@ -20,7 +20,7 @@ package com.igormaznitsa.j2z80.translator.aux;
 
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.ids.MethodID;
@@ -66,9 +66,9 @@ public class InvokevirtualTable {
 
         private String generateAsmForMethod(final ClassMethodInfo classMethodInfo) {
             final MethodGen methGen = classMethodInfo.getMethodGen();
-            final String methodLabel = LabelUtils.makeLabelNameForMethod(classMethodInfo);
+            final String methodLabel = LabelAndFrameUtils.makeLabelNameForMethod(classMethodInfo);
             final int classId = theTranslator.getClassContext().findClassUID(new ClassID(classMethodInfo.getClassInfo())).intValue();
-            final int frameSize = LabelUtils.calculateFrameSizeForMethod(methGen.getArgumentTypes().length, methGen.getMaxLocals(), false);
+            final int frameSize = LabelAndFrameUtils.calculateFrameSizeForMethod(methGen.getArgumentTypes().length, methGen.getMaxLocals(), false);
 
             return "DEFW " + classId + ','
                     + methodLabel + ','
@@ -166,7 +166,7 @@ public class InvokevirtualTable {
         for (final Record r : allVirtualMethods.values()) {
             final Method method = r.theMethod;
             // make record label
-            result.append(LabelUtils.makeLabelForVirtualMethodRecord(r.theClassId.getClassName(), method.getName(), method.getReturnType(), method.getArgumentTypes())).append(":\n");
+            result.append(LabelAndFrameUtils.makeLabelForVirtualMethodRecord(r.theClassId.getClassName(), method.getName(), method.getReturnType(), method.getArgumentTypes())).append(":\n");
             // records
             result.append(r.toAsm());
         }

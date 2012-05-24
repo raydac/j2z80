@@ -29,7 +29,7 @@ import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEVIRTUALManager;
 import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.aux.Assert;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.aux.Utils;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import com.igormaznitsa.j2z80.ids.ClassID;
@@ -44,7 +44,7 @@ import com.igormaznitsa.j2z80.translator.aux.InvokevirtualTable;
 import com.igormaznitsa.j2z80.translator.aux.MethodUtils;
 import com.igormaznitsa.j2z80.translator.jar.ZClassPath;
 import com.igormaznitsa.j2z80.translator.jar.ZParsedJar;
-import com.igormaznitsa.j2z80.translator.optimizator.OptimizationChain;
+import com.igormaznitsa.j2z80.translator.optimizator.AsmOptimizerChain;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationChainFactory;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
@@ -194,7 +194,7 @@ public class TranslatorImpl implements TranslatorContext{
             getLogger().logWarning("Make optimization for the level \'"+optimizationLevel.getTextName()+"\'");
             
             final List<ParsedAsmLine> asmLines = asParsedLines(result);
-            final OptimizationChain chain = OptimizationChainFactory.getOptimizators(this, optimizationLevel);
+            final AsmOptimizerChain chain = OptimizationChainFactory.getOptimizators(this, optimizationLevel);
             final List<String> optimizedAsString = asStringLines(chain.processSources(asmLines));
             
             optimizedAsString.add(0,"; optimization level is \'"+optimizationLevel.getTextName()+'\'');
@@ -256,12 +256,12 @@ public class TranslatorImpl implements TranslatorContext{
     private void processIDs(final List<String> out) {
         // class id
         for (final Entry<ClassID, ClassMethodInfo> id : classContext.getAllRegisteredClasses()) {
-            out.add(LabelUtils.makeLabelForClassID(id.getKey()) + ": EQU " + id.getValue().getUID());
+            out.add(LabelAndFrameUtils.makeLabelForClassID(id.getKey()) + ": EQU " + id.getValue().getUID());
         }
 
         // method id
         for (final Entry<MethodID, ClassMethodInfo> id : methodContext.getMethods()) {
-            out.add(LabelUtils.makeLabelForMethodID(id.getKey()) + ": EQU " + id.getValue().getUID());
+            out.add(LabelAndFrameUtils.makeLabelForMethodID(id.getKey()) + ": EQU " + id.getValue().getUID());
         }
     }
 
@@ -271,14 +271,14 @@ public class TranslatorImpl implements TranslatorContext{
             final String className = currentClass.getClassName();
             int offset = 0;
             for (final Field f : fieldList) {
-                out.add(LabelUtils.makeLabelNameForFieldOffset(className, f.getName(), f.getType()) + ": EQU " + offset);
+                out.add(LabelAndFrameUtils.makeLabelNameForFieldOffset(className, f.getName(), f.getType()) + ": EQU " + offset);
                 offset += 2;
             }
 
             // reservation cells for static fields
             for (final Field f : currentClass.getFields()) {
                 if (f.isStatic()) {
-                    out.add(LabelUtils.makeLabelNameForField(className, f.getName(), f.getType()) + ": DEFW 0");
+                    out.add(LabelAndFrameUtils.makeLabelNameForField(className, f.getName(), f.getType()) + ": DEFW 0");
                 }
             }
         }
@@ -313,7 +313,7 @@ public class TranslatorImpl implements TranslatorContext{
             if (curClass.isAbstract() || curClass.isInterface()) {
                 continue;
             }
-            result.add(LabelUtils.makeLabelForClassSizeInfo(curClass.getClassName()) + ": EQU " + ClassUtils.calculateNeededAreaForClassInstance(workingClassPath,curClass));
+            result.add(LabelAndFrameUtils.makeLabelForClassSizeInfo(curClass.getClassName()) + ": EQU " + ClassUtils.calculateNeededAreaForClassInstance(workingClassPath,curClass));
         }
 
         return result;
@@ -360,7 +360,7 @@ public class TranslatorImpl implements TranslatorContext{
            
            
            final byte [] data = binaryData.getValue();
-           final String label = LabelUtils.makeLabelForBinaryResource(path);
+           final String label = LabelAndFrameUtils.makeLabelForBinaryResource(path);
            
            getLogger().logInfo("Added the binary resource "+path+" as "+label);
            

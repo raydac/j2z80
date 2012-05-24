@@ -32,15 +32,29 @@ import org.apache.bcel.generic.PUTFIELD;
 import org.apache.bcel.generic.PUTSTATIC;
 import org.apache.bcel.generic.Type;
 
+/**
+ * The class is ancestor for all field processors
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor {
 
-    protected boolean processBootClassCall(final MethodTranslator methodTranslator, final FieldInstruction instr, final Writer out) throws IOException {
+    /**
+     * Check the invoke instruction for a bootstrap class and if the field is situated in 
+     * a bootstrap class  then the method will process it by a special way.
+     * @param methodTranslator a method translator, must not be null
+     * @param instruction a field instruction, must not be null
+     * @param out a writer to make output for assembler instructions, must not be null
+     * @return true if the field instruction processes a bootstrap class field, else false
+     * @throws IOException it will be thrown if there is any transport level error
+     */
+    protected boolean processBootClassCall(final MethodTranslator methodTranslator, final FieldInstruction instruction, final Writer out) throws IOException {
 
         final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
-        final ObjectType objType = (ObjectType) instr.getReferenceType(constantPool);
+        final ObjectType objType = (ObjectType) instruction.getReferenceType(constantPool);
         final String className = objType.getClassName();
-        final String fieldName = instr.getFieldName(constantPool);
-        final Type fieldType = instr.getFieldType(constantPool);
+        final String fieldName = instruction.getFieldName(constantPool);
+        final Type fieldType = instruction.getFieldType(constantPool);
 
         final Integer classGen = methodTranslator.getTranslatorContext().getClassContext().findClassUID(new ClassID(className));
 
@@ -51,27 +65,27 @@ public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor
         final AbstractBootClass processor = AbstractBootClass.findProcessor(className);
 
         if (processor != null) {
-            final boolean isStaticCall = ( instr instanceof PUTSTATIC ) || ( instr instanceof GETSTATIC );
+            final boolean isStaticCall = ( instruction instanceof PUTSTATIC ) || ( instruction instanceof GETSTATIC );
 
-            if (instr instanceof PUTSTATIC || instr instanceof PUTFIELD) {
-                for (final String s : processor.generateSetField(methodTranslator.getTranslatorContext(), fieldName, fieldType, isStaticCall)) {
+            if (instruction instanceof PUTSTATIC || instruction instanceof PUTFIELD) {
+                for (final String s : processor.generateFieldSetter(methodTranslator.getTranslatorContext(), fieldName, fieldType, isStaticCall)) {
                     out.write(s);
                     if (!s.endsWith("\n")) {
-                        out.write("\n");
+                        out.write(NEXT_LINE);
                     }
                 }
-            } else if (instr instanceof GETSTATIC || instr instanceof GETFIELD) {
-                for (final String s : processor.generateGetField(methodTranslator.getTranslatorContext(), fieldName, fieldType, isStaticCall)) {
+            } else if (instruction instanceof GETSTATIC || instruction instanceof GETFIELD) {
+                for (final String s : processor.generateFieldGetter(methodTranslator.getTranslatorContext(), fieldName, fieldType, isStaticCall)) {
                     out.write(s);
                     if (!s.endsWith("\n")) {
-                        out.write("\n");
+                        out.write(NEXT_LINE);
                     }
                 }
 
             } else {
-                throw new IllegalArgumentException("Unsupported field operation detected [" + instr + ']');
+                throw new IllegalArgumentException("Unsupported field operation detected [" + instruction + ']');
             }
-            out.write("\n");
+            out.write(NEXT_LINE);
 
             methodTranslator.getTranslatorContext().registerCalledBootClassProcesser(processor);
 

@@ -19,7 +19,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEVIRTUALManager;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.aux.Utils;
 import java.io.*;
@@ -59,13 +59,13 @@ public class TestINVOKEVIRTUAL extends AbstractInvokeTest implements NeedsINVOKE
     }
     
     private void prepareVirtualTable(){
-        final String virtualTableRecordLabel = LabelUtils.makeLabelForVirtualMethodRecord(mockupOfInvokedMethod.getClassName(),mockupOfInvokedMethod.getName(),mockupOfInvokedMethod.getReturnType(),mockupOfInvokedMethod.getArgumentTypes());
-        final String processingLabel = LabelUtils.makeLabelNameForMethod(mockupOfInvokedMethod.getClassName(), mockupOfInvokedMethod.getName(), mockupOfInvokedMethod.getReturnType(), mockupOfInvokedMethod.getArgumentTypes());
+        final String virtualTableRecordLabel = LabelAndFrameUtils.makeLabelForVirtualMethodRecord(mockupOfInvokedMethod.getClassName(),mockupOfInvokedMethod.getName(),mockupOfInvokedMethod.getReturnType(),mockupOfInvokedMethod.getArgumentTypes());
+        final String processingLabel = LabelAndFrameUtils.makeLabelNameForMethod(mockupOfInvokedMethod.getClassName(), mockupOfInvokedMethod.getName(), mockupOfInvokedMethod.getReturnType(), mockupOfInvokedMethod.getArgumentTypes());
         
         virtualTable = virtualTableRecordLabel+':'+"DEFB 3\n "
                 + "DEFW "+(FAKE_OBJECT_CLASS_ID-1)+",0,#FFFF\n"
                 + "DEFW "+(FAKE_OBJECT_CLASS_ID-2)+",0,#FFFF\n"
-                + "DEFW "+FAKE_OBJECT_CLASS_ID+','+processingLabel+','+LabelUtils.calculateFrameSizeForMethod(mockupOfInvokedMethod.getArgumentTypes().length, mockupOfInvokedMethod.getMaxLocals(), false);
+                + "DEFW "+FAKE_OBJECT_CLASS_ID+','+processingLabel+','+LabelAndFrameUtils.calculateFrameSizeForMethod(mockupOfInvokedMethod.getArgumentTypes().length, mockupOfInvokedMethod.getMaxLocals(), false);
     
         final ClassID mockClassID = new ClassID(mockupOfInvokedMethod.getClassName());
         

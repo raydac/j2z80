@@ -20,7 +20,7 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.aux.Assert;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
@@ -50,7 +50,7 @@ public class Processor_NEW extends AbstractJvmCommandProcessor implements NeedsM
         
         Assert.assertNotNull("Class ID must not be null [" + className + ']', classID);
         
-        final String classInfoLabel = LabelUtils.makeLabelForClassSizeInfo(type);
+        final String classInfoLabel = LabelAndFrameUtils.makeLabelForClassSizeInfo(type);
         
         out.write(template.replace(MACROS_VALUE, classInfoLabel).replace(MACROS_ID, Integer.toString(classID)));
         out.write(NEXT_LINE);

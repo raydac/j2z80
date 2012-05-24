@@ -23,18 +23,40 @@ import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OptimizationChain {
+/**
+ * It is a container allows to make a chain from several assembler optimizers.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
+public class AsmOptimizerChain {
+    /**
+     * The Translator context for the optimizer chain
+     */
     private final TranslatorContext context;
-    private final AsmOptimizator [] optimizators;
     
-    protected OptimizationChain(final TranslatorContext context, final AsmOptimizator ... optimizators){
+    /**
+     * Array of optimizers of the chain
+     */
+    private final AsmOptimizer [] optimizators;
+    
+    /**
+     * The Constructor.
+     * @param context the translator context, must not be null
+     * @param optimizators an array of optimizers for the chain, must not be null
+     */
+    protected AsmOptimizerChain(final TranslatorContext context, final AsmOptimizer ... optimizators){
         this.context = context;
-        this.optimizators = optimizators == null ? new AsmOptimizator[0] : optimizators.clone();
+        this.optimizators = optimizators == null ? new AsmOptimizer[0] : optimizators.clone();
     }
     
+    /**
+     * Process assembler sources by the chain
+     * @param lines a list contains parsed assembler lines, also it doesn't contain empty strings, must not be null
+     * @return an optimized list of assembler strings
+     */
     public List<ParsedAsmLine> processSources(final List<ParsedAsmLine> lines){
         List<ParsedAsmLine> processing = new ArrayList<ParsedAsmLine>(lines);
-        for(final AsmOptimizator optimizator : optimizators){
+        for(final AsmOptimizer optimizator : optimizators){
             processing = optimizator.optimizeAsmText(this.context,processing);
         }
         return processing;

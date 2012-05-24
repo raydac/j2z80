@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
 import org.apache.bcel.generic.*;
@@ -40,7 +40,7 @@ public class Processor_IF_ACMPEQ extends AbstractJvmCommandProcessor {
     @Override
     public void process(final MethodTranslator classProcessor, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
         final IF_ACMPEQ ifacmpeq = (IF_ACMPEQ)instruction;
-        final String label = LabelUtils.makeClassMethodJumpLabel(classProcessor.getMethod(),((BranchHandle)handle).getTarget().getPosition());
+        final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(classProcessor.getMethod(),((BranchHandle)handle).getTarget().getPosition());
         out.write(template.replace(MACROS_ADDRESS, label));
         out.write(NEXT_LINE);
     }

@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
 import org.apache.bcel.generic.*;
@@ -41,7 +41,7 @@ public class Processor_IFNONNULL extends AbstractJvmCommandProcessor {
     public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
         final IFNONNULL ifnonnul = (IFNONNULL)instruction;
         final BranchHandle branchHandler = (BranchHandle) handle;
-        final String label = LabelUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(),branchHandler.getTarget().getPosition());
+        final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(),branchHandler.getTarget().getPosition());
         out.write(template.replace(MACROS_ADDRESS, label));
         out.write(NEXT_LINE);
     }

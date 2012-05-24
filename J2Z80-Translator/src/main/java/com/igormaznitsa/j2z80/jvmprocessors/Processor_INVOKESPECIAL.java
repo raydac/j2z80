@@ -49,7 +49,7 @@ public class Processor_INVOKESPECIAL extends AbstractInvokeProcessor implements 
             final String labelForMethod = getMethodLabel(methodTranslator, inv);
 
             final int argBlockSize = calculateArgumentBlockSize(invokingMethod);
-            final int frameSize = calculateTotalFrameSize(invokingMethod);
+            final int frameSize = calculateTotalFrameSizeWithoutLocals(invokingMethod);
 
             assertLocalVariablesNumber(invokingMethod);
 

@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
 import org.apache.bcel.generic.*;
@@ -45,7 +45,7 @@ public class Processor_GETSTATIC extends AbstractFieldProcessor {
         if (!processBootClassCall(methodTranslator, ins, out)) {
             final ConstantPoolGen cpool = methodTranslator.getConstantPool();
             final ObjectType obj = (ObjectType) ins.getReferenceType(cpool);
-            final String address = LabelUtils.makeLabelNameForField(obj.getClassName(), ins.getFieldName(cpool), ins.getFieldType(cpool));
+            final String address = LabelAndFrameUtils.makeLabelNameForField(obj.getClassName(), ins.getFieldName(cpool), ins.getFieldType(cpool));
 
             out.write(template.replace(MACROS_ADDRESS, address));
             out.write(NEXT_LINE);

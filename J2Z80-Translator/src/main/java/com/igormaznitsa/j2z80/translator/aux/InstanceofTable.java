@@ -20,7 +20,7 @@ package com.igormaznitsa.j2z80.translator.aux;
 
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -53,7 +53,7 @@ public final class InstanceofTable {
         
         public String toAsm(){
             final StringBuilder result = new StringBuilder();
-            result.append("DEFW ").append(LabelUtils.makeLabelForClassID(classId)).append("\n");
+            result.append("DEFW ").append(LabelAndFrameUtils.makeLabelForClassID(classId)).append("\n");
             
             result.append("DEFB ").append(compatibleClasses.size()).append("\n");
             result.append("DEFW ");
@@ -62,7 +62,7 @@ public final class InstanceofTable {
                 if (!first){
                     result.append(',');
                 }
-                result.append(LabelUtils.makeLabelForClassID(compatibleClass));
+                result.append(LabelAndFrameUtils.makeLabelForClassID(compatibleClass));
                 first = false;
             }
             return result.toString();

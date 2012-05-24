@@ -19,7 +19,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEVIRTUALManager;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
 import java.util.Locale;
@@ -51,7 +51,7 @@ public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements 
 
             assertMethodIsNotNull(invokedMethod, methodTranslator, inv);
 
-            final String recordLabel = LabelUtils.makeLabelForVirtualMethodRecord(invokedMethod.getClassName(), invokedMethod.getName(), invokedMethod.getReturnType(), invokedMethod.getArgumentTypes());
+            final String recordLabel = LabelAndFrameUtils.makeLabelForVirtualMethodRecord(invokedMethod.getClassName(), invokedMethod.getName(), invokedMethod.getReturnType(), invokedMethod.getArgumentTypes());
 
             final int argumentsBlockSize = calculateArgumentBlockSize(invokedMethod);
 

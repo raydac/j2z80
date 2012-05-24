@@ -19,7 +19,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.*;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
@@ -48,7 +48,7 @@ public class Processor_INSTANCEOF extends AbstractJvmCommandProcessor implements
         
         methodTranslator.getTranslatorContext().registerClassForCastCheck(targetClassID);
         
-        out.write(template.replace(MACROS_ID, LabelUtils.makeLabelForClassID(targetClassID)));
+        out.write(template.replace(MACROS_ID, LabelAndFrameUtils.makeLabelForClassID(targetClassID)));
         out.write(NEXT_LINE);
     }
 }

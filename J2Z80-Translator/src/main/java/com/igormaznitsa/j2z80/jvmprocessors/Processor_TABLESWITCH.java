@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
 import org.apache.bcel.generic.*;
@@ -50,7 +50,7 @@ public class Processor_TABLESWITCH extends AbstractJvmCommandProcessor {
         final InstructionHandle[] targets = tableswitch.getTargets();
 
         final InstructionHandle defaultTarget = tableswitch.getTarget();
-        final String defaultJump = LabelUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), defaultTarget.getPosition());
+        final String defaultJump = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), defaultTarget.getPosition());
                 
         final int lowIndex = matchs[0];
         final int highIndex = matchs[matchs.length-1];
@@ -64,7 +64,7 @@ public class Processor_TABLESWITCH extends AbstractJvmCommandProcessor {
         if (matchs.length > 0) {
             for (int branchIndex = 0; branchIndex < matchs.length; branchIndex++) {
                 final InstructionHandle target = targets[branchIndex];
-                final String jumpLabel = LabelUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), target.getPosition());
+                final String jumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), target.getPosition());
 
                 out.write("DEFW "+jumpLabel+"\n");
             }

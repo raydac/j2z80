@@ -19,7 +19,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.aux.Utils;
 import java.io.*;
@@ -56,12 +56,12 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
         }
         
         final int argumentMemorySize = calculateArgumentBlockSize(initingMethod);
-        final int totalMemorySize = calculateTotalFrameSize(initingMethod);
+        final int totalMemorySize = calculateTotalFrameSizeWithoutLocals(initingMethod);
         String prefix = "";
         String postfix = "";
 
 
-        final String labelForMethod = LabelUtils.makeLabelNameForMethod(initingMethod);
+        final String labelForMethod = LabelAndFrameUtils.makeLabelNameForMethod(initingMethod);
 
         final boolean needsFrame = argumentMemorySize != 0 || totalMemorySize != 0;
 
@@ -87,7 +87,7 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
             assertMethodIsNotNull(invokedMethod, methodTranslator, inv);
 
             final int argumentMemorySize = calculateArgumentBlockSize(invokedMethod);
-            final int totalMemorySize = calculateTotalFrameSize(invokedMethod);
+            final int totalMemorySize = calculateTotalFrameSizeWithoutLocals(invokedMethod);
             String prefix = "";
             String postfix = "";
 

@@ -20,7 +20,7 @@ package com.igormaznitsa.j2z80.translator.aux;
 
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import java.util.ArrayList;
@@ -45,15 +45,15 @@ public class InvokeinterfaceTable {
         private String generateAsm(){
             final StringBuilder result = new StringBuilder("DEFW ");
             
-            result.append(LabelUtils.makeLabelForMethodID(interfaceMethod)).append('\n');
+            result.append(LabelAndFrameUtils.makeLabelForMethodID(interfaceMethod)).append('\n');
             
             result.append("DEFB ").append(inheritedMethods.size()).append('\n');
             
             for(final MethodID method : inheritedMethods){
                 final MethodGen meth = translator.getMethodContext().findMethod(method);
-                final int frameSize = LabelUtils.calculateFrameSizeForMethod(meth.getArgumentTypes().length, meth.getMaxLocals(),false);
+                final int frameSize = LabelAndFrameUtils.calculateFrameSizeForMethod(meth.getArgumentTypes().length, meth.getMaxLocals(),false);
                 
-                result.append("DEFW ").append(LabelUtils.makeLabelForClassID(method.getClassID())).append(',')
+                result.append("DEFW ").append(LabelAndFrameUtils.makeLabelForClassID(method.getClassID())).append(',')
                         .append(method.getMethodLabel()).append(',')
                         .append(frameSize)
                         .append('\n');

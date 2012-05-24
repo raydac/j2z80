@@ -17,7 +17,7 @@
  * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>. 
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.*;
 import org.apache.bcel.Constants;
@@ -68,7 +68,7 @@ public class TestPUTFIELD extends AbstractJvmCommandProcessorTest {
         push(OBJECT_REF);
         push(VALUE);
         
-        final String fieldOffset = LabelUtils.makeLabelNameForFieldOffset(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
+        final String fieldOffset = LabelAndFrameUtils.makeLabelNameForFieldOffset(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
         
         final PUTFIELD testInstruction = new PUTFIELD(CP_INDEX_FIELDREF);
         
@@ -81,7 +81,7 @@ public class TestPUTFIELD extends AbstractJvmCommandProcessorTest {
 
     @Override
     public String getAsmPostfix() {
-        final String fieldOffsetLabel = LabelUtils.makeLabelNameForFieldOffset(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
+        final String fieldOffsetLabel = LabelAndFrameUtils.makeLabelNameForFieldOffset(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
         return fieldOffsetLabel+": EQU "+FIELD_OFFSET;
     }
     

@@ -19,7 +19,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.aux.InstanceofTable;
 import com.igormaznitsa.j2z80.aux.Utils;
@@ -108,9 +108,9 @@ public class TestCHECKCAST extends AbstractTestBasedOnMemoryManager implements N
         }
         
         // add class ids
-        bldr.append(LabelUtils.makeLabelForClassID(new ClassID(TEST_CLASS_NAME1))).append(": EQU ").append(TEST_CLASS_NAME1_ID.intValue()).append('\n');
-        bldr.append(LabelUtils.makeLabelForClassID(new ClassID(TEST_CLASS_NAME2))).append(": EQU ").append(TEST_CLASS_NAME2_ID.intValue()).append('\n');
-        bldr.append(LabelUtils.makeLabelForClassID(new ClassID(TEST_CLASS_NAME3))).append(": EQU ").append(TEST_CLASS_NAME3_ID.intValue()).append('\n');
+        bldr.append(LabelAndFrameUtils.makeLabelForClassID(new ClassID(TEST_CLASS_NAME1))).append(": EQU ").append(TEST_CLASS_NAME1_ID.intValue()).append('\n');
+        bldr.append(LabelAndFrameUtils.makeLabelForClassID(new ClassID(TEST_CLASS_NAME2))).append(": EQU ").append(TEST_CLASS_NAME2_ID.intValue()).append('\n');
+        bldr.append(LabelAndFrameUtils.makeLabelForClassID(new ClassID(TEST_CLASS_NAME3))).append(": EQU ").append(TEST_CLASS_NAME3_ID.intValue()).append('\n');
         
         postfixText = table.toAsm()+"\n";
         
@@ -155,7 +155,7 @@ public class TestCHECKCAST extends AbstractTestBasedOnMemoryManager implements N
         return  "LD BC,EXSTART\n"
                 +"LD (___ATHROW_PROCESSING_CODE_ADDRESS),BC\n"
                 +"LD BC, "+CLASS_FIELD_NUMBER+"\n"
-                +"LD DE,"+LabelUtils.makeLabelForClassID(new ClassID(TEST_CLASS_NAME3))+'\n'
+                +"LD DE,"+LabelAndFrameUtils.makeLabelForClassID(new ClassID(TEST_CLASS_NAME3))+'\n'
                 +"CALL "+ SUB_ALLOCATE_OBJECT+"\n"
                 +"PUSH BC\n"
                 +"JP STRT\n"

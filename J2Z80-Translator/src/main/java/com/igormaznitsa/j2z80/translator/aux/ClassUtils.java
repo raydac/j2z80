@@ -30,10 +30,9 @@ import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Field;
 import org.apache.bcel.generic.ClassGen;
 
-public class ClassUtils {
-    private ClassUtils(){
-    }
-
+public enum ClassUtils {
+    ;
+    
     public static final String [] ALLOWED_JNI_ASM_EXTENSIONS = new String[]{".z80",".a80",".asm"};
     public static final String [] ALLOWED_JNI_BIN_EXTENSIONS = new String[]{".bin"};
     

@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.*;
@@ -57,7 +57,7 @@ public class TestNEW extends AbstractTestBasedOnMemoryManager {
 
     @Override
     public String getAsmPostfix() {
-        final String label = LabelUtils.makeLabelForClassSizeInfo(new ObjectType(TEST_CLASS_NAME));
+        final String label = LabelAndFrameUtils.makeLabelForClassSizeInfo(new ObjectType(TEST_CLASS_NAME));
         return label+": EQU "+TEST_OBJECT_SIZE;
     }
 }

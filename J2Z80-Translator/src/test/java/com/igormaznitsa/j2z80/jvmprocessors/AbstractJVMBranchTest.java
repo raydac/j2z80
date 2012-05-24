@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import java.io.StringWriter;
 import org.apache.bcel.generic.BranchHandle;
 import org.apache.bcel.generic.BranchInstruction;
@@ -38,7 +38,7 @@ public abstract class AbstractJVMBranchTest extends AbstractJvmCommandProcessorT
         when(mockTarget.getPosition()).thenReturn(Integer.valueOf(TARGET_INSTRUCTION_POS));
         final BranchInstruction instructionInstance = instruction.getConstructor(InstructionHandle.class).newInstance(mockTarget);
         final BranchHandle branchHandle = Whitebox.invokeMethod(BranchHandle.class, "getBranchHandle", instructionInstance);
-        final String jumpLabel = LabelUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, branchHandle.getTarget().getPosition());
+        final String jumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, branchHandle.getTarget().getPosition());
         
         processor.process(CLASS_PROCESSOR_MOCK, instructionInstance, branchHandle, writer);
         return jumpLabel;

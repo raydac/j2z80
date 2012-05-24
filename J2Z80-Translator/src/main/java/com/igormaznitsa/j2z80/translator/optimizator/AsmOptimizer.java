@@ -22,6 +22,17 @@ import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import java.util.List;
 
-public interface AsmOptimizator {
+/**
+ * The interface describes an optimizer working on the assembler level
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
+public interface AsmOptimizer {
+    /**
+     * Optimize assembler text.
+     * @param context a translator context, must not be null
+     * @param asmParsedLines a list contains parsed assembler lines without spaces and nulls
+     * @return a list contains optimized assembler lines
+     */
     List<ParsedAsmLine> optimizeAsmText(TranslatorContext context, List<ParsedAsmLine> asmParsedLines);
 }

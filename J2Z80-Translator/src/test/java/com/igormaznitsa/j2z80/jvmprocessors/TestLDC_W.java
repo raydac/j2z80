@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import java.io.StringWriter;
 import org.apache.bcel.generic.*;
 import static org.junit.Assert.assertEquals;
@@ -44,13 +44,13 @@ public class TestLDC_W extends AbstractJvmCommandProcessorTest {
         final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(LDC_W.class);
         final StringWriter writer = new StringWriter();
         
-        final String etalonLabel = LabelUtils.makeLabelForConstantPoolItem(JCLASS_GEN_MOCK, CONSTANT_UTF8);
+        final String etalonLabel = LabelAndFrameUtils.makeLabelForConstantPoolItem(JCLASS_GEN_MOCK, CONSTANT_UTF8);
         
         when(CLASS_PROCESSOR_MOCK.registerUsedConstantPoolItem(CONSTANT_UTF8)).thenReturn(etalonLabel);
         
         processor.process(CLASS_PROCESSOR_MOCK, new LDC_W(CONSTANT_UTF8), mock(InstructionHandle.class), writer);
         
-        final String labelName = LabelUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_UTF8);
+        final String labelName = LabelAndFrameUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_UTF8);
         final int labelAddress = assertLinearExecutionToEnd(writer.toString()).findLabelAddress(labelName).intValue();
         assertEquals(labelAddress, pop());
         assertStackEmpty();
@@ -63,7 +63,7 @@ public class TestLDC_W extends AbstractJvmCommandProcessorTest {
         final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(LDC_W.class);
         final StringWriter writer = new StringWriter();
 
-        final String labelName = LabelUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_UTF8);
+        final String labelName = LabelAndFrameUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_UTF8);
 
         when(CLASS_PROCESSOR_MOCK.registerUsedConstantPoolItem(CONSTANT_UTF8)).thenReturn(labelName);
         when(CLASS_PROCESSOR_MOCK.registerUsedConstantPoolItem(CONSTANT_STR)).thenReturn(labelName);
@@ -101,9 +101,9 @@ public class TestLDC_W extends AbstractJvmCommandProcessorTest {
 
      @Override
     public String getAsmPostfix() {
-        final String labelUTF8 = LabelUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_UTF8);
-        final String labelStr = LabelUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_STR);
-        final String labelInt = LabelUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_INT);
+        final String labelUTF8 = LabelAndFrameUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_UTF8);
+        final String labelStr = LabelAndFrameUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_STR);
+        final String labelInt = LabelAndFrameUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_INT);
         return labelUTF8+": NOP\n"+labelInt+": NOP\n"+labelStr+": EQU "+labelUTF8;
     }
 }

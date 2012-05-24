@@ -23,15 +23,15 @@ import com.igormaznitsa.j2z80.translator.optimizator.base.ReplacePatterns;
 
 public class OptimizationChainFactory {
 
-    public static OptimizationChain getOptimizators(final TranslatorContext context, final OptimizationLevel level) {
+    public static AsmOptimizerChain getOptimizators(final TranslatorContext context, final OptimizationLevel level) {
         if (level == null){
-            return new OptimizationChain(context);
+            return new AsmOptimizerChain(context);
         }
         switch (level) {
             case NONE:
-                return new OptimizationChain(context);
+                return new AsmOptimizerChain(context);
             case BASE:
-                return new OptimizationChain(context, new AsmOptimizator[]{new ReplacePatterns()});
+                return new AsmOptimizerChain(context, new AsmOptimizer[]{new ReplacePatterns()});
             default:
                 throw new IllegalArgumentException("Unsupported optimization level " + level);
         }

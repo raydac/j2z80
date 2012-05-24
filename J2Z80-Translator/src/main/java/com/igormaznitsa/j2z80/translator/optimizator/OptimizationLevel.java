@@ -20,20 +20,42 @@ package com.igormaznitsa.j2z80.translator.optimizator;
 
 import java.util.Locale;
 
+/**
+ * List of allowed optimization levels
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public enum OptimizationLevel {
-
+    /**
+     * Don't make any optimization
+     */
     NONE("none"),
+    
+    /**
+     * Make low optimization, mainly remove meaningless command pairs
+     */
     BASE("base");
+    
+    // save the text name for the optimization level
     private final String textName;
 
     private OptimizationLevel(final String textName) {
         this.textName = textName;
     }
 
+    /**
+     * Get the human level name
+     * @return the level name as String
+     */
     public String getTextName() {
         return this.textName;
     }
 
+    /**
+     * Find an optimization level for its human name
+     * @param textName the human name of the needed optimization level
+     * @return found optimization level or NONE if such level is not found for its text name
+     */
     public static OptimizationLevel findForTextName(final String textName) {
         final String textNameInLowCase = textName.toLowerCase(Locale.ENGLISH);
         for (final OptimizationLevel value : values()) {

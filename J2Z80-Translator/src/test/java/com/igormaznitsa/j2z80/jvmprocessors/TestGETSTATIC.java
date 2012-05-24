@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.*;
 import org.apache.bcel.Constants;
@@ -64,7 +64,7 @@ public class TestGETSTATIC extends AbstractJvmCommandProcessorTest {
         
         when(CP_MOCK.getConstantString(CP_INDEX_CLASSREF,Constants.CONSTANT_Class)).thenReturn(CLASS_NAME);
         
-        final String staticFieldLabel = LabelUtils.makeLabelNameForField(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
+        final String staticFieldLabel = LabelAndFrameUtils.makeLabelNameForField(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
         
         final GETSTATIC testInstruction = new GETSTATIC(CP_INDEX_FIELDREF);
         
@@ -79,7 +79,7 @@ public class TestGETSTATIC extends AbstractJvmCommandProcessorTest {
 
     @Override
     public String getAsmPostfix() {
-        final String staticFieldLabel = LabelUtils.makeLabelNameForField(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
+        final String staticFieldLabel = LabelAndFrameUtils.makeLabelNameForField(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
         return staticFieldLabel+": DEFW "+VALUE;
     }
     

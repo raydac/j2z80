@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;
 import org.apache.bcel.generic.*;
@@ -45,7 +45,7 @@ public class Processor_PUTSTATIC extends AbstractFieldProcessor {
             final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
             final ObjectType objType = (ObjectType) putstatic.getReferenceType(constantPool);
 
-            final String label = LabelUtils.makeLabelNameForField(objType.getClassName(), putstatic.getFieldName(constantPool), putstatic.getFieldType(constantPool));
+            final String label = LabelAndFrameUtils.makeLabelNameForField(objType.getClassName(), putstatic.getFieldName(constantPool), putstatic.getFieldType(constantPool));
 
             out.write(template.replace(MACROS_ADDRESS, label));
             out.write(NEXT_LINE);

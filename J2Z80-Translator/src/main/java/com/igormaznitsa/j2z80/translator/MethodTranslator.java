@@ -19,7 +19,7 @@
 package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.aux.LabelUtils;
+import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.aux.Utils;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.jvmprocessors.AbstractJvmCommandProcessor;
@@ -71,7 +71,7 @@ public class MethodTranslator {
     private List<String> methodToAsm() throws IOException {
         final List<String> result = new ArrayList<String>(1024);
 
-        result.add(LabelUtils.makeLabelNameForMethod(theMethod) + ':');
+        result.add(LabelAndFrameUtils.makeLabelNameForMethod(theMethod) + ':');
 
         final MethodGen methodG = theMethod.getMethodGen();
         
@@ -100,7 +100,7 @@ public class MethodTranslator {
             
             if (checkHandleForInstructionTargeters(handler)) {
                 // the instruction is a jump target so we label it
-                final String methodJumpLabel = LabelUtils.makeClassMethodJumpLabel(theMethod.getClassInfo(), theMethod.getMethodGen(), handler.getPosition());
+                final String methodJumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(theMethod.getClassInfo(), theMethod.getMethodGen(), handler.getPosition());
                 result.add(methodJumpLabel + ":\r\n");
             }
 
@@ -132,10 +132,10 @@ public class MethodTranslator {
         
         if (item instanceof ConstantString) {
             final ConstantUtf8 utfconst = (ConstantUtf8) getConstantPool().getConstant(( (ConstantString) item ).getStringIndex());
-            result = LabelUtils.makeLabelForConstantPoolItem(theMethod.getClassInfo(), ( (ConstantString) item ).getStringIndex());
+            result = LabelAndFrameUtils.makeLabelForConstantPoolItem(theMethod.getClassInfo(), ( (ConstantString) item ).getStringIndex());
             getTranslatorContext().registerConstantPoolItem(result, utfconst);
         } else {
-            result = LabelUtils.makeLabelForConstantPoolItem(theMethod.getClassInfo(), itemIndex);
+            result = LabelAndFrameUtils.makeLabelForConstantPoolItem(theMethod.getClassInfo(), itemIndex);
             getTranslatorContext().registerConstantPoolItem(result, item);
         }
         return result;
