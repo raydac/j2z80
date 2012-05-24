@@ -21,13 +21,32 @@ package com.igormaznitsa.j2z80.translator.jar;
 import com.igormaznitsa.j2z80.aux.MutableObjectContainer;
 import com.igormaznitsa.j2z80.aux.Utils;
 import org.apache.bcel.Constants;
-import org.apache.bcel.classfile.*;
-import org.apache.bcel.generic.*;
+import org.apache.bcel.classfile.Constant;
+import org.apache.bcel.classfile.ConstantDouble;
+import org.apache.bcel.classfile.ConstantFloat;
+import org.apache.bcel.classfile.ConstantInteger;
+import org.apache.bcel.classfile.ConstantLong;
+import org.apache.bcel.classfile.ConstantUtf8;
+import org.apache.bcel.classfile.Field;
+import org.apache.bcel.classfile.Method;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.ConstantPoolGen;
+import org.apache.bcel.generic.Type;
 
+/**
+ * The Class contains methods allow to check a compiled Java class to be translated
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa,com)
+ */
 public enum ClassValidator {
 
 ;
-        
+ 
+    /**
+     * Check a class to be compatible with the translator
+     * @param cgen a parsed compiled java class, must not be null
+     * @return null if the class is compatible and a incompatibility message string if the class is not compatible
+     */
     public static String validateClass(final ClassGen cgen) {
         final MutableObjectContainer<String> result = new MutableObjectContainer<String>();
 

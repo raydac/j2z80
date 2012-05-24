@@ -18,6 +18,17 @@
  */
 package com.igormaznitsa.z80asm;
 
+/**
+ * The interface describes a local label expectant, it works like an observer but only one time.
+ * 
+ * @author Imgor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public interface LocalLabelExpectant {
-    void onLabelIsAccessible(AsmTranslator context, String labelName, long labelAddress);
+    /**
+     * This method will be called when the needed label is registered.
+     * @param asmTranslator the assembler translator, must not be null
+     * @param labelName the label name, must not be null
+     * @param labelAddress the label address
+     */
+    void onLabelIsAccessible(AsmTranslator asmTranslator, String labelName, long labelAddress);
 }

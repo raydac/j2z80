@@ -40,14 +40,15 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
 /**
- * It allow to make preprocessing of sources and text data in maven projects.
+ * This Maven plugin allows to translate compiled Java classes packed as JARs
+ * into Z80 assembler instructions and compiled binary code.
  *
  * @goal translate2z80 
  * @phase install 
  * @threadSafe 
  * @requiresProject
  * @requiresDependencyResolution compile
- * 
+ *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
@@ -55,101 +56,94 @@ public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
     /**
      * The project.
      *
-     * @parameter default-value="${project}" 
-     * @required 
-     * @readonly
+     * @parameter default-value="${project}" @required @readonly
      */
     private MavenProject project;
-
     /**
-     * Local Maven repository where artifacts are cached during the build process.
+     * Local Maven repository where artifacts are cached during the build
+     * process.
      *
-     * @parameter default-value="${localRepository}"
-     * @required
-     * @readonly
+     * @parameter default-value="${localRepository}" @required @readonly
      */
     private ArtifactRepository localRepository;
-
     /**
      * JAR File
      *
-     * @parameter name="jar" default-value="${project.build.directory}/${project.build.finalName}.jar"
+     * @parameter name="jar"
+     * default-value="${project.build.directory}/${project.build.finalName}.jar"
      * @readonly
      */
     private File jarFile;
     /**
      * Result file
      *
-     * @parameter name="result" default-value="${project.build.directory}/${project.build.finalName}.bin"
+     * @parameter name="result"
+     * default-value="${project.build.directory}/${project.build.finalName}.bin"
      * @readonly
      */
     private File resultFile;
     /**
      * Output file format
      *
-     * @parameter name="format" default-value="bin"
-     * @readonly
+     * @parameter name="format" default-value="bin" @readonly
      */
     private String format;
     /**
      * The start address of the generated code
      *
-     * @parameter name="startAddress" default-value="28672" 
-     * @readonly
+     * @parameter name="startAddress" default-value="28672" @readonly
      */
     private int startAddress;
     /**
      * The Stack top address
      *
-     * @parameter name="stackTop" default-value="65534"
-     * @readonly
+     * @parameter name="stackTop" default-value="65534" @readonly
      */
     private int stackTop;
     /**
      * Output assembler text into log
      *
-     * @parameter name="logAsmText" default-value="false" 
-     * @readonly
+     * @parameter name="logAsmText" default-value="false" @readonly
      */
     private boolean logAsmText;
     /**
      * The name of a file where the result asm text must be saved
      *
-     * @parameter name="asmOutFile" default-value="${project.build.directory}/${project.build.finalName}.a80" 
+     * @parameter name="asmOutFile"
+     * default-value="${project.build.directory}/${project.build.finalName}.a80"
      * @readonly
      */
     private File asmOutFile;
-
     /**
-     * Patterns to be used to exclude binary resources from result compilation. Patterns use ANT style.
+     * Patterns to be used to exclude binary resources from result compilation.
+     * Patterns use ANT style.
      *
      * @parameter name="excludeResources"
      */
-    private String [] excludeResources;
-
+    private String[] excludeResources;
     /**
      * Optimization level. Can be 'none' or 'base'
      *
      * @parameter name="optimization" default-value="none"
      */
     private String optimization;
-    
-    public void setOptimization(final String value){
+
+    public void setOptimization(final String value) {
         optimization = value;
     }
-    
-    public String getOptimization(){
+
+    public String getOptimization() {
         return this.optimization;
     }
-    
-    public void setExcludeResources(final String [] resources){
+
+    public void setExcludeResources(final String[] resources) {
         this.excludeResources = resources;
     }
-    
-    public String [] getExcludeResources(){
+
+    public String[] getExcludeResources() {
         return this.excludeResources;
     }
-    
+
     public ArtifactRepository getLocalRepository() {
         return localRepository;
     }
@@ -158,14 +152,14 @@ public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
         this.localRepository = localRepository;
     }
 
-    public void setLogAsmText(final boolean flag){
+    public void setLogAsmText(final boolean flag) {
         this.logAsmText = flag;
     }
-    
-    public void setAsmOutFile(final File file){
+
+    public void setAsmOutFile(final File file) {
         this.asmOutFile = file;
     }
-    
+
     public void setFormat(final String value) {
         this.format = value;
     }
@@ -191,16 +185,16 @@ public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            File [] classPath = getCompilationDependencies();
-            
-            classPath = Arrays.copyOf(classPath, classPath.length+1);
-            classPath[classPath.length-1] = jarFile;
-            
+            File[] classPath = getCompilationDependencies();
+
+            classPath = Arrays.copyOf(classPath, classPath.length + 1);
+            classPath[classPath.length - 1] = jarFile;
+
             logInfo("The result file format : " + format);
             logInfo("The result file name : " + resultFile.getName());
 
             final OptimizationLevel optimizationLevel = OptimizationLevel.findForTextName(getOptimization());
-            
+
             final TranslatorContext translator = new TranslatorImpl(this, optimizationLevel, classPath);
             final String[] translatedAsmText = translator.translate(null, startAddress, stackTop, getExcludeResources());
 
@@ -241,19 +235,19 @@ public class J2ZTranslator extends AbstractMojo implements TranslatorLogger {
         }
     }
 
-    private File [] getCompilationDependencies(){
+    private File[] getCompilationDependencies() {
         final List<File> dependencyList = new ArrayList<File>();
-        for(final Artifact arty : project.getDependencyArtifacts()){
-                if ("z80".equalsIgnoreCase(arty.getClassifier())){
-                    final Artifact art = localRepository.find(arty);
-                    logInfo("Detected Z80 dependency :"+art.getFile().getAbsolutePath());
-                    dependencyList.add(art.getFile());
-                }
+        for (final Artifact arty : project.getDependencyArtifacts()) {
+            if ("z80".equalsIgnoreCase(arty.getClassifier())) {
+                final Artifact art = localRepository.find(arty);
+                logInfo("Detected Z80 dependency :" + art.getFile().getAbsolutePath());
+                dependencyList.add(art.getFile());
+            }
         }
-        
+
         return dependencyList.toArray(new File[dependencyList.size()]);
     }
-    
+
     private void saveResultAsBin(final byte[] data) throws IOException {
         logInfo("Save the binary result as BIN file");
         final OutputStream out = new FileOutputStream(resultFile);

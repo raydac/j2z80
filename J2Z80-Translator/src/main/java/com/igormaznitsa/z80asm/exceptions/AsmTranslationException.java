@@ -18,6 +18,11 @@
  */
 package com.igormaznitsa.z80asm.exceptions;
 
+/**
+ * It is the special exception which will be thrown if there is some problems in code translation.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @SuppressWarnings("serial")
 public class AsmTranslationException extends RuntimeException {
     private final String srcString;

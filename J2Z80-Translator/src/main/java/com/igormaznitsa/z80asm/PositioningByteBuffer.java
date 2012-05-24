@@ -21,6 +21,11 @@ package com.igormaznitsa.z80asm;
 import com.igormaznitsa.j2z80.aux.Assert;
 import java.util.Arrays;
 
+/**
+ * The class implements a byte buffer which can be extended automatically to bounds of written data
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @SuppressWarnings("serial")
 public class PositioningByteBuffer {
 

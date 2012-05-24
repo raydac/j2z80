@@ -61,6 +61,11 @@ import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.INVOKESTATIC;
 import org.apache.bcel.generic.MethodGen;
 
+/**
+ * The class is the Translator implementation. It is the core central class which does the main work.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @SuppressWarnings("serial")
 public class TranslatorImpl implements TranslatorContext{
 

@@ -26,6 +26,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * The class allows to parse an assemler command line and split it to three parts: label, command and arguments.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @SuppressWarnings("serial")
 public class ParsedAsmLine {
 

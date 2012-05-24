@@ -32,6 +32,11 @@ import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.MethodGen;
 
+/**
+ * The class allows to work with parsed methods during translation.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 class MethodContextImpl implements MethodContext {
     private final TranslatorImpl theTranslator;
     private final Map<MethodID, ClassMethodInfo> methodIds = new HashMap<MethodID, ClassMethodInfo>();

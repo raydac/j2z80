@@ -37,6 +37,11 @@ import org.apache.bcel.generic.InstructionList;
 import org.apache.bcel.generic.InstructionTargeter;
 import org.apache.bcel.generic.MethodGen;
 
+/**
+ * The class is a method translator. It translates a parsed class method into Z80 assembler.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class MethodTranslator {
 
     private final TranslatorContext translatorContext;
@@ -128,7 +133,7 @@ public class MethodTranslator {
     public String registerUsedConstantPoolItem(final int itemIndex) {
         final Constant item = getConstantPool().getConstant(itemIndex);
 
-        String result = null;
+        String result;
         
         if (item instanceof ConstantString) {
             final ConstantUtf8 utfconst = (ConstantUtf8) getConstantPool().getConstant(( (ConstantString) item ).getStringIndex());

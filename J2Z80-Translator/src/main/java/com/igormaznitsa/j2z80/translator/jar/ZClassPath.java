@@ -26,6 +26,12 @@ import java.util.Map.Entry;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 
+/**
+ * The class implements inside virtual class and resource storage for the translator. 
+ * The Storage is formed through parsing all jar files and extract all their classes and resources.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class ZClassPath {
 
     private final Map<String, ClassGen> classStorage = new HashMap<String, ClassGen>();

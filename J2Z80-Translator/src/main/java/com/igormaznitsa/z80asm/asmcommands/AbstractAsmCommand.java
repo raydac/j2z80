@@ -20,8 +20,17 @@ package com.igormaznitsa.z80asm.asmcommands;
 
 import com.igormaznitsa.j2z80.aux.Assert;
 import com.igormaznitsa.z80asm.AsmTranslator;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * The class describes an abstract Z80 assembler command.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 @SuppressWarnings("serial")
 public abstract class AbstractAsmCommand {
 
@@ -67,6 +76,7 @@ public abstract class AbstractAsmCommand {
     protected static final byte[] EMPTY_ARRAY = new byte[0];
 
     static {
+        // init inside mapping and command list
         REGISTER_ORDER.put("A", Integer.valueOf(7));
         REGISTER_ORDER.put("B", Integer.valueOf(0));
         REGISTER_ORDER.put("C", Integer.valueOf(1));

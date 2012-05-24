@@ -35,6 +35,11 @@ import java.util.jar.JarFile;
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.generic.ClassGen;
 
+/**
+ * The class allows to parse a Jar file and extract its entries.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class ZParsedJar {
 
     private final JarFile jarFile;

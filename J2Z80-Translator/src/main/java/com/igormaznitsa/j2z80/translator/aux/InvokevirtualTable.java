@@ -35,8 +35,18 @@ import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.MethodGen;
 
+/**
+ * The class describes a invoke virtual table.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class InvokevirtualTable {
 
+    /**
+     * The class describes a record in a invoke virtual table
+     * 
+     * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+     */
     private class Record {
 
         private final ClassID theClassId;

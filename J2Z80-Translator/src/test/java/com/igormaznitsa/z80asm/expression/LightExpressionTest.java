@@ -39,4 +39,70 @@ public class LightExpressionTest {
         when(MOCK_TRANSLATOR.findLabelAddress(eq(label))).thenReturn(Integer.valueOf(address));
         assertEquals("Must return the label address", address, new LightExpression(MOCK_TRANSLATOR, MOCK_COMMAND, MOCK_PARSED_LINE, label).calculate());
     }
+
+    @Test
+    public void testAddOperator() {
+        final int value = new LightExpression(MOCK_TRANSLATOR, MOCK_COMMAND, MOCK_PARSED_LINE, "1+2+3+4+5").calculate();
+        assertEquals((1+2+3+4+5), value);
+    }
+
+    @Test
+    public void testSingleAddOperator() {
+        final int value = new LightExpression(MOCK_TRANSLATOR, MOCK_COMMAND, MOCK_PARSED_LINE, "+5").calculate();
+        assertEquals(5, value);
+    }
+
+    @Test
+    public void testSubOperator() {
+        final int value = new LightExpression(MOCK_TRANSLATOR, MOCK_COMMAND, MOCK_PARSED_LINE, "34-12-5-6").calculate();
+        assertEquals((34-12-5-6), value);
+    }
+
+    @Test
+    public void testSingleSubOperator() {
+        final int value = new LightExpression(MOCK_TRANSLATOR, MOCK_COMMAND, MOCK_PARSED_LINE, "-12").calculate();
+        assertEquals((-12), value);
+    }
+
+    @Test
+    public void testExpressionWithSpaces() {
+        final int value = new LightExpression(MOCK_TRANSLATOR, MOCK_COMMAND, MOCK_PARSED_LINE, "  -  4   +8 \t -  \n 9    ").calculate();
+        assertEquals((-4+8-9), value);
+    }
+
+    @Test
+    public void testStringDeclarationWithRegularChars(){
+        final int value = new LightExpression(MOCK_TRANSLATOR,MOCK_COMMAND, MOCK_PARSED_LINE, "\"abcd\"").calculate();
+        assertEquals("The value must be 'abcd'",((int)'a'<<24) | ((int)'b'<<16) | ((int)'c'<<8) | 'd', value);
+    }
+
+    @Test
+    public void testSpecialCharInString() {
+        final int value = new LightExpression(MOCK_TRANSLATOR, MOCK_COMMAND, MOCK_PARSED_LINE, "\"\\\\\"").calculate();
+        assertEquals("The value must be '\\'", (int)'\\', value);
+    }
+
+    @Test
+    public void testStringDeclarationWithSpecialChars(){
+        final int value = new LightExpression(MOCK_TRANSLATOR,MOCK_COMMAND, MOCK_PARSED_LINE, "\"\b\t\n\r\"").calculate();
+        assertEquals("The value must be '\b\t\n\r'",((int)'\b'<<24) | ((int)'\t'<<16) | ((int)'\n'<<8) | '\r', value);
+    }
+
+    @Test
+    public void testHexNumberInExpression(){
+        final int value = new LightExpression(MOCK_TRANSLATOR,MOCK_COMMAND, MOCK_PARSED_LINE, "#10+#20").calculate();
+        assertEquals("The value must be 0x30",0x30, value);
+    }
+
+    @Test
+    public void testBinaryNumberInExpression() {
+        final int value = new LightExpression(MOCK_TRANSLATOR, MOCK_COMMAND, MOCK_PARSED_LINE, "10+%00110100100101-\"a\"").calculate();
+        assertEquals((10+Integer.parseInt("00110100100101",2)-'a'), value);
+    }
+    
+    @Test
+    public void testComplexExpression(){
+        final int value = new LightExpression(MOCK_TRANSLATOR,MOCK_COMMAND, MOCK_PARSED_LINE, "344-11+\"\\\\\"+#23").calculate();
+        assertEquals((344-11+'\\'+0x23), value);
+    }
 }

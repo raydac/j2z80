@@ -25,6 +25,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The class implements an inside container to save met equ directives to process them later.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class EquDirectiveContainer {
     public static class EquDirectiveRecord {
 

@@ -36,7 +36,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The class implements a small Z80 assembler translator
+ * The class implements a small Z80 assembler translator.
+ * It allows only documented Z80 commands and supports only light expressions as command arguments.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
@@ -53,7 +54,6 @@ public class Z80Asm implements AsmTranslator {
     private int entryPoint;
     private boolean firstPassFlag;
     private String[] sources;
-    private CodeGenerationObjserver processObserver;
 
     public Z80Asm(final File file) throws IOException {
         this(Utils.readTextFileAsStringArray(file, "UTF-8"));
@@ -73,10 +73,6 @@ public class Z80Asm implements AsmTranslator {
             }
         }
         sources = normalized.toArray(new String[normalized.size()]);
-    }
-
-    public void setGenerationObserver(final CodeGenerationObjserver observer) {
-        processObserver = observer;
     }
 
     private void processEquCommands() {
@@ -189,10 +185,6 @@ public class Z80Asm implements AsmTranslator {
                     final int currentPC = getPC();
                     final byte[] machineCode = command.makeMachineCode(this, parsed);
 
-                    if (processObserver != null) {
-                        processObserver.onCodeGeneration(this, asmString, stringIndex, currentPC, machineCode.clone());
-                    }
-
                     writeCode(machineCode);
                 }
             }
@@ -252,9 +244,6 @@ public class Z80Asm implements AsmTranslator {
                 final byte[] compiled = asmCommand.makeMachineCode(this, parsed);
                 final int address = getPC();
                 writeCode(compiled);
-                if (processObserver != null) {
-                    processObserver.onCodeGeneration(this, rawString, strIndex, address, compiled);
-                }
             }
         }
         return false;
@@ -353,7 +342,8 @@ public class Z80Asm implements AsmTranslator {
 
     @Override
     public void printText(final String info) {
-        System.out.println(info);
+        if (System.out!=null)
+            System.out.println(info);
     }
 
     @Override

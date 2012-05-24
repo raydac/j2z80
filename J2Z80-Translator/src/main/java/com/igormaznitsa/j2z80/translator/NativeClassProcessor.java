@@ -24,6 +24,11 @@ import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.translator.aux.ClassUtils;
 import java.io.IOException;
 
+/**
+ * The class allows to process classes containing JNI methods.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class NativeClassProcessor {
 
     private final TranslatorContext theTranslator;

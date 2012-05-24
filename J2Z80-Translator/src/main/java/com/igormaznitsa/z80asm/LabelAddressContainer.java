@@ -24,6 +24,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * The class implements a label data container.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class LabelAddressContainer {
     private boolean flagAllowReplace;
     private final Map<String,Integer> labelMap = new LinkedHashMap<String, Integer>();

@@ -24,6 +24,12 @@ import com.igormaznitsa.z80asm.LocalLabelExpectant;
 import com.igormaznitsa.z80asm.asmcommands.AbstractAsmCommand;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 
+/**
+ * It is a small easy expression parser. It allows to use '-' and '+' operators,
+ * $ symbol as the current PC value, labels and strings
+ *
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class LightExpression {
 
     private final AsmTranslator context;
@@ -46,6 +52,7 @@ public class LightExpression {
         final StringBuilder result = new StringBuilder();
         boolean atWorking = true;
         boolean insideString = false;
+        boolean specialChar = false;
         while (atWorking && position < expression.length()) {
             final char chr = expression.charAt(position++);
             switch (chr) {
@@ -70,6 +77,7 @@ public class LightExpression {
                         if (result.length() == 0) {
                             result.append("\"");
                             insideString = true;
+                            specialChar = false;
                         } else {
                             position--;
                             atWorking = false;
@@ -90,20 +98,67 @@ public class LightExpression {
                     }
                 }
                 break;
+                case '\\': {
+                    if (insideString) {
+                        if (specialChar) {
+                            specialChar = false;
+                            result.append('\\');
+                        } else {
+                            specialChar = true;
+                        }
+                    }
+                }
+                break;
                 default: {
-                    if (Character.isWhitespace(chr)) {
+                    if (!insideString && Character.isWhitespace(chr)) {
                         if (result.length() > 0) {
                             atWorking = false;
                         } else {
                             continue;
                         }
                     } else {
-                        result.append(chr);
+                        if (insideString && specialChar) {
+                            specialChar = false;
+                            switch (chr) {
+                                case 'n':
+                                    result.append('\n');
+                                    break;
+                                case 't':
+                                    result.append('\t');
+                                    break;
+                                case 'b':
+                                    result.append('\b');
+                                    break;
+                                case 'r':
+                                    result.append('\r');
+                                    break;
+                                case 'f':
+                                    result.append('\f');
+                                    break;
+                                case '"':
+                                    result.append('\"');
+                                    break;
+                                case '\'':
+                                    result.append('\'');
+                                    break;
+                                default:
+                                    throw new IllegalArgumentException("Unsupported special char detected [\\" + chr + ']');
+                            }
+                        } else {
+                            result.append(chr);
+                        }
                     }
                 }
             }
         }
-        return result.toString();
+
+        if (specialChar) {
+            throw new IllegalArgumentException("Non-defined special char detected");
+        }
+
+        final String resultStr = result.toString();
+        
+        return resultStr.isEmpty() ? null : resultStr;
     }
 
     private int operandToNumber(final String str) {
@@ -153,7 +208,7 @@ public class LightExpression {
                             });
                             address = Integer.valueOf(context.getPC());
                         } else {
-                            throw new IllegalArgumentException("Unknown label detected [" + str + ']',ex);
+                            throw new IllegalArgumentException("Unknown label detected [" + str + ']', ex);
                         }
                     }
                     return address.intValue();
