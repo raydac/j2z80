@@ -32,9 +32,9 @@
         </fileSet>
         <fileSet>
             <outputDirectory>/examples</outputDirectory>
-            <directory>${project.basedir}/examples</directory>
+            <directory>${project.basedir}/examples/</directory>
             <excludes>
-                <exclude>/**/target</exclude>
+                <exclude>/**/target/</exclude>
             </excludes>
         </fileSet>
         <fileSet>

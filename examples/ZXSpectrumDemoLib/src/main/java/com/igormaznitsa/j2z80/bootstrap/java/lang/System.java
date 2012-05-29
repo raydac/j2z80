@@ -10,7 +10,7 @@ public class System extends AbstractBootClass {
     private static final String [] ERR_STREAM = new String[]{"LD BC,#1", "PUSH BC"};
     
     @Override
-    public String[] generateGetField(final TranslatorContext translator, final String fieldName, final Type fieldType, final boolean isStatic) {
+    public String[] generateFieldGetter(final TranslatorContext translator, final String fieldName, final Type fieldType, final boolean isStatic) {
         String[] data = null;
         if (isStatic) {
             if ("out".equals(fieldName)) {
@@ -27,13 +27,13 @@ public class System extends AbstractBootClass {
     }
 
     @Override
-    public String[] generateInvokation(final TranslatorContext translator, final String methodName, final Type[] methodArguments, final Type resultType) {
+    public String[] generateInvocation(final TranslatorContext translator, final String methodName, final Type[] methodArguments, final Type resultType) {
         throwBootClassExceptionForMethod(methodName, resultType, methodArguments);
         return null;
     }
 
     @Override
-    public String[] generateSetField(final TranslatorContext translator, final String fieldName, final Type methodSignature, final boolean isStatic) {
+    public String[] generateFieldSetter(final TranslatorContext translator, final String fieldName, final Type methodSignature, final boolean isStatic) {
         throwBootClassExceptionForField(fieldName, methodSignature);
         return null;
     }
