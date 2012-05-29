@@ -11,16 +11,19 @@ There you should place the path to the result file. The default value is ${proje
 3. <format>...</format>
 The parameter allows to choose the result file format. At present only 'bin' format (and it is the default one) is supported.
 
-4. <stackTop>...</stackTop>
+4. <startAddress>...</startAddress>
+The parameter allows to set the start address of translated code. The first byte of the translated code will have the address. The default value is 28672.
+
+5. <stackTop>...</stackTop>
 The parameter allows to set the stack top value for the translated file, the default value is 65534.
 
-5. <logAsmText>...</logAsmText>
+6. <logAsmText>...</logAsmText>
 It's a boolean parameter which allows to switch on logging of the translated ASM text on a console.
 
-6. <asmOutFile>...</asmOutFile>
+7. <asmOutFile>...</asmOutFile>
 If you define the parameter then the translator will save the translated assembler text into the file.
 
-7. <excludeResources>...</excludeResources>
+8. <excludeResources>...</excludeResources>
 Very often we can meet some special resources in jar files like MANIFEST.MF or some special property files. We don't need to have they in our result file and the configuration parameter can help us to exclude them all.
 
                    <excludeResources>
@@ -29,9 +32,14 @@ Very often we can meet some special resources in jar files like MANIFEST.MF or s
                             <value>/**/manifest.mf</value>
                     </excludeResources>
 
+9. <optimization>...</optimization>
+The parameter allows to set the optimization level, not there are only two levels are accessible:
+ - none (default) - it makes nothing
+ - base - it just removes unecessary stack command pairs like PUSH HL POP HL
+
 Dependencies
 ----------------------
-The plugin allows to use other jar files as libraries. To use a jar file as a library the jar file must have the z80 classifier.
+The plugin allows to use project dependenices as libraries. To use a jar file as a library the jar file must have the z80 classifier.
 
 Example:
 
