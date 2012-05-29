@@ -1,30 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?>
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.igormaznitsa.j2z80</groupId>
         <artifactId>J2Z80-Project</artifactId>
-        <version>1.0.0</version>
+        <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
-    <artifactId>J2Z80-Translator</artifactId>
-    <packaging>maven-plugin</packaging>
-    <name>Translator JVM To Z80</name>
-    <description>A Translator of JVM byte-codes into Z80 machine commands</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <artifactId>J2Z80-API</artifactId>
+    <packaging>jar</packaging>
+
+    <name>API for the JVM To Z80 translator</name>
+    <description>API for the Translator of JVM byte-codes into Z80 machine commands</description>
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>J2Z80-API</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>3.1.1.RELEASE</version>
+            <type>jar</type>
         </dependency>
-    </dependencies>    
-
+    </dependencies>
 </project>
