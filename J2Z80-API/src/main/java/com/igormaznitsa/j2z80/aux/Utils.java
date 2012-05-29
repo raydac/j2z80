@@ -31,6 +31,11 @@ import java.util.List;
 import java.util.Locale;
 import org.springframework.util.AntPathMatcher;
 
+/**
+ * It is an Auxiliary class contains some useful methods.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public enum Utils {
 
     ;

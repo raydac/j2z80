@@ -20,8 +20,9 @@ package com.igormaznitsa.j2z80.aux;
 
 /**
  * A Special object-wrapper allows to change an object and emulate changing of method arguments inside th method
- * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ * 
  * @param <V> the type of the carried object
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public class MutableObjectContainer <V> {
     private V value;

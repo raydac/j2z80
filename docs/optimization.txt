@@ -1,0 +1,3 @@
+At present the translator supports only two kinds of optimizations:
+1. NONE - it makes nothing to optimize the translated code.
+2. BASE - it removes unnecessary stack command pairs like "PUSH HL POP HL"

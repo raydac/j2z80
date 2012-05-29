@@ -1,0 +1,22 @@
+The Translator has a small embedded Z80 assembler which is used to translate generated assembler sources into binary representation. The assembler allows only (!) documented Z80 commands and also it has several special commands to manage the translating process and labels.
+
+Labels
+-------
+There are two kinds of labels:
+1. Global labels. There can be only label with such name.
+2. Local labels. Such kind of labels can be redefined. A Local label name starts with '@' symbol. To avoid duplication or wrong behaviour you can 'forget' all known local labes with the CLRLOC special command.
+
+Special commands
+------------------
+ENT <address> - it defines the start point of the code
+ORG <address> - it defines the current start address for translation
+DEFB <byte>,..<byte> - it allows to place byte values (1 cell per value) into memory cells
+DEFW <word>,..<word> - it allows to place word values (2 cells per value) into memory cells
+DEFM <string> - save a string (8 bit per char) into memory cells
+DEFS <length> - to make reservation of memory block with the length in bytes
+CLRLOC - the directive resets all met local labels 
+<label>: EQU <expression>- it allows to set some numeric value to a label
+
+Expressions as arguments
+--------------------------
+Only very lite expressions can be used in arguments, the assembler supports only two operators - "-" and "+" to be used n expressions. Also the '$' symbol can be used to get the current PC state. Very restricted but can be used strings, their chars will be combined into 4 byte word, for instance - "    " -> 0x20202020, also strings support special chars [\t\r\n\b\"\'\\].

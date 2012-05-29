@@ -22,6 +22,12 @@ import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import org.apache.bcel.generic.Type;
 
+/**
+ * The class implements stub for the java.lang.Object class from the standard Java framework.
+ * At present it supports only the constructor and the hashCode method.
+ * 
+ * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ */
 public class Object extends AbstractBootClass {
 
     @Override

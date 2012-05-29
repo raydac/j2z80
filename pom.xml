@@ -8,7 +8,7 @@
     <groupId>com.igormaznitsa.j2z80</groupId>
     <artifactId>J2Z80-Project</artifactId>
     <packaging>pom</packaging>
-    <version>0.2-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <name>A JVM-To-Z80 Translator Project</name>
 
     <properties>
@@ -19,10 +19,10 @@
     <url>http://igormaznitsa.com/</url>
 
     <scm>
-        <connection>https://j2z80.googlecode.com/hg/</connection>
-        <developerConnection>https://j2z80.googlecode.com/hg/</developerConnection>
+        <connection>scm:hg:https://j2z80.googlecode.com/hg/</connection>
+        <developerConnection>scm:hg:https://j2z80.googlecode.com/hg/</developerConnection>
         <tag>HEAD</tag>
-        <url>http://j2z80.googlecode.com/</url>
+        <url>http://code.google.com/p/j2z80/source/browse/</url>
     </scm>
     <issueManagement>
         <system>code.google.com</system>
@@ -129,6 +129,28 @@
                     </reportPlugins>
                 </configuration>    
             </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>assembly/distribution.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <inherited>false</inherited>
+            </plugin>
+            
         </plugins>
     </build>
 

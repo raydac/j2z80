@@ -23,7 +23,8 @@ import com.igormaznitsa.j2z80.ids.MethodID;
 import org.apache.bcel.generic.MethodGen;
 
 /**
- * The interface describes a method context to work with methods
+ * The interface describes a method context to work with class methods.
+ * 
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public interface MethodContext {

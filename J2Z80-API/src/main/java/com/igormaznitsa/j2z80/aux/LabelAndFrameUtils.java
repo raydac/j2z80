@@ -21,7 +21,6 @@ package com.igormaznitsa.j2z80.aux;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.ids.MethodID;
-import java.util.jar.JarEntry;
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.FieldGen;

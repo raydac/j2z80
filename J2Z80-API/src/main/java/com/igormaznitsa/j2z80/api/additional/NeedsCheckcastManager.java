@@ -27,7 +27,7 @@ package com.igormaznitsa.j2z80.api.additional;
 @AdditionPath("CHECKCAST_MANAGER.a80")
 public interface NeedsCheckcastManager extends J2ZAdditionalBlock {
     /**
-     * The label of the subroutine processing checkast commands
+     * The label of the subroutine processing checkcast commands
      */
     public static final String SUB_CHECKCAST = "___CHECKCAST";
 }

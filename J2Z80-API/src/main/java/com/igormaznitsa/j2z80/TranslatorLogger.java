@@ -19,7 +19,8 @@
 package com.igormaznitsa.j2z80;
 
 /**
- * The interface describes a logger to be used inbound of the translator
+ * The interface describes a logger to be used inbound of the translator.
+ * 
  * @author Igor Maznutsa (igor.maznitsa@igormaznitsa.com)
  */
 public interface TranslatorLogger {

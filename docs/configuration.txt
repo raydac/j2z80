@@ -1,0 +1,80 @@
+Because the translator is a maven plugin, it can be configured.
+
+Parameters
+-------------
+1. <jar>...</jar>
+There you should place the path to the jar which should be translated. The default value is ${project.build.directory}/${project.build.finalName}.jar so that in the default case you will translate your project result jar file.
+
+2. <result>...</result>
+There you should place the path to the result file. The default value is ${project.build.directory}/${project.build.finalName}.bin
+
+3. <format>...</format>
+The parameter allows to choose the result file format. At present only 'bin' format (and it is the default one) is supported.
+
+4. <stackTop>...</stackTop>
+The parameter allows to set the stack top value for the translated file, the default value is 65534.
+
+5. <logAsmText>...</logAsmText>
+It's a boolean parameter which allows to switch on logging of the translated ASM text on a console.
+
+6. <asmOutFile>...</asmOutFile>
+If you define the parameter then the translator will save the translated assembler text into the file.
+
+7. <excludeResources>...</excludeResources>
+Very often we can meet some special resources in jar files like MANIFEST.MF or some special property files. We don't need to have they in our result file and the configuration parameter can help us to exclude them all.
+
+                   <excludeResources>
+                            <value>/**/*.xml</value>
+                            <value>/**/*.properties</value>
+                            <value>/**/manifest.mf</value>
+                    </excludeResources>
+
+Dependencies
+----------------------
+The plugin allows to use other jar files as libraries. To use a jar file as a library the jar file must have the z80 classifier.
+
+Example:
+
+    <dependencies>
+        <dependency>
+            <groupId>com.igormaznitsa</groupId>
+            <artifactId>Test_ExtJar</artifactId>
+            <version>1.0}</version>
+            <classifier>z80</classifier>
+        </dependency>    
+    </dependencies>    
+
+
+
+Example of the plugin configuration
+-------------------------------------
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.igormaznitsa</groupId>
+                <artifactId>J2Z80-Translator</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>translate2z80</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludeResources>
+                            <value>/**/*.xml</value>
+                            <value>/**/*.properties</value>
+                            <value>/**/manifest.mf</value>
+                    </excludeResources>
+                    <optimization>base</optimization>
+                    <startAddress>29000</startAddress>
+                    <stackTop>60000</stackTop>
+                    <logAsmText>true</logAsmText>
+                    <asmOutFile>${asmFile}</asmOutFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    

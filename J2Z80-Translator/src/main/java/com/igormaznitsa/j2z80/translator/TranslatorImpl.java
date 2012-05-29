@@ -62,7 +62,7 @@ import org.apache.bcel.generic.INVOKESTATIC;
 import org.apache.bcel.generic.MethodGen;
 
 /**
- * The class is the Translator implementation. It is the core central class which does the main work.
+ * The class is the Translator implementation. It is the core central class which implements the main work-flow.
  * 
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
@@ -363,8 +363,12 @@ public class TranslatorImpl implements TranslatorContext{
                }
            }
            
-           
            final byte [] data = binaryData.getValue();
+           
+           if (data.length>0xFFFF) {
+               throw new IllegalArgumentException("Too big binary resource has been detected ["+path+"], it's length must not be greater than 64Kb.");
+           }
+           
            final String label = LabelAndFrameUtils.makeLabelForBinaryResource(path);
            
            getLogger().logInfo("Added the binary resource "+path+" as "+label);
