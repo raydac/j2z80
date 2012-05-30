@@ -45,6 +45,9 @@ The Project home page: http://code.google.com/p/j2z80/
 
 Versions
 ----------------------
+1.0.1 (may 2012) hot fix
+- removed the 'aux' word which was used as a package name, it has been changed to 'utils' because Windows doesn't support the folder name.
+
 1.0.0 (may 2012)
 - bug fixing
 - commenting

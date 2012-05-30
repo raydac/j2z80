@@ -8,7 +8,7 @@
     <groupId>com.igormaznitsa.j2z80</groupId>
     <artifactId>J2Z80-Project</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>A JVM-To-Z80 Translator Project</name>
 
     <properties>
