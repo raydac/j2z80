@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>. 
  */
-package com.igormaznitsa.j2z80.aux;
+package com.igormaznitsa.j2z80.utils;
 
 import java.io.BufferedReader;
 import java.io.Closeable;

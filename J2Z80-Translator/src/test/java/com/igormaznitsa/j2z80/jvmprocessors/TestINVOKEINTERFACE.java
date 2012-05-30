@@ -18,8 +18,10 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import com.igormaznitsa.j2z80.utils.Utils;
+import com.igormaznitsa.j2z80.utils.MutableObjectContainer;
 import com.igormaznitsa.j2z80.api.additional.*;
-import com.igormaznitsa.j2z80.aux.*;
 import com.igormaznitsa.j2z80.ids.*;
 import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.*;

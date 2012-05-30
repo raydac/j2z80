@@ -19,9 +19,9 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEVIRTUALManager;
-import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
-import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.j2z80.utils.Utils;
 import java.io.*;
 import javassist.bytecode.AccessFlag;
 import org.apache.bcel.generic.*;

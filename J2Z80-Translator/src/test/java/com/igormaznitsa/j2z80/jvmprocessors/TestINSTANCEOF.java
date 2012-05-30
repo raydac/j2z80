@@ -19,9 +19,9 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
-import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
-import com.igormaznitsa.j2z80.translator.aux.InstanceofTable;
+import com.igormaznitsa.j2z80.translator.InstanceofTable;
 import java.io.*;
 import java.util.HashSet;
 import org.apache.bcel.Constants;

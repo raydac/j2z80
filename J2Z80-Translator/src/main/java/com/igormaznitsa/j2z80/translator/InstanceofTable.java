@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>. 
  */
-package com.igormaznitsa.j2z80.translator.aux;
+package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

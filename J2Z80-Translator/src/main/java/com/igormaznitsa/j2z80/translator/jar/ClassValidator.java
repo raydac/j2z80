@@ -18,8 +18,8 @@
  */
 package com.igormaznitsa.j2z80.translator.jar;
 
-import com.igormaznitsa.j2z80.aux.MutableObjectContainer;
-import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.j2z80.utils.MutableObjectContainer;
+import com.igormaznitsa.j2z80.utils.Utils;
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantDouble;

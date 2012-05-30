@@ -19,10 +19,10 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
-import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
-import com.igormaznitsa.j2z80.translator.aux.InstanceofTable;
-import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.j2z80.translator.InstanceofTable;
+import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.*;
 import java.util.HashSet;

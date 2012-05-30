@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.z80asm.expression;
 
-import com.igormaznitsa.j2z80.aux.Assert;
+import com.igormaznitsa.j2z80.utils.Assert;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.LocalLabelExpectant;
 import com.igormaznitsa.z80asm.asmcommands.AbstractAsmCommand;

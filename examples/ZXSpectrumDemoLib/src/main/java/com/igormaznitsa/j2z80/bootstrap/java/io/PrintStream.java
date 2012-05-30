@@ -1,7 +1,7 @@
 package com.igormaznitsa.j2z80.bootstrap.java.io;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import java.io.IOException;
 import org.apache.bcel.generic.Type;

@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.z80asm;
 
-import com.igormaznitsa.j2z80.aux.Assert;
+import com.igormaznitsa.j2z80.utils.Assert;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -19,7 +19,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
-import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.j2z80.utils.Utils;
 import java.io.IOException;
 import java.io.StringWriter;
 import org.apache.bcel.generic.Instruction;

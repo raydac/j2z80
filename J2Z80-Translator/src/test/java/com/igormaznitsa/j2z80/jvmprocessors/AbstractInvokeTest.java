@@ -20,8 +20,8 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
-import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
-import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import com.igormaznitsa.j2z80.utils.Utils;
 import java.io.IOException;
 import java.io.StringWriter;
 import org.apache.bcel.generic.Type;

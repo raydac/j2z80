@@ -18,8 +18,8 @@
  */
 package com.igormaznitsa.j2z80.ids;
 
-import com.igormaznitsa.j2z80.aux.Assert;
-import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
+import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import org.apache.bcel.generic.ClassGen;
 
 /**

@@ -19,7 +19,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsBREAKPOINTManager;
-import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.*;
 import org.apache.bcel.generic.*;

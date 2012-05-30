@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.z80asm;
 
-import com.igormaznitsa.j2z80.aux.Assert;
+import com.igormaznitsa.j2z80.utils.Assert;
 import java.util.Arrays;
 
 /**

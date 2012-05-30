@@ -19,8 +19,8 @@
 package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
-import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.jvmprocessors.AbstractJvmCommandProcessor;
 import java.io.IOException;

@@ -19,7 +19,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
-import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;

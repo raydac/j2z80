@@ -19,8 +19,8 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
-import com.igormaznitsa.j2z80.aux.Assert;
-import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
+import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.*;

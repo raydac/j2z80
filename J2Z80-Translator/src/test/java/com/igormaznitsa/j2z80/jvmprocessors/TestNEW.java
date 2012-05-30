@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.aux.LabelAndFrameUtils;
+import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.*;

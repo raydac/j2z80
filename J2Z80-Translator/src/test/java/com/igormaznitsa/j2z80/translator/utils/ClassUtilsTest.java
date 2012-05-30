@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>. 
  */
-package com.igormaznitsa.j2z80.translator.aux;
+package com.igormaznitsa.j2z80.translator.utils;
 
+import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
 import com.igormaznitsa.j2z80.api.additional.J2ZAdditionalBlock;
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
 import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEINTERFACEManager;

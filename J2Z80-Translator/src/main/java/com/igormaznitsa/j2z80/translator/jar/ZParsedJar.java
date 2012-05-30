@@ -18,8 +18,8 @@
  */
 package com.igormaznitsa.j2z80.translator.jar;
 
-import com.igormaznitsa.j2z80.aux.Utils;
-import com.igormaznitsa.j2z80.translator.aux.ClassUtils;
+import com.igormaznitsa.j2z80.utils.Utils;
+import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;

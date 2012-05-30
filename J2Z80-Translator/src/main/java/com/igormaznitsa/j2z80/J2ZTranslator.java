@@ -18,8 +18,8 @@
  */
 package com.igormaznitsa.j2z80;
 
-import com.igormaznitsa.j2z80.aux.Assert;
-import com.igormaznitsa.j2z80.aux.Utils;
+import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.j2z80.translator.TranslatorImpl;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
 import com.igormaznitsa.z80asm.Z80Asm;
