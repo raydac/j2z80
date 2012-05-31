@@ -105,7 +105,15 @@ public class ClassMethodInfo {
     }
 
     /**
-     * Get only class name (package data excluded) for the class contains the method
+     * Get the canonical class name.
+     * @return the canonical class name as String
+     */
+    public String getCanonicalClassName(){
+        return this.classInfo.getClassName();
+    }
+    
+    /**
+     * Get only class name (package data excluded) for the class contains the method.
      * @return the class name as String
      */
     public String getOnlyClassName() {

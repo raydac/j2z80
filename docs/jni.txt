@@ -1,0 +1,63 @@
+The Translator supports JNI calls to native code.
+
+
+Register usage
+---------------
+The alternate register set can be used without restrictions. The HL,BC,DE values should be saved and restored before return. IY can be changed. IX is the frame index register and can be changed because it will be restored from the stack by the calling code. AF can be changed.
+
+JNI call
+-------------
+Each call of JNI method creates a stack frame contains arguments for the method call. If the method is not a static one then the first argument will be the address of the class instance. The IX register contains the pointer to the first element of the frame and is being used as an index register.
+
+a non static method
+-------------------
+native void method(Object A, int B, int C)
+(IX-0+1)   ; Instance address (high byte)
+(IX-0)     ; Instance address (low byte)
+
+(IX-2+1) ; Object A (high byte)
+(IX-2) ; Object A (low byte
+
+(IX-4+1) ; Int B (high byte)
+(IX-4) ; Int B (low byte)
+
+(IX-6+1) ; Int C (high byte)
+(IX-6) ; Int C (low byte)
+
+a static method
+-------------------
+native static void method(Object A, int B, int C)
+(IX-0+1) ; Object A (high byte)
+(IX-0) ; Object A (low byte
+
+(IX-2+1) ; Int B (high byte)
+(IX-2) ; Int B (low byte)
+
+(IX-4+1) ; Int C (high byte)
+(IX-4) ; Int C (low byte)
+
+
+
+JNI result
+--------------
+If a jni method should return a result, it can be returned through the BC register. If the method returns the void result then it should make just return and the value of BC will not be used by the calling code.
+
+
+Memory management
+-------------------
+The translator has the special module called "Memory manager", you can notify the Translator about your need to use the module through implementation of the com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager interface by your class and in the case the manager will be included into the result code. The manager has auxiliary methods allow to work with memory areas, arrays and objects. Reference and labels can be found in the interface source.
+The heap and the stack are growing towards each other. The stack grows top-down and the memory heap grows bottom-up.
+At present there is only possibility to reserve some memory block for your needs inside of a translated program, it is the usage of the DEFS assembler directive inside a JNI asm sources. To allocate dynamic memory areas in your program, the "new byte[]" command can be used.
+
+
+Assembler
+-----------
+The assembler which is being used is not very powerful one and supports only documented commands. When the translator meets a native method it an assembler source (which has ".a80",".asm" or ".z80" extension) file near the class and with the same name as the class name. I think that there should be way to include precompiled blocks but I need some time to think about it.
+
+The Upper-memory (different memory extenders 128K, 256K, 1024K)
+--------------------------------------------------------------------
+The translator knows nothing about different memory extenders and works only with the regular 64Kb memory area.
+
+Interruptions and HALT usage
+-------------------------------
+I think it should not make any problem to use interruptions in translated programms, so that HALT can be used too. I didn't make experiments with interruptions.
