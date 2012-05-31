@@ -80,7 +80,9 @@ public class NativeClassProcessor {
         // make the result
         // as the first we add the whole class body if it is presented
         final List<String> result = new ArrayList<String>(1024);
-        result.add("; JNI body of " + classInfo.getCanonicalClassName());
+        
+        result.add("");
+        result.add("; -------- [JNI] START OF " + classInfo.getCanonicalClassName()+" --------");
         if (jniWholeClass != null) {
             for (final String str : jniWholeClass) {
                 result.add(str);
@@ -98,7 +100,8 @@ public class NativeClassProcessor {
                 for(final String str : methodEntry.getValue()) result.add(str);
             }
         }
-        
+        result.add("; -------- [JNI] END OF " + classInfo.getCanonicalClassName() + " --------");
+        result.add("");
         return result.toArray(new String[result.size()]);
     }
 
@@ -125,7 +128,7 @@ public class NativeClassProcessor {
         }
 
         if (result != null) {
-            return insertFirstStringIntoArray("; file "+readResourcePath,Utils.breakToLines(new String(result, "UTF8")));
+            return insertFirstStringIntoArray("; file "+readResourcePath, Utils.breakToLines(new String(result, "UTF8")));
         }
 
         // find between bin files
