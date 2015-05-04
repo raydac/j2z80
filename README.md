@@ -2,7 +2,7 @@ Description
 ============
 It is a maven plugin developed for academical purposes, the plugin allows to translate compiled JVM byte codes into Z80 instructions. It works as a pattern compiler with minimal optimization. **Warning! It is not a JVM interpreter because it generates low-level native code for Z80. It doesn't contain any GC!**
 
-![Screenshot](http://www.igormaznitsa.com/projects/j2z80/j2z80scr1.jpg)
+![Screenshot](https://raw.githubusercontent.com/raydac/j2z80/master/docs/java_on_spec.png)
 ```Java
 package com.igormaznitsa.test.helloworld;
 
