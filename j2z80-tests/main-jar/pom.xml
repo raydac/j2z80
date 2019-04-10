@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>j2z80-tests</artifactId>
+    <version>0-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <asmFile>${project.build.directory}/source.a80</asmFile>
+  </properties>
+
+  <artifactId>main-jar</artifactId>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ext-jar</artifactId>
+      <version>${project.version}</version>
+      <classifier>z80</classifier>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>j2z80-plugin</artifactId>
+        <version>${j2z80.version}</version>
+        <executions>
+          <execution>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>translate2z80</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <excludeResources>
+            <value>/**/*.xml</value>
+            <value>/**/*.properties</value>
+            <value>/**/manifest.mf</value>
+          </excludeResources>
+          <optimization>base</optimization>
+          <startAddress>29000</startAddress>
+          <stackTop>60000</stackTop>
+          <logAsmText>true</logAsmText>
+          <asmOutFile>${asmFile}</asmOutFile>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M3</version>
+        <configuration>
+          <excludes>
+            <exclude>*/**/*ITCase.*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.0.0-M3</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <systemPropertyVariables>
+            <translatedBinFile>${project.build.directory}/${project.artifactId}-${project.version}.bin</translatedBinFile>
+            <asmFile>${asmFile}</asmFile>
+          </systemPropertyVariables>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>
