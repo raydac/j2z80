@@ -18,7 +18,7 @@
  */
 package com.igormaznitsa.j2z80.ids;
 
-import org.apache.bcel.Constants;
+import org.apache.bcel.Const;
 import org.apache.bcel.classfile.Attribute;
 import org.apache.bcel.classfile.ConstantPool;
 import org.apache.bcel.classfile.ConstantUtf8;
@@ -36,7 +36,7 @@ public class ClassMethodInfoTest {
     private static final ClassGen CLASS_MOCK = mock(ClassGen.class);
     private static final ClassGen CLASS_MOCK_NO_PACKAGE = mock(ClassGen.class);
     private static final ConstantPool CP_MOCK = mock(ConstantPool.class);
-    private static final Method METHOD_MOCK = new Method(Constants.ACC_PUBLIC, 1, 2, new Attribute[0], CP_MOCK);
+    private static final Method METHOD_MOCK = new Method(Const.ACC_PUBLIC, 1, 2, new Attribute[0], CP_MOCK);
 
     static {
         when(CP_MOCK.getConstant(1)).thenReturn(new ConstantUtf8("someMethod"));

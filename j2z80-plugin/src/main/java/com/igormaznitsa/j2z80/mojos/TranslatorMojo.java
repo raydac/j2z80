@@ -56,14 +56,11 @@ import java.util.List;
  * Maven mojo to translate a compiled Java classes from a Jar into Z80 binary
  * code through assembler stage.
  */
-@Mojo(
-    name = "translate",
+@Mojo(name = "translate",
     defaultPhase = LifecyclePhase.INSTALL,
     threadSafe = true,
-    requiresProject = true,
-    requiresDependencyResolution = ResolutionScope.COMPILE
-)
-public class J2Z80Mojo extends AbstractMojo implements TranslatorLogger {
+    requiresDependencyResolution = ResolutionScope.COMPILE)
+public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
 
   /**
    * Current maven project.
@@ -76,12 +73,12 @@ public class J2Z80Mojo extends AbstractMojo implements TranslatorLogger {
 
   @Getter
   @Setter
-  @Parameter(name = "jarFile", defaultValue = "${project.build.directory}/${project.build.finalName}.jar")
+  @Parameter(name = "jarFile", defaultValue = "${project.build.directory}${file.separator}${project.build.finalName}.jar")
   private File jarFile;
 
   @Getter
   @Setter
-  @Parameter(name = "result", defaultValue = "${project.build.directory}/${project.build.finalName}.bin")
+  @Parameter(name = "result", defaultValue = "${project.build.directory}${file.separator}${project.build.finalName}.bin")
   private File resultFile;
 
   @Getter
@@ -106,7 +103,7 @@ public class J2Z80Mojo extends AbstractMojo implements TranslatorLogger {
 
   @Getter
   @Setter
-  @Parameter(name = "asmOutFile", defaultValue = "${project.build.directory}/${project.build.finalName}.a80")
+  @Parameter(name = "asmOutFile", defaultValue = "${project.build.directory}${file.separator}${project.build.finalName}.a80")
   private File asmOutFile;
 
   @Getter
@@ -119,13 +116,13 @@ public class J2Z80Mojo extends AbstractMojo implements TranslatorLogger {
   @Parameter(name = "optimization", defaultValue = "none")
   private String optimization;
 
-  @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
+  @Parameter(name = "remoteRepositories", defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
   private List<ArtifactRepository> remoteRepositories;
 
-  @Parameter(defaultValue = "${session}", readonly = true, required = true)
+  @Parameter(name = "session", defaultValue = "${session}", readonly = true, required = true)
   private MavenSession session;
 
-  @Parameter(defaultValue = "${mojoExecution}", readonly = true, required = true)
+  @Parameter(name = "execution", defaultValue = "${mojoExecution}", readonly = true, required = true)
   private MojoExecution execution;
 
   @Override

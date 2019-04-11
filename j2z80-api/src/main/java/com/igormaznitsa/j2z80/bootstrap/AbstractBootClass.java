@@ -19,6 +19,8 @@
 package com.igormaznitsa.j2z80.bootstrap;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.bcel.generic.Type;
@@ -39,9 +41,13 @@ public abstract class AbstractBootClass {
             final String newname = AbstractBootClass.class.getPackage().getName()+"."+className;
             try {
                 final Class<? extends AbstractBootClass> japiClass = Class.forName(newname).asSubclass(AbstractBootClass.class);
-                result = (AbstractBootClass)japiClass.newInstance();
+                result = japiClass.getDeclaredConstructor().newInstance();
                 insideCache.put(className, result);
             }catch(ClassNotFoundException ex){
+
+            }catch (InvocationTargetException ex){
+            }catch (NoSuchMethodException ex){
+
             }catch(IllegalAccessException ex){
                 throw new RuntimeException("Can't get access to a bootstrap class ["+className+']',ex);
             }catch(InstantiationException ex){

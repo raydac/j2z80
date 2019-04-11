@@ -21,7 +21,8 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.*;
-import org.apache.bcel.Constants;
+
+import org.apache.bcel.Const;
 import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.*;
 import static org.junit.Assert.assertEquals;
@@ -62,7 +63,7 @@ public class TestGETSTATIC extends AbstractJvmCommandProcessorTest {
         when(CP_GEN_MOCK.getConstant(CP_INDEX_FIELD_NAMEANDTYPE)).thenReturn(cp_nameandtype);
         when(CP_GEN_MOCK.getConstant(CP_INDEX_FIELD_SIGNATURE)).thenReturn(cp_fieldtype);
         
-        when(CP_MOCK.getConstantString(CP_INDEX_CLASSREF,Constants.CONSTANT_Class)).thenReturn(CLASS_NAME);
+        when(CP_MOCK.getConstantString(CP_INDEX_CLASSREF, Const.CONSTANT_Class)).thenReturn(CLASS_NAME);
         
         final String staticFieldLabel = LabelAndFrameUtils.makeLabelNameForField(CLASS_NAME, FIELD_NAME, FIELD_TYPE);
         

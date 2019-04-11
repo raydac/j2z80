@@ -26,7 +26,8 @@ import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.*;
 import java.util.HashSet;
-import org.apache.bcel.Constants;
+
+import org.apache.bcel.Const;
 import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.*;
 import static org.junit.Assert.*;
@@ -79,7 +80,7 @@ public class TestCHECKCAST extends AbstractTestBasedOnMemoryManager implements N
         final ConstantClass cpClass = new ConstantClass(CLASS_NAME_INDEX);
         when(CP_GEN_MOCK.getConstant(CLASS_NAME_INDEX)).thenReturn(cpClassName);
         when(CP_GEN_MOCK.getConstant(CLASS_INDEX)).thenReturn(cpClass);
-        when(CP_MOCK.getConstantString(CLASS_INDEX, Constants.CONSTANT_Class)).thenReturn(TEST_CLASS_NAME1);
+        when(CP_MOCK.getConstantString(CLASS_INDEX, Const.CONSTANT_Class)).thenReturn(TEST_CLASS_NAME1);
         
         final ClassID cid1 = new ClassID(TEST_CLASS_NAME1);
         final ClassID cid2 = new ClassID(TEST_CLASS_NAME2);

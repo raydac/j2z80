@@ -21,9 +21,10 @@ package com.igormaznitsa.j2z80;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.MethodID;
-import java.io.IOException;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.generic.Type;
+
+import java.io.IOException;
 
 /**
  * The interface describes the translator context

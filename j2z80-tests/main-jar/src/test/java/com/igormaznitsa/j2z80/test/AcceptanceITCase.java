@@ -18,6 +18,10 @@
  */
 package com.igormaznitsa.j2z80.test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import com.igormaznitsa.j2z80test.Main;
 import com.igormaznitsa.j2z80test.Main.AbstractTemplateGen;
 import com.igormaznitsa.templategen.EvenPatternGenerator;
@@ -28,7 +32,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import static junit.framework.Assert.*;
 import org.junit.Test;
 
 public class AcceptanceITCase extends Z80 {

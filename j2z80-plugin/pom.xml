@@ -13,6 +13,22 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>${mvn.version}</version>
@@ -32,7 +48,7 @@
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>3.5.2</version>
+      <version>3.6.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -41,32 +57,5 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>    
-
-<build>
-  <plugins>
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-plugin-plugin</artifactId>
-      <version>3.6.0</version>
-      <executions>
-        <execution>
-          <id>mojo-descriptor</id>
-          <goals>
-            <goal>descriptor</goal>
-          </goals>
-          <configuration>
-            <goalPrefix>j2z80</goalPrefix>
-          </configuration>
-        </execution>
-        <execution>
-          <id>mojo-help</id>
-          <goals>
-            <goal>helpmojo</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-  </plugins>
-</build>
 
 </project>

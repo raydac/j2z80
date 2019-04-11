@@ -46,6 +46,7 @@ import com.igormaznitsa.j2z80.utils.Assert;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
+import org.apache.bcel.Const;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantInteger;
 import org.apache.bcel.classfile.ConstantUtf8;
@@ -85,12 +86,12 @@ public class TranslatorImpl implements TranslatorContext {
 
   private final TranslatorLogger messageLogger;
   private final List<MethodID> methodsToBeProcessed;
-  private final Set<MethodID> methodsUsedInInvokeinterface = new HashSet<MethodID>();
-  private final Map<ClassMethodInfo, String[]> asmForMethods = new LinkedHashMap<ClassMethodInfo, String[]>();
-  private final Set<Class<? extends J2ZAdditionalBlock>> registeredAdditions = new HashSet<Class<? extends J2ZAdditionalBlock>>();
-  private final Set<AbstractBootClass> usedBootstrapClassese = new HashSet<AbstractBootClass>();
-  private final Map<String, Constant> classPoolConstants = new HashMap<String, Constant>();
-  private final Set<ClassID> classesForCheckcast = new HashSet<ClassID>();
+  private final Set<MethodID> methodsUsedInInvokeinterface = new HashSet<>();
+  private final Map<ClassMethodInfo, String[]> asmForMethods = new LinkedHashMap<>();
+  private final Set<Class<? extends J2ZAdditionalBlock>> registeredAdditions = new HashSet<>();
+  private final Set<AbstractBootClass> usedBootstrapClassese = new HashSet<>();
+  private final Map<String, Constant> classPoolConstants = new HashMap<>();
+  private final Set<ClassID> classesForCheckcast = new HashSet<>();
   private String[] excludeResourcePatterns;
   private OptimizationLevel optimizationLevel;
 
@@ -515,7 +516,7 @@ public class TranslatorImpl implements TranslatorContext {
   }
 
   @Override
-  public void registerConstantPoolItem(final String constantLabel, final Constant item) {
+  public void registerConstantPoolItem(String constantLabel, Constant item) {
     this.classPoolConstants.put(constantLabel, item);
   }
 

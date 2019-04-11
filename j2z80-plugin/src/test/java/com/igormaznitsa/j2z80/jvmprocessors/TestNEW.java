@@ -20,7 +20,7 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.ids.ClassID;
-import org.apache.bcel.Constants;
+import org.apache.bcel.Const;
 import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.*;
 import static org.junit.Assert.assertEquals;
@@ -42,7 +42,7 @@ public class TestNEW extends AbstractTestBasedOnMemoryManager {
         
         when(CP_GEN_MOCK.getConstant(CLASS_NAME_INDEX)).thenReturn(new ConstantUtf8(testClassName));
         when(CP_GEN_MOCK.getConstant(CLASS_INDEX)).thenReturn(new ConstantClass(CLASS_NAME_INDEX));
-        when(CP_MOCK.getConstantString(CLASS_INDEX, Constants.CONSTANT_Class)).thenReturn(testClassName);
+        when(CP_MOCK.getConstantString(CLASS_INDEX, Const.CONSTANT_Class)).thenReturn(testClassName);
         
         final ClassID cid = new ClassID(testClassName);
         

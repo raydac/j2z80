@@ -29,9 +29,7 @@ import com.igormaznitsa.z80asm.Z80Asm;
 import j80.cpu.Z80;
 import java.util.HashMap;
 import java.util.Map;
-import javassist.bytecode.AccessFlag;
-import junit.framework.Assert;
-import org.apache.bcel.Constants;
+import org.apache.bcel.Const;
 import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.ConstantPoolGen;
@@ -40,6 +38,8 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.Type;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Assert;
 import org.junit.Before;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -155,7 +155,7 @@ public abstract class AbstractJvmCommandProcessorTest extends Z80 {
     }
 
     protected MethodGen makeMethodMockup() {
-        return new MethodGen(AccessFlag.STATIC, Type.VOID, new Type[0], new String[0], "MOCK_METHOD", MOCK_CLASS_NAME, new InstructionList(), CP_GEN_MOCK);
+        return new MethodGen(Const.ACC_STATIC, Type.VOID, new Type[0], new String[0], "MOCK_METHOD", MOCK_CLASS_NAME, new InstructionList(), CP_GEN_MOCK);
     }
 
     protected void registerBreakPoint(final String labelName) {
@@ -223,7 +223,7 @@ public abstract class AbstractJvmCommandProcessorTest extends Z80 {
         when(CP_GEN_MOCK.getConstant(INDEX_METHOD_SIGNATURE)).thenReturn(cpMethodSignature);
         when(CP_GEN_MOCK.getConstant(INDEX_NAME_TYPE)).thenReturn(cpNameType);
         when(CP_GEN_MOCK.getConstant(index)).thenReturn(methodRef);
-        when(CP_MOCK.getConstantString(INDEX_CLASS, Constants.CONSTANT_Class)).thenReturn(className);
+        when(CP_MOCK.getConstantString(INDEX_CLASS, Const.CONSTANT_Class)).thenReturn(className);
         
         final String [] argNames = new String[argTypes.length];
         for(int i=0;i<argTypes.length;i++){
@@ -282,7 +282,7 @@ public abstract class AbstractJvmCommandProcessorTest extends Z80 {
     }
 
     public void assertStackEmpty() {
-        Assert.assertEquals("Stack must be empty", INIT_SP, SP);
+        org.junit.Assert.assertEquals("Stack must be empty", INIT_SP, SP);
     }
 
     public String getAsmPostfix() {
