@@ -15,9 +15,6 @@
 
     <artifactId>ext-jar</artifactId>
     <packaging>jar</packaging>
-
-    <name>The Ext JAR</name>
-    <description>The Ext JAR archive for the Acceptance Test</description>
     
     <build>
         <plugins>

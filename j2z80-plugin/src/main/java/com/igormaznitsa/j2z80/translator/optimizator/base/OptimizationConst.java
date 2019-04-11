@@ -1,7 +1,10 @@
 package com.igormaznitsa.j2z80.translator.optimizator.base;
 
-public interface OptimizationConst {
-  static final String CLRLOC_STR = "CLRLOC";
-  static final String[] NONE = new String[0];
-  static final String[] CLRLOC = new String[] {CLRLOC_STR};
+import java.util.Collections;
+import java.util.List;
+
+interface OptimizationConst {
+  String CLRLOC_STR = "CLRLOC";
+  List<String> NONE = Collections.emptyList();
+  List<String> CLRLOC = Collections.singletonList(CLRLOC_STR);
 }

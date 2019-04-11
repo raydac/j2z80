@@ -6,28 +6,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
 
 public enum OptimizationState implements OptimizationConst {
 
-    PUSH_POP_BC(new String[] {"PUSH BC", "POP BC"}, NONE),
-    PUSH_CLRLOC_POP_BC(new String[] {"PUSH BC", CLRLOC_STR, "POP BC"}, CLRLOC),
-    PUSH_POP_DE(new String[] {"PUSH DE", "POP DE"}, NONE),
-    PUSH_CLRLOC_POP_DE(new String[] {"PUSH DE", CLRLOC_STR, "POP DE"}, CLRLOC),
-    PUSH_POP_HL(new String[] {"PUSH HL", "POP HL"}, NONE),
-    PUSH_CLRLOC_POP_HL(new String[] {"PUSH HL", CLRLOC_STR, "POP HL"}, CLRLOC),
-    PUSH_POP_AF(new String[] {"PUSH AF", "POP AF"}, NONE),
-    PUSH_CLRLOC_POP_AF(new String[] {"PUSH AF", CLRLOC_STR, "POP AF"}, CLRLOC),
-    PUSH_POP_IX(new String[] {"PUSH IX", "POP IX"}, NONE),
-    PUSH_CLRLOC_POP_IX(new String[] {"PUSH IX", CLRLOC_STR, "POP IX"}, CLRLOC),
-    PUSH_POP_IY(new String[] {"PUSH IY", "POP IY"}, NONE),
-    PUSH_CLRLOC_IY(new String[] {"PUSH IY", CLRLOC_STR, "POP IY"}, CLRLOC);
+    PUSH_POP_BC(asList("PUSH BC", "POP BC"), NONE),
+    PUSH_CLRLOC_POP_BC(asList("PUSH BC", CLRLOC_STR, "POP BC"), CLRLOC),
+    PUSH_POP_DE(asList("PUSH DE", "POP DE"), NONE),
+    PUSH_CLRLOC_POP_DE(asList("PUSH DE", CLRLOC_STR, "POP DE"), CLRLOC),
+    PUSH_POP_HL(asList("PUSH HL", "POP HL"), NONE),
+    PUSH_CLRLOC_POP_HL(asList("PUSH HL", CLRLOC_STR, "POP HL"), CLRLOC),
+    PUSH_POP_AF(asList("PUSH AF", "POP AF"), NONE),
+    PUSH_CLRLOC_POP_AF(asList("PUSH AF", CLRLOC_STR, "POP AF"), CLRLOC),
+    PUSH_POP_IX(asList("PUSH IX", "POP IX"), NONE),
+    PUSH_CLRLOC_POP_IX(asList("PUSH IX", CLRLOC_STR, "POP IX"), CLRLOC),
+    PUSH_POP_IY(asList("PUSH IY", "POP IY"), NONE),
+    PUSH_CLRLOC_IY(asList("PUSH IY", CLRLOC_STR, "POP IY"), CLRLOC);
 
     private final List<ParsedAsmLine> theCase = new ArrayList<>();
     private final List<ParsedAsmLine> replacement = new ArrayList<>();
 
-    OptimizationState(final String[] theCase, final String[] replacement) {
-        Arrays.stream(theCase).map(ParsedAsmLine::new).forEach(this.theCase::add);
-        Arrays.stream(replacement).map(ParsedAsmLine::new).forEach(this.replacement::add);
+    OptimizationState(final List<String> theCase, final List<String> replacement) {
+      theCase.stream().map(ParsedAsmLine::new).forEach(this.theCase::add);
+      replacement.stream().map(ParsedAsmLine::new).forEach(this.replacement::add);
     }
 
     public boolean process(final List<ParsedAsmLine> lines) {

@@ -39,7 +39,7 @@
           <execution>
             <phase>integration-test</phase>
             <goals>
-              <goal>translate2z80</goal>
+              <goal>translate</goal>
             </goals>
           </execution>
         </executions>
