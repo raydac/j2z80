@@ -17,7 +17,7 @@
  * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.igormaznitsa.j2z80.mojos;
+package com.igormaznitsa.j2z80.translator.mojos;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.TranslatorLogger;
