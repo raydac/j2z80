@@ -1,14 +1,12 @@
 package com.igormaznitsa.j2z80.translator.optimizator.base;
 
+import static java.util.Arrays.asList;
+
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
-
-import static java.util.Arrays.asList;
 
 public enum OptimizationState implements OptimizationConst {
 
@@ -29,8 +27,8 @@ public enum OptimizationState implements OptimizationConst {
     private final List<ParsedAsmLine> replacement = new ArrayList<>();
 
     OptimizationState(final List<String> theCase, final List<String> replacement) {
-      theCase.stream().map(ParsedAsmLine::new).forEach(this.theCase::add);
-      replacement.stream().map(ParsedAsmLine::new).forEach(this.replacement::add);
+        theCase.stream().map(ParsedAsmLine::new).forEach(this.theCase::add);
+        replacement.stream().map(ParsedAsmLine::new).forEach(this.replacement::add);
     }
 
     public boolean process(final List<ParsedAsmLine> lines) {

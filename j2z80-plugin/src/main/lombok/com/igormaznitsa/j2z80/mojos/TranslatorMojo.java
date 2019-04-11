@@ -30,6 +30,7 @@ import lombok.Setter;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -41,6 +42,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -79,7 +82,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   @Getter
   @Setter
   @Parameter(name = "result", defaultValue = "${project.build.directory}${file.separator}${project.build.finalName}.bin")
-  private File resultFile;
+  private File result;
 
   @Getter
   @Setter
@@ -134,7 +137,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
       classPath[classPath.length - 1] = jarFile;
 
       logInfo("The result file format : " + format);
-      logInfo("The result file name : " + resultFile.getName());
+      logInfo("The result file name : " + result.getName());
 
       final OptimizationLevel optimizationLevel = OptimizationLevel.findForTextName(getOptimization());
 
@@ -172,7 +175,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
         throw new IllegalArgumentException("Usupported format [" + format + ']');
       }
 
-      getLog().info("The result file has been saved as " + resultFile.getAbsolutePath());
+      getLog().info("The result file has been saved as " + result.getAbsolutePath());
     } catch (Exception ex) {
       throw new MojoExecutionException("Exception during translation", ex);
     }
@@ -182,9 +185,15 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
     final List<File> dependencyList = new ArrayList<>();
     for (final Artifact arty : this.project.getDependencyArtifacts()) {
       if ("z80".equalsIgnoreCase(arty.getClassifier())) {
-//        final Artifact art = artifactResolver.resolveArtifact(pbr, arty)localRepository.find(arty);
-//        logInfo("Detected Z80 dependency :" + art.getFile().getAbsolutePath());
-//        dependencyList.add(art.getFile());
+        try {
+          final ArtifactResult art = artifactResolver.resolveArtifact(project.getProjectBuildingRequest(), arty);
+          final File file = art.getArtifact().getFile();
+          logInfo("Detected Z80 dependency :" + file.getAbsolutePath());
+          dependencyList.add(file);
+        }catch(ArtifactResolverException ex){
+          logError("Can't resolve Z80 dependency artifact: "+arty);
+          throw new RuntimeException(ex);
+        }
       }
     }
 
@@ -193,7 +202,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
 
   private void saveResultAsBin(final byte[] data) throws IOException {
     logInfo("Save the binary result as BIN file");
-    final OutputStream out = new FileOutputStream(resultFile);
+    final OutputStream out = new FileOutputStream(result);
     try {
       out.write(data);
       out.flush();
