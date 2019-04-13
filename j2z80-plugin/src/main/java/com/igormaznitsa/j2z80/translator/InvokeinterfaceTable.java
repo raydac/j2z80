@@ -30,10 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("serial")
 public class InvokeinterfaceTable {
   private final TranslatorContext translator;
-  private final List<Record> records = new ArrayList<Record>();
+  private final List<Record> records = new ArrayList<>();
   public InvokeinterfaceTable(final TranslatorContext translator, final Set<MethodID> calledInterfaceMethods) {
     this.translator = translator;
     final ClassContext classContext = translator.getClassContext();
@@ -58,7 +57,7 @@ public class InvokeinterfaceTable {
 
   private class Record {
     private final MethodID interfaceMethod;
-    private final List<MethodID> inheritedMethods = new ArrayList<MethodID>();
+    private final List<MethodID> inheritedMethods = new ArrayList<>();
 
     private Record(final MethodID interfaceMethod) {
       this.interfaceMethod = interfaceMethod;

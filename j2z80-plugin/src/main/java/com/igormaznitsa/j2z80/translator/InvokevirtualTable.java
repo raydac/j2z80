@@ -44,7 +44,7 @@ import java.util.Set;
  */
 public class InvokevirtualTable {
 
-  private final Map<String, Record> allVirtualMethods = new HashMap<String, Record>();
+  private final Map<String, Record> allVirtualMethods = new HashMap<>();
   private final TranslatorContext theTranslator;
   public InvokevirtualTable(final TranslatorContext translator) {
     theTranslator = translator;
@@ -65,7 +65,7 @@ public class InvokevirtualTable {
       return;
     }
 
-    final Map<String, ClassMethodInfo> visibleMethods = collectAllVisibledVirtualMethodsToRoot(classGen, new HashMap<String, ClassMethodInfo>());
+    final Map<String, ClassMethodInfo> visibleMethods = collectAllVisibledVirtualMethodsToRoot(classGen, new HashMap<>());
 
     if (!visibleMethods.isEmpty()) {
       makeRecordsForVirtualMethods(classGen, visibleMethods.values());
@@ -75,7 +75,7 @@ public class InvokevirtualTable {
   private void makeRecordsForVirtualMethods(final ClassGen classGen, final Collection<ClassMethodInfo> methods) {
     final ClassContext classContext = theTranslator.getClassContext();
 
-    final List<String> allAncestors = new ArrayList<String>(classContext.findAllClassAncestors(classGen.getClassName()));
+    final List<String> allAncestors = new ArrayList<>(classContext.findAllClassAncestors(classGen.getClassName()));
     allAncestors.add(classGen.getClassName());
 
     for (final String className : allAncestors) {
@@ -151,7 +151,7 @@ public class InvokevirtualTable {
 
     private final ClassID theClassId;
     private final Method theMethod;
-    private final Set<ClassMethodInfo> cases = new HashSet<ClassMethodInfo>();
+    private final Set<ClassMethodInfo> cases = new HashSet<>();
 
     private Record(final ClassID classId, final Method method) {
       theClassId = classId;
@@ -177,7 +177,7 @@ public class InvokevirtualTable {
     private String generateAsmForMethod(final ClassMethodInfo classMethodInfo) {
       final MethodGen methGen = classMethodInfo.getMethodGen();
       final String methodLabel = LabelAndFrameUtils.makeLabelNameForMethod(classMethodInfo);
-      final int classId = theTranslator.getClassContext().findClassUID(new ClassID(classMethodInfo.getClassInfo())).intValue();
+      final int classId = theTranslator.getClassContext().findClassUID(new ClassID(classMethodInfo.getClassInfo()));
       final int frameSize = LabelAndFrameUtils.calculateFrameSizeForMethod(methGen.getArgumentTypes().length, methGen.getMaxLocals(), false);
 
       return "DEFW " + classId + ','

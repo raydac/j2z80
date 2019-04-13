@@ -36,9 +36,9 @@ import java.util.Map.Entry;
  */
 public class ZClassPath {
 
-  private final Map<String, ClassGen> classStorage = new HashMap<String, ClassGen>();
-  private final Map<String, byte[]> jniCodeStorage = new HashMap<String, byte[]>();
-  private final Map<String, byte[]> binaryDataStorage = new HashMap<String, byte[]>();
+  private final Map<String, ClassGen> classStorage = new HashMap<>();
+  private final Map<String, byte[]> jniCodeStorage = new HashMap<>();
+  private final Map<String, byte[]> binaryDataStorage = new HashMap<>();
   private final TranslatorContext context;
   private final ZParsedJar[] jarFiles;
   private ClassGen mainClass;

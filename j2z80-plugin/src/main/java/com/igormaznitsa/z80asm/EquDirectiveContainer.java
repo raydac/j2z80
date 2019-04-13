@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public class EquDirectiveContainer {
-  private final Map<String, EquDirectiveRecord> directiveContainer = new LinkedHashMap<String, EquDirectiveRecord>();
+  private final Map<String, EquDirectiveRecord> directiveContainer = new LinkedHashMap<>();
 
   public EquDirectiveRecord findRecordForLabel(final String associatedLabel) {
     Assert.assertNotNull("Must not be null", associatedLabel);
@@ -46,7 +46,7 @@ public class EquDirectiveContainer {
   }
 
   public List<EquDirectiveRecord> getValuesAsList() {
-    final List<EquDirectiveRecord> result = new ArrayList<EquDirectiveContainer.EquDirectiveRecord>(directiveContainer.size());
+    final List<EquDirectiveRecord> result = new ArrayList<>(directiveContainer.size());
     for (final String key : directiveContainer.keySet()) {
       result.add(directiveContainer.get(key));
     }

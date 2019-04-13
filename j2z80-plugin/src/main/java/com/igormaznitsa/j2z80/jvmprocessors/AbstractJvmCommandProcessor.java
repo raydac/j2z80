@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,7 +82,7 @@ public abstract class AbstractJvmCommandProcessor {
    */
   public static final String MACROS_RECORDADDR = "%recordaddress%";
   // the map contains all processors for allowed jvm commands
-  private static final Map<Class<? extends Instruction>, AbstractJvmCommandProcessor> PROCESSORS = new HashMap<Class<? extends Instruction>, AbstractJvmCommandProcessor>();
+  private static final Map<Class<? extends Instruction>, AbstractJvmCommandProcessor> PROCESSORS = new HashMap<>();
 
   static {
     try {
@@ -89,7 +90,7 @@ public abstract class AbstractJvmCommandProcessor {
       final String PROCESSOR_LIST_FILE = "processorlist.txt";
       final InputStream file = AbstractJvmCommandProcessor.class.getResourceAsStream(PROCESSOR_LIST_FILE);
       Assert.assertNotNull("There must be " + PROCESSOR_LIST_FILE + " in the same directory", file);
-      final BufferedReader reader = new BufferedReader(new InputStreamReader(file, "UTF-8"));
+      final BufferedReader reader = new BufferedReader(new InputStreamReader(file, StandardCharsets.UTF_8));
       try {
         while (true) {
           final String line = reader.readLine();
@@ -101,7 +102,7 @@ public abstract class AbstractJvmCommandProcessor {
           }
           final String className = AbstractJvmCommandProcessor.class.getPackage().getName() + '.' + line;
           final Class<? extends AbstractJvmCommandProcessor> cls = Class.forName(className).asSubclass(AbstractJvmCommandProcessor.class);
-          final AbstractJvmCommandProcessor processor = (AbstractJvmCommandProcessor) cls.getDeclaredConstructor().newInstance();
+          final AbstractJvmCommandProcessor processor = cls.getDeclaredConstructor().newInstance();
           final Class<? extends Instruction> bcelClass = Class.forName("org.apache.bcel.generic." + processor.getName()).asSubclass(Instruction.class);
           PROCESSORS.put(bcelClass, processor);
         }

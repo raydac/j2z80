@@ -66,13 +66,11 @@ public class Processor_TABLESWITCH extends AbstractJvmCommandProcessor {
         .replace(MACROS_DEFAULT, defaultJump)
     );
 
-    if (matchs.length > 0) {
-      for (int branchIndex = 0; branchIndex < matchs.length; branchIndex++) {
-        final InstructionHandle target = targets[branchIndex];
-        final String jumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), target.getPosition());
+    for (int branchIndex = 0; branchIndex < matchs.length; branchIndex++) {
+      final InstructionHandle target = targets[branchIndex];
+      final String jumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), target.getPosition());
 
-        out.write("DEFW " + jumpLabel + "\n");
-      }
+      out.write("DEFW " + jumpLabel + "\n");
     }
 
     out.write(NEXT_LINE);

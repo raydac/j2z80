@@ -41,8 +41,8 @@ import java.util.Set;
 class ClassContextImpl implements ClassContext {
 
   private final TranslatorImpl theTranslator;
-  private final Map<ClassID, ClassMethodInfo> mapClassId = new HashMap<ClassID, ClassMethodInfo>();
-  private final Set<ClassID> setClassesWithJNI = new HashSet<ClassID>();
+  private final Map<ClassID, ClassMethodInfo> mapClassId = new HashMap<>();
+  private final Set<ClassID> setClassesWithJNI = new HashSet<>();
 
   public ClassContextImpl(final TranslatorImpl translator) {
     this.theTranslator = translator;
@@ -82,14 +82,14 @@ class ClassContextImpl implements ClassContext {
   public Integer findClassUID(final ClassID classId) {
     final ClassMethodInfo info = mapClassId.get(classId);
     if (info != null) {
-      return Integer.valueOf(info.getUID());
+      return info.getUID();
     }
     return null;
   }
 
   @Override
   public Set<ClassID> findAllClassesImplementInterface(final String interfaceName) {
-    final Set<ClassID> result = new HashSet<ClassID>();
+    final Set<ClassID> result = new HashSet<>();
 
     final ClassGen classGen = findClassForID(new ClassID(interfaceName));
     if (classGen.isInterface()) {
@@ -151,7 +151,7 @@ class ClassContextImpl implements ClassContext {
 
   @Override
   public List<String> findAllClassAncestors(final String className) {
-    final List<String> result = new ArrayList<String>();
+    final List<String> result = new ArrayList<>();
 
     String tmpClassName = className;
 
@@ -167,7 +167,7 @@ class ClassContextImpl implements ClassContext {
 
   @Override
   public List<String> findAllClassSuccessors(final String className) {
-    final List<String> result = new ArrayList<String>();
+    final List<String> result = new ArrayList<>();
     for (final ClassGen cls : theTranslator.workingClassPath.getAllClasses().values()) {
       if (className.equals(cls.getClassName())) {
         continue;

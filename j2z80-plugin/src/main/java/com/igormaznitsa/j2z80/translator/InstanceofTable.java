@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 public final class InstanceofTable {
-  private final List<InstanceofRow> rows = new ArrayList<InstanceofRow>();
+  private final List<InstanceofRow> rows = new ArrayList<>();
 
   public InstanceofTable(final TranslatorContext translator, final Set<ClassID> classesToBeChecked) {
     final ClassContext classContext = translator.getClassContext();
@@ -44,7 +44,7 @@ public final class InstanceofTable {
       final List<String> allSuccesors = classContext.findAllClassSuccessors(classGen.getClassName());
       final Set<ClassID> allImplementingInterface = classContext.findAllClassesImplementInterface(classGen.getClassName());
 
-      final Set<ClassID> allCompatible = new HashSet<ClassID>();
+      final Set<ClassID> allCompatible = new HashSet<>();
       for (final String s : allSuccesors) {
         allCompatible.add(new ClassID(s));
       }
@@ -89,7 +89,7 @@ public final class InstanceofTable {
 
   public final static class InstanceofRow {
     private final ClassID classId;
-    private final Set<ClassID> compatibleClasses = new HashSet<ClassID>();
+    private final Set<ClassID> compatibleClasses = new HashSet<>();
 
     public InstanceofRow(final ClassID classId) {
       this.classId = classId;

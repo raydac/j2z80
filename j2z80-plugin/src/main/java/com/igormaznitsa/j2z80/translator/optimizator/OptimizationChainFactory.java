@@ -32,7 +32,7 @@ public class OptimizationChainFactory {
       case NONE:
         return new AsmOptimizerChain(context);
       case BASE:
-        return new AsmOptimizerChain(context, new AsmOptimizer[] {new ReplacePatterns()});
+        return new AsmOptimizerChain(context, new ReplacePatterns());
       default:
         throw new IllegalArgumentException("Unsupported optimization level " + level);
     }

@@ -37,6 +37,7 @@ import org.apache.bcel.generic.MethodGen;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -60,15 +61,13 @@ public class MethodTranslator {
 
   public String[] translate() throws IOException {
     final List<String> asm = methodToAsm();
-    final List<String> result = new ArrayList<String>();
+    final List<String> result = new ArrayList<>();
     for (final String str : asm) {
       final String[] splitted = Utils.breakToLines(str);
-      for (final String s : splitted) {
-        result.add(s);
-      }
+      result.addAll(Arrays.asList(splitted));
     }
 
-    return result.toArray(new String[result.size()]);
+    return result.toArray(new String[0]);
   }
 
   public ClassMethodInfo getMethod() {
@@ -76,7 +75,7 @@ public class MethodTranslator {
   }
 
   private List<String> methodToAsm() throws IOException {
-    final List<String> result = new ArrayList<String>(1024);
+    final List<String> result = new ArrayList<>(1024);
 
     result.add(LabelAndFrameUtils.makeLabelNameForMethod(theMethod) + ':');
 

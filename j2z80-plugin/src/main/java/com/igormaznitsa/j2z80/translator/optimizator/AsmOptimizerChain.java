@@ -59,7 +59,7 @@ public class AsmOptimizerChain {
    * @return an optimized list of assembler strings
    */
   public List<ParsedAsmLine> processSources(final List<ParsedAsmLine> lines) {
-    List<ParsedAsmLine> processing = new ArrayList<ParsedAsmLine>(lines);
+    List<ParsedAsmLine> processing = new ArrayList<>(lines);
     for (final AsmOptimizer optimizator : optimizators) {
       processing = optimizator.optimizeAsmText(this.context, processing);
     }

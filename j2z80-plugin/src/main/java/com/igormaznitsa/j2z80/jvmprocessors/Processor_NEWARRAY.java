@@ -48,7 +48,7 @@ public class Processor_NEWARRAY extends AbstractJvmCommandProcessor implements N
 
     final int arrayType = newarray.getTypecode();
 
-    String sub = null;
+    String sub;
 
     switch (arrayType) {
       case 4: // boolean

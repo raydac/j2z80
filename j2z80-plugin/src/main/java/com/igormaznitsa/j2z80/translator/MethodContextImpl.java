@@ -41,7 +41,7 @@ import java.util.Set;
  */
 class MethodContextImpl implements MethodContext {
   private final TranslatorImpl theTranslator;
-  private final Map<MethodID, ClassMethodInfo> methodIds = new HashMap<MethodID, ClassMethodInfo>();
+  private final Map<MethodID, ClassMethodInfo> methodIds = new HashMap<>();
 
 
   public MethodContextImpl(final TranslatorImpl translator) {
@@ -51,7 +51,7 @@ class MethodContextImpl implements MethodContext {
   public List<MethodID> init() {
     int methodIdCounter = 0;
 
-    final List<MethodID> methodsToProcess = new ArrayList<MethodID>();
+    final List<MethodID> methodsToProcess = new ArrayList<>();
 
     for (final ClassGen c : theTranslator.workingClassPath.getAllClasses().values()) {
       for (final Method m : c.getMethods()) {
@@ -81,7 +81,7 @@ class MethodContextImpl implements MethodContext {
   public Integer findMethodUID(final MethodID methodId) {
     final ClassMethodInfo info = methodIds.get(methodId);
     if (info != null) {
-      return Integer.valueOf(info.getUID());
+      return info.getUID();
     }
     return null;
   }

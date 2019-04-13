@@ -28,7 +28,6 @@ import java.util.Arrays;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-@SuppressWarnings("serial")
 public class PositioningByteBuffer {
 
   private byte[] insideArray;
@@ -92,8 +91,8 @@ public class PositioningByteBuffer {
     setAddress(address);
 
     int addr = address;
-    for (int i = 0; i < data.length; i++) {
-      writeByteAtPos(addr, data[i]);
+    for (byte datum : data) {
+      writeByteAtPos(addr, datum);
       addr++;
     }
   }

@@ -33,7 +33,6 @@ import java.util.Set;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-@SuppressWarnings("serial")
 public abstract class AbstractAsmCommand {
 
   protected static final byte[] EMPTY_ARRAY = new byte[0];
@@ -44,14 +43,14 @@ public abstract class AbstractAsmCommand {
 
   static {
     // init inside mapping and command list
-    REGISTER_ORDER.put("A", Integer.valueOf(7));
-    REGISTER_ORDER.put("B", Integer.valueOf(0));
-    REGISTER_ORDER.put("C", Integer.valueOf(1));
-    REGISTER_ORDER.put("D", Integer.valueOf(2));
-    REGISTER_ORDER.put("E", Integer.valueOf(3));
-    REGISTER_ORDER.put("H", Integer.valueOf(4));
-    REGISTER_ORDER.put("L", Integer.valueOf(5));
-    REGISTER_ORDER.put("(HL)", Integer.valueOf(6));
+    REGISTER_ORDER.put("A", 7);
+    REGISTER_ORDER.put("B", 0);
+    REGISTER_ORDER.put("C", 1);
+    REGISTER_ORDER.put("D", 2);
+    REGISTER_ORDER.put("E", 3);
+    REGISTER_ORDER.put("H", 4);
+    REGISTER_ORDER.put("L", 5);
+    REGISTER_ORDER.put("(HL)", 6);
 
     REGISTER_NAME.addAll(Arrays.asList("A", "B", "C", "D", "E", "H", "L", "BC", "DE", "HL", "IX", "IY", "AF", "AF'", "R", "I", "(BC)", "(DE)", "(HL)", "SP", "(SP)"));
     REGISTER_NAME_16.addAll(Arrays.asList("BC", "DE", "HL", "SP", "IX", "IY"));
@@ -192,7 +191,7 @@ public abstract class AbstractAsmCommand {
     final String className = AbstractAsmCommand.class.getPackage().getName() + ".AsmCommand" + name;
     try {
       final Class<? extends AbstractAsmCommand> commandClass = Class.forName(className).asSubclass(AbstractAsmCommand.class);
-      final AbstractAsmCommand command = (AbstractAsmCommand) commandClass.getDeclaredConstructor().newInstance();
+      final AbstractAsmCommand command = commandClass.getDeclaredConstructor().newInstance();
       Assert.assertTrue("A Command must have the same name as its class name [" + name + ']', command.getName().equals(name));
       COMMAND_MAP.put(command.getName(), command);
     } catch (ClassNotFoundException ex) {
@@ -228,7 +227,7 @@ public abstract class AbstractAsmCommand {
     if (!isIndexRegisterReference(register)) {
       final Integer order = REGISTER_ORDER.get(register);
       Assert.assertNotNull("Register name must be known [" + register + ']', order);
-      result = order.intValue();
+      result = order;
     }
     return result;
   }

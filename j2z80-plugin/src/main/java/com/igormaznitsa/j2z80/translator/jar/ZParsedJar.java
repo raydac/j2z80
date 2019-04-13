@@ -46,9 +46,9 @@ public class ZParsedJar {
 
   private final JarFile jarFile;
 
-  private final List<ClassGen> classes = new ArrayList<ClassGen>();
-  private final Map<String, byte[]> nativeCodeFiles = new HashMap<String, byte[]>();
-  private final Map<String, byte[]> binaryResources = new HashMap<String, byte[]>();
+  private final List<ClassGen> classes = new ArrayList<>();
+  private final Map<String, byte[]> nativeCodeFiles = new HashMap<>();
+  private final Map<String, byte[]> binaryResources = new HashMap<>();
 
   public ZParsedJar(final File jarFile) throws IOException {
     this.jarFile = new JarFile(jarFile);

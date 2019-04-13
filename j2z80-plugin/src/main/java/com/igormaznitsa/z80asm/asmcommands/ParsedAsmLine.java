@@ -33,7 +33,6 @@ import java.util.Set;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-@SuppressWarnings("serial")
 public class ParsedAsmLine {
 
   private static final String[] SPEC_ARGS = new String[] {
@@ -42,7 +41,7 @@ public class ParsedAsmLine {
       "NZ", "Z", "NC", "C", "PO", "PE", "M", "P",
       "SP", "(SP)", "IX", "IY", "(C)", "(HL)"
   };
-  private static final Set<String> SPECIAL_ARG_SET = new HashSet<String>(Arrays.asList(SPEC_ARGS));
+  private static final Set<String> SPECIAL_ARG_SET = new HashSet<>(Arrays.asList(SPEC_ARGS));
   private static final String[] EMPTY_ARRAY = new String[0];
   private final String command;
   private final String[] arguments;
@@ -199,7 +198,7 @@ public class ParsedAsmLine {
   }
 
   private static String[] splitArguments(final String normalArguments) {
-    final List<String> resultList = new ArrayList<String>();
+    final List<String> resultList = new ArrayList<>();
     final StringBuilder buffer = new StringBuilder();
 
     boolean atString = false;
@@ -217,11 +216,7 @@ public class ParsedAsmLine {
       }
       switch (chr) {
         case '\"': {
-          if (atString) {
-            atString = false;
-          } else {
-            atString = true;
-          }
+          atString = !atString;
           buffer.append("\"");
         }
         break;
@@ -266,7 +261,7 @@ public class ParsedAsmLine {
       }
     }
 
-    return resultList.toArray(new String[resultList.size()]);
+    return resultList.toArray(new String[0]);
   }
 
   private static String makeSignatureFromNormalizedArgs(final String[] arguments) {
@@ -291,14 +286,12 @@ public class ParsedAsmLine {
       if (Character.isWhitespace(chr)) {
         if (atStr) {
           result.append(chr);
-        } else {
-          continue;
         }
       } else {
         switch (chr) {
           case '\"': {
             result.append(chr);
-            atStr = atStr ? false : true;
+            atStr = !atStr;
           }
           break;
           case ';': {
@@ -333,7 +326,7 @@ public class ParsedAsmLine {
     try {
       Long.parseLong(label);
       throw new IllegalArgumentException("Label is like a number [" + label + ']');
-    } catch (NumberFormatException ex) {
+    } catch (NumberFormatException ignored) {
     }
 
     for (final char chr : label.toCharArray()) {

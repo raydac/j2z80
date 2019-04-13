@@ -43,14 +43,13 @@ import java.util.Set;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-@SuppressWarnings("serial")
 public class Z80Asm implements AsmTranslator {
 
   private final PositioningByteBuffer codeBuffer = new PositioningByteBuffer(0xFFFF);
-  private final Set<String> nonAssignedLabels = new HashSet<String>();
+  private final Set<String> nonAssignedLabels = new HashSet<>();
   private final LabelAddressContainer globalLabelMap = new LabelAddressContainer();
   private final LabelAddressContainer localLabelMap = new LabelAddressContainer(true);
-  private final Map<String, List<LocalLabelExpectant>> localLabelExpectants = new HashMap<String, List<LocalLabelExpectant>>();
+  private final Map<String, List<LocalLabelExpectant>> localLabelExpectants = new HashMap<>();
   private final EquDirectiveContainer equContainer = new EquDirectiveContainer();
   private int programCounter;
   private int entryPoint;
@@ -67,14 +66,12 @@ public class Z80Asm implements AsmTranslator {
 
   public Z80Asm(final String[] sourceToBeCompiled) {
     Assert.assertNotNull("Source array must not be null", (Object) sourceToBeCompiled);
-    final List<String> normalized = new ArrayList<String>(sourceToBeCompiled.length);
+    final List<String> normalized = new ArrayList<>(sourceToBeCompiled.length);
     for (final String str : sourceToBeCompiled) {
       final String[] parsed = Utils.breakToLines(str);
-      for (final String ps : parsed) {
-        normalized.add(ps);
-      }
+      normalized.addAll(Arrays.asList(parsed));
     }
-    sources = normalized.toArray(new String[normalized.size()]);
+    sources = normalized.toArray(new String[0]);
   }
 
   private static boolean isLocalLabelName(final String labelName) {
@@ -177,9 +174,7 @@ public class Z80Asm implements AsmTranslator {
         final String currentLabel = parsed.getLabel();
 
         if (currentLabel != null) {
-          if (!nonAssignedLabels.contains(currentLabel)) {
-            nonAssignedLabels.add(currentLabel);
-          }
+          nonAssignedLabels.add(currentLabel);
           parsed.setLabel(null);
         }
 
@@ -209,7 +204,7 @@ public class Z80Asm implements AsmTranslator {
           registerGlobalLabelAddress(lbl, address);
         }
         if (result == null) {
-          result = new ArrayList<String>();
+          result = new ArrayList<>();
         }
         result.add(lbl);
       }
@@ -219,7 +214,7 @@ public class Z80Asm implements AsmTranslator {
           registerLocalLabelAddress(lbl, address);
         }
         if (result == null) {
-          result = new ArrayList<String>();
+          result = new ArrayList<>();
         }
         result.add(lbl);
       }
@@ -296,11 +291,7 @@ public class Z80Asm implements AsmTranslator {
     Assert.assertNotNull("Arguments must not contain null", label, expectant);
     Assert.assertLocalLabelName(label);
 
-    List<LocalLabelExpectant> listeners = localLabelExpectants.get(label);
-    if (listeners == null) {
-      listeners = new ArrayList<LocalLabelExpectant>();
-      localLabelExpectants.put(label, listeners);
-    }
+    List<LocalLabelExpectant> listeners = localLabelExpectants.computeIfAbsent(label, k -> new ArrayList<>());
     listeners.add(expectant);
   }
 

@@ -50,7 +50,7 @@ public enum ClassValidator {
    * @return null if the class is compatible and a incompatibility message string if the class is not compatible
    */
   public static String validateClass(final ClassGen cgen) {
-    final MutableObjectContainer<String> result = new MutableObjectContainer<String>();
+    final MutableObjectContainer<String> result = new MutableObjectContainer<>();
 
     return checkClassFlags(cgen, result)
         && checkConstantPool(cgen, result)

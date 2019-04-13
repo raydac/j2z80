@@ -32,7 +32,7 @@ import java.util.Set;
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public class LabelAddressContainer {
-  private final Map<String, Integer> labelMap = new LinkedHashMap<String, Integer>();
+  private final Map<String, Integer> labelMap = new LinkedHashMap<>();
   private boolean flagAllowReplace;
 
   public LabelAddressContainer() {
@@ -60,7 +60,7 @@ public class LabelAddressContainer {
     final Integer address = labelMap.get(labelName);
     Assert.assertNotNull("Only exist label must be requested", address);
 
-    return address.intValue();
+    return address;
   }
 
   public void clear() {
@@ -79,7 +79,7 @@ public class LabelAddressContainer {
     Assert.assertNotNull("Must not be null", labelName);
     Assert.assertAddress(address);
 
-    final Integer addressAsInteger = Integer.valueOf(address);
+    final Integer addressAsInteger = address;
 
     if (flagAllowReplace) {
       labelMap.put(labelName, addressAsInteger);

@@ -31,18 +31,17 @@ public class AsmCommandBIT extends AbstractAsmCommand {
     final String arg1 = asm.getArgs()[1];
 
     final int number = new LightExpression(context, this, asm, arg0).calculate();
-    final String register = arg1;
 
     Assert.assertZero("Bit number is outbound [" + number + ']', number & ~0x7);
 
     final int basecode = 0x40 + (number << 3);
-    if (isIndexRegisterReference(register)) {
-      final int offset = new LightExpression(context, this, asm, extractCalculatedPart(register)).calculate();
+    if (isIndexRegisterReference(arg1)) {
+      final int offset = new LightExpression(context, this, asm, extractCalculatedPart(arg1)).calculate();
       Assert.assertSignedByte(offset);
-      final byte prefix = register.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
+      final byte prefix = arg1.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
       return new byte[] {prefix, (byte) 0xCB, (byte) offset, (byte) (basecode + 6)};
     } else {
-      final int registerIndex = getRegisterOrder(register);
+      final int registerIndex = getRegisterOrder(arg1);
       return new byte[] {(byte) 0xCB, (byte) (basecode + registerIndex)};
     }
   }

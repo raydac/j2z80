@@ -57,7 +57,7 @@ public enum ClassUtils {
   }
 
   public static List<Field> findAllFields(final ZClassPath archive, final ClassGen classGen) {
-    final List<Field> result = new ArrayList<Field>();
+    final List<Field> result = new ArrayList<>();
     _fillAllFields(archive, classGen, result);
     return result;
   }
@@ -83,7 +83,7 @@ public enum ClassUtils {
   }
 
   public static Set<Class<? extends J2ZAdditionalBlock>> findAllAdditionalBlocksInClass(final Class<?> processingClass) {
-    final Set<Class<? extends J2ZAdditionalBlock>> result = new HashSet<Class<? extends J2ZAdditionalBlock>>();
+    final Set<Class<? extends J2ZAdditionalBlock>> result = new HashSet<>();
     _findAllAdditionalBlocksInClass(processingClass, result);
     return result;
   }
@@ -102,7 +102,7 @@ public enum ClassUtils {
   }
 
   public static Set<ClassID> findAllImplementedInterfaces(final ClassContext classContext, final String className) {
-    final Set<ClassID> result = new HashSet<ClassID>();
+    final Set<ClassID> result = new HashSet<>();
 
     final ClassGen classGen = classContext.findClassForID(new ClassID(className));
 

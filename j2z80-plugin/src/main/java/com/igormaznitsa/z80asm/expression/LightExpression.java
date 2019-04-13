@@ -21,7 +21,6 @@ package com.igormaznitsa.z80asm.expression;
 
 import com.igormaznitsa.j2z80.utils.Assert;
 import com.igormaznitsa.z80asm.AsmTranslator;
-import com.igormaznitsa.z80asm.LocalLabelExpectant;
 import com.igormaznitsa.z80asm.asmcommands.AbstractAsmCommand;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 
@@ -114,8 +113,6 @@ public class LightExpression {
           if (!insideString && Character.isWhitespace(chr)) {
             if (result.length() > 0) {
               atWorking = false;
-            } else {
-              continue;
             }
           } else {
             if (insideString && specialChar) {
@@ -197,22 +194,18 @@ public class LightExpression {
               // local label
               final int currentAddress = context.getPC();
 
-              context.registerLocalLabelExpectant(str, new LocalLabelExpectant() {
-
-                @Override
-                public void onLabelIsAccessible(final AsmTranslator context, final String labelName, final long labelAddress) {
-                  final int currentPC = context.getPC();
-                  context.setPC(currentAddress);
-                  context.writeCode(callingCommand.makeMachineCode(context, asmLineParameters));
-                  context.setPC(currentPC);
-                }
+              context.registerLocalLabelExpectant(str, (context, labelName, labelAddress) -> {
+                final int currentPC = context.getPC();
+                context.setPC(currentAddress);
+                context.writeCode(callingCommand.makeMachineCode(context, asmLineParameters));
+                context.setPC(currentPC);
               });
-              address = Integer.valueOf(context.getPC());
+              address = context.getPC();
             } else {
               throw new IllegalArgumentException("Unknown label detected [" + str + ']', ex);
             }
           }
-          return address.intValue();
+          return address;
         }
       }
     }
@@ -240,20 +233,20 @@ public class LightExpression {
         if (lastOperandStack == null) {
           if (lastOperation != null) {
             if ("-".equals(lastOperation)) {
-              lastOperandStack = Integer.valueOf(0 - operand);
+              lastOperandStack = 0 - operand;
             } else {
-              lastOperandStack = Integer.valueOf(operand);
+              lastOperandStack = operand;
             }
             lastOperation = null;
           } else {
-            lastOperandStack = Integer.valueOf(operand);
+            lastOperandStack = operand;
           }
         } else {
           Assert.assertNotNull("There must be an operand in between of two operands [" + expression + ']', lastOperation);
           if ("+".equals(lastOperation)) {
-            lastOperandStack = Integer.valueOf(lastOperandStack.intValue() + operand);
+            lastOperandStack = lastOperandStack + operand;
           } else if ("-".equals(lastOperation)) {
-            lastOperandStack = Integer.valueOf(lastOperandStack.intValue() - operand);
+            lastOperandStack = lastOperandStack - operand;
           } else {
             throw new IllegalStateException("Unknown operation detected");
           }
@@ -265,6 +258,6 @@ public class LightExpression {
     Assert.assertNull("Every operation must have operands [" + expression + ']', lastOperation);
     Assert.assertNotNull("Expression must not be empty one", lastOperandStack);
 
-    return lastOperandStack.intValue();
+    return lastOperandStack;
   }
 }

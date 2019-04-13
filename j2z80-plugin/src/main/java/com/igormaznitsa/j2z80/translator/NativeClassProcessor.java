@@ -27,7 +27,9 @@ import com.igormaznitsa.j2z80.utils.Utils;
 import org.apache.bcel.classfile.Method;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -63,8 +65,8 @@ public class NativeClassProcessor {
     final String[] jniWholeClass = readNativeResource(path, onlyClassName);
 
     // find resources for each native method
-    final Map<Method, String[]> jniMethodBodies = new HashMap<Method, String[]>();
-    final Set<String> jniMethodNames = new HashSet<String>();
+    final Map<Method, String[]> jniMethodBodies = new HashMap<>();
+    final Set<String> jniMethodNames = new HashSet<>();
     for (final Method method : classInfo.getClassInfo().getMethods()) {
       if (!method.isNative()) {
         continue;
@@ -86,14 +88,12 @@ public class NativeClassProcessor {
 
     // make the result
     // as the first we add the whole class body if it is presented
-    final List<String> result = new ArrayList<String>(1024);
+    final List<String> result = new ArrayList<>(1024);
 
     result.add("");
     result.add("; -------- [JNI] START OF " + classInfo.getCanonicalClassName() + " --------");
     if (jniWholeClass != null) {
-      for (final String str : jniWholeClass) {
-        result.add(str);
-      }
+      result.addAll(Arrays.asList(jniWholeClass));
     }
 
     // next we add all found method bodies and generate labels for them
@@ -104,14 +104,12 @@ public class NativeClassProcessor {
 
         result.add(methodLabel + ':');
 
-        for (final String str : methodEntry.getValue()) {
-          result.add(str);
-        }
+        result.addAll(Arrays.asList(methodEntry.getValue()));
       }
     }
     result.add("; -------- [JNI] END OF " + classInfo.getCanonicalClassName() + " --------");
     result.add("");
-    return result.toArray(new String[result.size()]);
+    return result.toArray(new String[0]);
   }
 
   private String[] readNativeResource(final String path, final String resourceName) throws IOException {
@@ -130,7 +128,7 @@ public class NativeClassProcessor {
     }
 
     if (result != null) {
-      return insertFirstStringIntoArray("; file " + readResourcePath, Utils.breakToLines(new String(result, "UTF8")));
+      return insertFirstStringIntoArray("; file " + readResourcePath, Utils.breakToLines(new String(result, StandardCharsets.UTF_8)));
     }
 
     // find between bin files
@@ -143,8 +141,7 @@ public class NativeClassProcessor {
     }
 
     if (result != null) {
-      final String[] data = Utils.byteArrayToAsm("; file " + readResourcePath, result, -1);
-      return data;
+      return Utils.byteArrayToAsm("; file " + readResourcePath, result, -1);
     }
 
     return null;

@@ -34,7 +34,7 @@ public class Processor_LDC extends AbstractJvmCommandProcessor {
 
     final int index = ldc.getIndex();
 
-    String strvalue = null;
+    String strvalue;
     final Constant cp_constant = methodTranslator.getConstantPool().getConstant(index);
 
     if (cp_constant instanceof ConstantInteger) {

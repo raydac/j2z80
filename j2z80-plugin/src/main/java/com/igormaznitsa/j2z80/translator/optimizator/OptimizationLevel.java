@@ -40,7 +40,7 @@ public enum OptimizationLevel {
   // save the text name for the optimization level
   private final String textName;
 
-  private OptimizationLevel(final String textName) {
+  OptimizationLevel(final String textName) {
     this.textName = textName;
   }
 

@@ -30,7 +30,6 @@ import lombok.Setter;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -129,7 +128,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   private MojoExecution execution;
 
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  public void execute() throws MojoExecutionException {
     try {
       File[] classPath = getCompilationDependencies();
 
@@ -190,14 +189,14 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
           final File file = art.getArtifact().getFile();
           logInfo("Detected Z80 dependency :" + file.getAbsolutePath());
           dependencyList.add(file);
-        }catch(ArtifactResolverException ex){
-          logError("Can't resolve Z80 dependency artifact: "+arty);
+        } catch (ArtifactResolverException ex) {
+          logError("Can't resolve Z80 dependency artifact: " + arty);
           throw new RuntimeException(ex);
         }
       }
     }
 
-    return dependencyList.toArray(new File[dependencyList.size()]);
+    return dependencyList.toArray(new File[0]);
   }
 
   private void saveResultAsBin(final byte[] data) throws IOException {
