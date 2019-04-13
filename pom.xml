@@ -23,6 +23,50 @@
         <module>j2z80-tests</module>
     </modules>
 
+    <name>J2Z80 maven plugin</name>
+    <description>Maven plugin to translate Java classes into Z80 asm instructions</description>
+
+    <inceptionYear>2019</inceptionYear>
+
+    <url>https://github.com/raydac/j2z80</url>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/raydac/j2z80/issues</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <id>raydac</id>
+            <name>Igor Maznitsa</name>
+            <email>rrg4400@gmail.com</email>
+            <url>https://www.igormaznitsa.com</url>
+            <timezone>+2</timezone>
+            <roles>
+                <role>Author</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/raydac/j2z80</url>
+        <connection>scm:git:git://github.com/raydac/j2z80.git</connection>
+        <developerConnection>scm:git:git@github.com:raydac/j2z80.git</developerConnection>
+    </scm>
+
+    <organization>
+        <name>Igor Maznitsa</name>
+        <url>http://www.igormaznitsa.com</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <build>
         <pluginManagement>
             <plugins>
