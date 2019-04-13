@@ -33,6 +33,7 @@ import java.util.Set;
 public class InvokeinterfaceTable {
   private final TranslatorContext translator;
   private final List<Record> records = new ArrayList<>();
+
   public InvokeinterfaceTable(final TranslatorContext translator, final Set<MethodID> calledInterfaceMethods) {
     this.translator = translator;
     final ClassContext classContext = translator.getClassContext();

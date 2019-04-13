@@ -46,6 +46,7 @@ public class InvokevirtualTable {
 
   private final Map<String, Record> allVirtualMethods = new HashMap<>();
   private final TranslatorContext theTranslator;
+
   public InvokevirtualTable(final TranslatorContext translator) {
     theTranslator = translator;
 

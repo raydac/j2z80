@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 Igor Maznitsa (http://www.igormaznitsa.com)
- * 
+ *
  * This file is part of the JVM to Z80 translator project (hereinafter referred to as J2Z80).
  *
  * J2Z80 is free software: you can redistribute it and/or modify
@@ -14,34 +14,39 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>. 
+ * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import java.io.*;
-import org.apache.bcel.generic.*;
-import static org.junit.Assert.assertEquals;
+import org.apache.bcel.generic.InstructionHandle;
+import org.apache.bcel.generic.SWAP;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.StringWriter;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class TestSWAP extends AbstractJvmCommandProcessorTest {
 
-    @Test
-    public void testExecution() throws IOException {
-        final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(SWAP.class);
-        final StringWriter writer = new StringWriter();
-        final int VALUE1 = 0xCAFE;
-        final int VALUE2 = 0xBB01;
-        
-        push(VALUE1);
-        push(VALUE2);
-        
-        processor.process(CLASS_PROCESSOR_MOCK,new SWAP(), mock(InstructionHandle.class), writer);
-        assertLinearExecutionToEnd(writer.toString());
-        
-        assertEquals(VALUE1,pop());
-        assertEquals(VALUE2,pop());
-        assertEquals(INIT_SP, SP);
-    }
-    
+  @Test
+  public void testExecution() throws IOException {
+    final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(SWAP.class);
+    final StringWriter writer = new StringWriter();
+    final int VALUE1 = 0xCAFE;
+    final int VALUE2 = 0xBB01;
+
+    push(VALUE1);
+    push(VALUE2);
+
+    processor.process(CLASS_PROCESSOR_MOCK, new SWAP(), mock(InstructionHandle.class), writer);
+    assertLinearExecutionToEnd(writer.toString());
+
+    assertEquals(VALUE1, pop());
+    assertEquals(VALUE2, pop());
+    assertEquals(INIT_SP, SP);
+  }
+
 }

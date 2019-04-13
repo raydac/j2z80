@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 Igor Maznitsa (http://www.igormaznitsa.com)
- * 
+ *
  * This file is part of the JVM to Z80 translator project (hereinafter referred to as J2Z80).
  *
  * J2Z80 is free software: you can redistribute it and/or modify
@@ -14,28 +14,33 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>. 
+ * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import java.io.*;
-import org.apache.bcel.generic.*;
+import org.apache.bcel.generic.InstructionHandle;
+import org.apache.bcel.generic.MONITOREXIT;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.StringWriter;
+
 import static org.mockito.Mockito.mock;
 
 public class TestMONITOREXIT extends AbstractJvmCommandProcessorTest {
 
-    @Test
-    public void testExecution() throws IOException {
-        final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(MONITOREXIT.class);
-        final StringWriter writer = new StringWriter();
-        final int VALUE = 0xCAFE;
-        
-        push(VALUE);
-        
-        processor.process(CLASS_PROCESSOR_MOCK,new MONITOREXIT(), mock(InstructionHandle.class), writer);
-        assertLinearExecutionToEnd(writer.toString());
-        assertStackEmpty();
-    }
-    
+  @Test
+  public void testExecution() throws IOException {
+    final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(MONITOREXIT.class);
+    final StringWriter writer = new StringWriter();
+    final int VALUE = 0xCAFE;
+
+    push(VALUE);
+
+    processor.process(CLASS_PROCESSOR_MOCK, new MONITOREXIT(), mock(InstructionHandle.class), writer);
+    assertLinearExecutionToEnd(writer.toString());
+    assertStackEmpty();
+  }
+
 }

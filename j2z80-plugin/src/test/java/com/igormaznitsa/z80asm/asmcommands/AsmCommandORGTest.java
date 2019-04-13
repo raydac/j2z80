@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 Igor Maznitsa (http://www.igormaznitsa.com)
- * 
+ *
  * This file is part of the JVM to Z80 translator project (hereinafter referred to as J2Z80).
  *
  * J2Z80 is free software: you can redistribute it and/or modify
@@ -14,26 +14,28 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>. 
+ * along with J2Z80.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
 import com.igormaznitsa.z80asm.AsmTranslator;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class AsmCommandORGTest {
-    
-    final AbstractAsmCommand orgCommand = AbstractAsmCommand.findCommandForName("ORG");
-    
-    @Test
-    public void testSomeMethod() {
-        final AsmTranslator mockContext = mock(AsmTranslator.class);
-        final ParsedAsmLine parsedLine = new ParsedAsmLine("org #FF00");
-        final byte [] generated = orgCommand.makeMachineCode(mockContext, parsedLine);
-        assertEquals(0, generated.length);
-        verify(mockContext).setPC(0xFF00);
-    }
+
+  final AbstractAsmCommand orgCommand = AbstractAsmCommand.findCommandForName("ORG");
+
+  @Test
+  public void testSomeMethod() {
+    final AsmTranslator mockContext = mock(AsmTranslator.class);
+    final ParsedAsmLine parsedLine = new ParsedAsmLine("org #FF00");
+    final byte[] generated = orgCommand.makeMachineCode(mockContext, parsedLine);
+    assertEquals(0, generated.length);
+    verify(mockContext).setPC(0xFF00);
+  }
 }
