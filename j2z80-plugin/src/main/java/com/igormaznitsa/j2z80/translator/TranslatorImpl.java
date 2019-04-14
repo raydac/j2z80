@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.ClassContext;
@@ -36,11 +37,12 @@ import com.igormaznitsa.j2z80.translator.jar.ZParsedJar;
 import com.igormaznitsa.j2z80.translator.optimizator.AsmOptimizerChain;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationChainFactory;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
 import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
 import com.igormaznitsa.j2z80.translator.utils.MethodUtils;
-import com.igormaznitsa.j2z80.utils.Assert;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantInteger;
@@ -173,8 +175,8 @@ public class TranslatorImpl implements TranslatorContext {
   public String[] translate(final String mainClassName, final int startAddress, final int stackTop, final String[] patternsExcludeBinResources) throws IOException {
     reset();
 
-    Assert.assertAddress(startAddress);
-    Assert.assertAddress(stackTop);
+    AsmAssertions.assertAddress(startAddress);
+    AsmAssertions.assertAddress(stackTop);
 
     getLogger().logInfo("The Start address for translation :" + Utils.intToString(startAddress));
     getLogger().logInfo("The Stack Top address :" + Utils.intToString(stackTop));
@@ -499,7 +501,7 @@ public class TranslatorImpl implements TranslatorContext {
 
   @Override
   public void registerCalledBootClassProcesser(AbstractBootClass bootClass) {
-    Assert.assertNotNull("Boot class must not be null", bootClass);
+    Assertions.assertNotNull("Boot class must not be null", bootClass);
     usedBootstrapClassese.add(bootClass);
   }
 

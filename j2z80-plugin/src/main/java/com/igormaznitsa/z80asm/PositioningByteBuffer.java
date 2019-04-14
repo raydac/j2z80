@@ -15,14 +15,12 @@
  */
 package com.igormaznitsa.z80asm;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
 
 import java.util.Arrays;
 
 /**
  * The class implements a byte buffer which can be extended automatically to bounds of written data
- *
- * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public class PositioningByteBuffer {
 
@@ -82,7 +80,7 @@ public class PositioningByteBuffer {
   }
 
   public void write(final int address, final byte[] data) {
-    Assert.assertAddress(address);
+    AsmAssertions.assertAddress(address);
 
     setAddress(address);
 

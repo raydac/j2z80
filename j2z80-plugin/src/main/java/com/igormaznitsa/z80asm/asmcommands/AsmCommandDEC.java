@@ -15,7 +15,7 @@
  */
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -46,7 +46,7 @@ public class AsmCommandDEC extends AbstractAsmCommand {
     if (isIndexRegisterReference(arg)) {
       final byte prefix = arg.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
       final int offset = new LightExpression(context, this, asm, extractCalculatedPart(arg)).calculate();
-      Assert.assertSignedByte(offset);
+      AsmAssertions.assertSignedByte(offset);
       return new byte[] {prefix, (byte) 0x35, (byte) offset};
     } else {
       return getPatternCase(asm.getSignature());

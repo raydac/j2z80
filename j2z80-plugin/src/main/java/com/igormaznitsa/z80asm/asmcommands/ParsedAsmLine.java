@@ -15,7 +15,7 @@
  */
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.meta.common.utils.Assertions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +26,6 @@ import java.util.Set;
 
 /**
  * The class allows to parse an assemler command line and split it to three parts: label, command and arguments.
- *
- * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public class ParsedAsmLine {
 
@@ -312,7 +310,7 @@ public class ParsedAsmLine {
   }
 
   private static String checkLabel(final String label) {
-    Assert.assertNotEmpty("Label must not be an empty string", label);
+    Assertions.assertFalse("Label must not be an empty string", label.isEmpty());
 
     final char firstChar = label.charAt(0);
     if (firstChar == '#' || firstChar == '%') {
@@ -333,7 +331,7 @@ public class ParsedAsmLine {
         case '+':
           throw new IllegalArgumentException("Label contains a symbol which can be wrong recognized [" + chr + ']');
         default:
-          Assert.assertFalse("Label must not contain a whitespace char", Character.isWhitespace(chr));
+          Assertions.assertFalse("Label must not contain a whitespace char", Character.isWhitespace(chr));
       }
     }
 

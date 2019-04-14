@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.j2z80.utils;
 
+import com.igormaznitsa.meta.common.utils.Assertions;
 import org.springframework.util.AntPathMatcher;
 
 import java.io.BufferedReader;
@@ -129,7 +130,7 @@ public enum Utils {
    * @return a string array contains all content of arrays as the arguments
    */
   public static String[] concatStringArrays(final String[]... arrays) {
-    Assert.assertNotNull("Concatenated arrays must not contain null", (Object[]) arrays);
+    Assertions.assertNotNull("Concatenated arrays must not contain null", (Object[]) arrays);
     final List<String> result = new ArrayList<String>();
     for (final String[] arg : arrays) {
       for (final String s : arg) {

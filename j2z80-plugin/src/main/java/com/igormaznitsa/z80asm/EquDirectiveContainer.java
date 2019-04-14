@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 
 import java.util.ArrayList;
@@ -32,12 +33,13 @@ public class EquDirectiveContainer {
   private final Map<String, EquDirectiveRecord> directiveContainer = new LinkedHashMap<>();
 
   public EquDirectiveRecord findRecordForLabel(final String associatedLabel) {
-    Assert.assertNotNull("Must not be null", associatedLabel);
+    Assertions.assertNotNull("Must not be null", associatedLabel);
     return directiveContainer.get(associatedLabel);
   }
 
   public EquDirectiveRecord addRecord(final String associatedLabel, final ParsedAsmLine parsedAsmLine, final int pcCounter) {
-    Assert.assertNotNull("Must not be null", associatedLabel, parsedAsmLine);
+    Assertions.assertNotNull("Label Must not be null", associatedLabel);
+    Assertions.assertNotNull("Line must not be null", parsedAsmLine);
     return directiveContainer.put(associatedLabel, new EquDirectiveRecord(associatedLabel, parsedAsmLine, pcCounter));
   }
 

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -42,12 +43,12 @@ public class AsmCommandSUB extends AbstractAsmCommand {
         int number;
         if (isIndexRegisterReference(arg)) {
           number = new LightExpression(context, this, asm, extractCalculatedPart(arg)).calculate();
-          Assert.assertSignedByte(number);
+          AsmAssertions.assertSignedByte(number);
           return arg.startsWith("(IX") ? new byte[] {(byte) 0xDD, (byte) 0x96, (byte) number} :
               new byte[] {(byte) 0xFD, (byte) 0x96, (byte) number};
         } else {
           number = new LightExpression(context, this, asm, arg).calculate();
-          Assert.assertSignedByte(number);
+          AsmAssertions.assertSignedByte(number);
           return new byte[] {(byte) 0xD6, (byte) number};
         }
       }

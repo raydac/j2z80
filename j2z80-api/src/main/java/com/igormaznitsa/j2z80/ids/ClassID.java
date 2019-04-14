@@ -15,14 +15,12 @@
  */
 package com.igormaznitsa.j2z80.ids;
 
-import com.igormaznitsa.j2z80.utils.Assert;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import org.apache.bcel.generic.ClassGen;
 
 /**
- * The class describes CLASS ID which is being used by the translator to identify a java class during processing.
- *
- * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ * CLASS ID which is being used by the translator to identify a java class during processing.
  */
 public class ClassID {
   // inside storage of the full class name
@@ -34,8 +32,8 @@ public class ClassID {
    * @param className the full canonical class path name, must not be null
    */
   public ClassID(final String className) {
-    Assert.assertNotNull("Class name must not be null", className);
-    Assert.assertNotEmpty("Class name must not be empty", className);
+    Assertions.assertNotNull("Class name must not be null", className);
+    Assertions.assertFalse("Class name must not be empty", className.isEmpty());
     this.className = className;
   }
 
@@ -45,7 +43,7 @@ public class ClassID {
    * @param classGen the object to be used for creation, must not be null
    */
   public ClassID(final ClassGen classGen) {
-    Assert.assertNotNull("Argument must not be null", classGen);
+    Assertions.assertNotNull("Argument must not be null", classGen);
     className = classGen.getClassName();
   }
 

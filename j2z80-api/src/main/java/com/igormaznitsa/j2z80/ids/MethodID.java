@@ -15,8 +15,8 @@
  */
 package com.igormaznitsa.j2z80.ids;
 
-import com.igormaznitsa.j2z80.utils.Assert;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.MethodGen;
@@ -76,7 +76,10 @@ public class MethodID {
    * @param argTypes   the argument type signatures for the method, must not be null
    */
   public MethodID(final String className, final String methodName, final Type returnType, final Type[] argTypes) {
-    Assert.assertNotNull("Arguments must not contain null", className, methodName, returnType, argTypes);
+    Assertions.assertNotNull("ClassName must not contain null", className);
+    Assertions.assertNotNull("Method name must not be null", methodName);
+    Assertions.assertNotNull("ReturnType must not be null", returnType);
+    Assertions.assertNotNull("ArgTypes must not be null", argTypes);
     this.methodId = className + '.' + methodName + '.' + Type.getMethodSignature(returnType, argTypes);
     this.methodLabel = LabelAndFrameUtils.makeLabelNameForMethod(className, methodName, returnType, argTypes);
     this.className = className;
@@ -143,8 +146,8 @@ public class MethodID {
     }
 
     if (obj instanceof MethodID) {
-      final MethodID meth = (MethodID) obj;
-      return methodId.equals(meth.methodId);
+      final MethodID that = (MethodID) obj;
+      return this.methodId.equals(that.methodId);
     }
     return false;
   }
@@ -170,7 +173,7 @@ public class MethodID {
    * @return a found compatible method if it is found or null if not found
    */
   public Method findCompatibleMethod(final ClassGen cgen) {
-    Assert.assertNotNull("Class must not be null", cgen);
+    Assertions.assertNotNull("Class must not be null", cgen);
     for (final Method m : cgen.getMethods()) {
       if (methodName.equals(m.getName()) && Arrays.deepEquals(argTypes, m.getArgumentTypes()) && returnType.equals(m.getReturnType())) {
         return m;

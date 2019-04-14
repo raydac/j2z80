@@ -16,8 +16,8 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import com.igormaznitsa.j2z80.utils.Assert;
 import com.igormaznitsa.j2z80.utils.Utils;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.MethodGen;
 
@@ -85,7 +85,7 @@ public abstract class AbstractJvmCommandProcessor {
       // read the file containig all jvm commands, search processors and map them
       final String PROCESSOR_LIST_FILE = "processorlist.txt";
       final InputStream file = AbstractJvmCommandProcessor.class.getResourceAsStream(PROCESSOR_LIST_FILE);
-      Assert.assertNotNull("There must be " + PROCESSOR_LIST_FILE + " in the same directory", file);
+      Assertions.assertNotNull("There must be " + PROCESSOR_LIST_FILE + " in the same directory", file);
       final BufferedReader reader = new BufferedReader(new InputStreamReader(file, StandardCharsets.UTF_8));
       try {
         while (true) {
@@ -147,7 +147,7 @@ public abstract class AbstractJvmCommandProcessor {
       final String label = method.getClassName() + '#' + method.getName() + " " + method.getSignature();
       final int MAX_VARIABLES = 64;
       final int locals = (method.isStatic() ? 0 : 1) + method.getArgumentTypes().length;
-      Assert.assertTrue("Max locals number for a mathod must be less than " + MAX_VARIABLES + " [" + locals + "] at " + label, locals < MAX_VARIABLES);
+      Assertions.assertTrue("Max locals number for a mathod must be less than " + MAX_VARIABLES + " [" + locals + "] at " + label, locals < MAX_VARIABLES);
     }
   }
 

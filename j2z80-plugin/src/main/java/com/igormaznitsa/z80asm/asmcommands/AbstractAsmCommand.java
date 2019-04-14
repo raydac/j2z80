@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 
 import java.util.Arrays;
@@ -136,7 +138,7 @@ public abstract class AbstractAsmCommand {
   }
 
   protected static String extractCalculatedPart(final String arg) {
-    Assert.assertNotEmpty("Argument must not be empty", arg);
+    Assertions.assertFalse("Argument must not be empty", arg.isEmpty());
 
     String result;
 
@@ -144,10 +146,10 @@ public abstract class AbstractAsmCommand {
       result = arg.substring(3, arg.length() - 1);
     } else {
       if (arg.charAt(0) == '(') {
-        Assert.assertTrue("Each bracket must be closed [" + arg + ']', arg.endsWith(")"));
+        Assertions.assertTrue("Each bracket must be closed [" + arg + ']', arg.endsWith(")"));
         result = arg.substring(1, arg.length() - 1);
       } else {
-        Assert.assertFalse("Each bracket must be opened [" + arg + ']', arg.endsWith(")"));
+        Assertions.assertFalse("Each bracket must be opened [" + arg + ']', arg.endsWith(")"));
         result = arg;
       }
     }
@@ -179,7 +181,7 @@ public abstract class AbstractAsmCommand {
 
   protected static int calculateAddressOffset(final int jumpAddress, final int baseAddress) {
     final int result = jumpAddress - (baseAddress + 2);
-    Assert.assertSignedByte(result);
+    AsmAssertions.assertSignedByte(result);
     return result;
   }
 
@@ -188,7 +190,7 @@ public abstract class AbstractAsmCommand {
     try {
       final Class<? extends AbstractAsmCommand> commandClass = Class.forName(className).asSubclass(AbstractAsmCommand.class);
       final AbstractAsmCommand command = commandClass.getDeclaredConstructor().newInstance();
-      Assert.assertTrue("A Command must have the same name as its class name [" + name + ']', command.getName().equals(name));
+      Assertions.assertTrue("A Command must have the same name as its class name [" + name + ']', command.getName().equals(name));
       COMMAND_MAP.put(command.getName(), command);
     } catch (ClassNotFoundException ex) {
       throw new IllegalArgumentException("Can't find any class for the \'" + name + "\' command", ex);
@@ -202,19 +204,18 @@ public abstract class AbstractAsmCommand {
   }
 
   protected void addCase(final String signature, final byte... codes) {
-    Assert.assertNotNull("Signature must not be null", signature);
-    Assert.assertNotNull("Code block must not be null", codes);
-    Assert.assertNotEmpty("Code block must not be empty", codes);
+    Assertions.assertNotNull("Signature must not be null", signature);
+    Assertions.assertNotNull("Code block must not be null", codes);
+    Assertions.assertFalse("Code block must not be empty", codes.length == 0);
 
-
-    Assert.assertFalse("Signature must be unique", PATTERN_CASES.containsKey(signature));
+    Assertions.assertFalse("Signature must be unique", PATTERN_CASES.containsKey(signature));
 
     PATTERN_CASES.put(signature, codes);
   }
 
   protected byte[] getPatternCase(final String pattern) {
     final byte[] result = PATTERN_CASES.get(pattern);
-    Assert.assertNotNull("A Case must be declared [" + pattern + ']', result);
+    Assertions.assertNotNull("A Case must be declared [" + pattern + ']', result);
     return result;
   }
 
@@ -222,7 +223,7 @@ public abstract class AbstractAsmCommand {
     int result = 6;
     if (!isIndexRegisterReference(register)) {
       final Integer order = REGISTER_ORDER.get(register);
-      Assert.assertNotNull("Register name must be known [" + register + ']', order);
+      Assertions.assertNotNull("Register name must be known [" + register + ']', order);
       result = order;
     }
     return result;

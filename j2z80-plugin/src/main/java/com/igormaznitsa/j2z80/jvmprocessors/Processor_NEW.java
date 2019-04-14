@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import com.igormaznitsa.j2z80.utils.Assert;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.NEW;
@@ -50,7 +51,7 @@ public class Processor_NEW extends AbstractJvmCommandProcessor implements NeedsM
 
     final Integer classID = methodTranslator.getTranslatorContext().getClassContext().findClassUID(new ClassID(className));
 
-    Assert.assertNotNull("Class ID must not be null [" + className + ']', classID);
+    Assertions.assertNotNull("Class ID must not be null [" + className + ']', classID);
 
     final String classInfoLabel = LabelAndFrameUtils.makeLabelForClassSizeInfo(type);
 

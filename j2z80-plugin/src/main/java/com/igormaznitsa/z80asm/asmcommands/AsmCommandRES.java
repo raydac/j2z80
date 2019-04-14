@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -25,14 +27,14 @@ public class AsmCommandRES extends AbstractAsmCommand {
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
     final int number = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
 
-    Assert.assertZero("Bit number is outbound [" + number + ']', number & ~0x7);
+    Assertions.assertTrue("Bit number is outbound [" + number + ']', (number & ~0x7) == 0);
 
     final String register = asm.getArgs()[1];
 
     final int basecode = 0x80 + (number << 3);
     if (isIndexRegisterReference(register)) {
       final int offset = new LightExpression(context, this, asm, extractCalculatedPart(register)).calculate();
-      Assert.assertSignedByte(offset);
+      AsmAssertions.assertSignedByte(offset);
       final byte prefix = register.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
       return new byte[] {prefix, (byte) 0xCB, (byte) offset, (byte) (basecode + 6)};
     } else {

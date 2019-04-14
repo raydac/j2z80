@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -39,10 +41,10 @@ public class AsmCommandOUT extends AbstractAsmCommand {
       return getPatternCase(asm.getSignature());
     } else {
       final String rightPart = asm.getArgs()[1];
-      Assert.assertTrue("Port value must be in brakes [" + port + ']', isInBrakes(port));
-      Assert.assertTrue("The right operand must be A [" + rightPart + ']', "A".equals(rightPart));
+      Assertions.assertTrue("Port value must be in brakes [" + port + ']', isInBrakes(port));
+      Assertions.assertTrue("The right operand must be A [" + rightPart + ']', "A".equals(rightPart));
       final int number = new LightExpression(context, this, asm, extractCalculatedPart(port)).calculate();
-      Assert.assertUnsignedByte(number);
+      AsmAssertions.assertUnsignedByte(number);
       return new byte[] {(byte) 0xD3, (byte) number};
     }
   }

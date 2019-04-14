@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.expression;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.asmcommands.AbstractAsmCommand;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
@@ -23,8 +24,6 @@ import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 /**
  * It is a small easy expression parser. It allows to use '-' and '+' operators,
  * $ symbol as the current PC value, labels and strings
- *
- * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public class LightExpression {
 
@@ -156,14 +155,14 @@ public class LightExpression {
   }
 
   private int operandToNumber(final String str) {
-    Assert.assertNotEmpty("Operand must not be an empty string", str);
+    Assertions.assertFalse("Operand must not be an empty string", str.isEmpty());
 
     switch (str.charAt(0)) {
       case '\"': {
         // string
-        Assert.assertTrue("String must be closed [" + str + ']', str.endsWith("\""));
+        Assertions.assertTrue("String must be closed [" + str + ']', str.endsWith("\""));
         final String work = str.substring(1, str.length() - 1);
-        Assert.assertTrue("String length must be greater than 2 chars [" + str + ']', str.length() > 2);
+        Assertions.assertTrue("String length must be greater than 2 chars [" + str + ']', str.length() > 2);
         int result = 0;
         for (final char chr : work.toCharArray()) {
           result = (result << 8) | (chr & 0xFF);
@@ -221,7 +220,7 @@ public class LightExpression {
 
       if ("+".equals(token) || "-".equals(token)) {
         // operation
-        Assert.assertNull("Every operation must have operands [" + expression + ']', lastOperation);
+        Assertions.assertNull("Every operation must have operands [" + expression + ']', lastOperation);
         lastOperation = token;
       } else {
         // operand
@@ -238,7 +237,7 @@ public class LightExpression {
             lastOperandStack = operand;
           }
         } else {
-          Assert.assertNotNull("There must be an operand in between of two operands [" + expression + ']', lastOperation);
+          Assertions.assertNotNull("There must be an operand in between of two operands [" + expression + ']', lastOperation);
           if ("+".equals(lastOperation)) {
             lastOperandStack = lastOperandStack + operand;
           } else if ("-".equals(lastOperation)) {
@@ -251,8 +250,8 @@ public class LightExpression {
       }
     }
 
-    Assert.assertNull("Every operation must have operands [" + expression + ']', lastOperation);
-    Assert.assertNotNull("Expression must not be empty one", lastOperandStack);
+    Assertions.assertNull("Every operation must have operands [" + expression + ']', lastOperation);
+    Assertions.assertNotNull("Expression must not be empty one", lastOperandStack);
 
     return lastOperandStack;
   }

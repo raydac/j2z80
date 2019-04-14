@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -55,7 +56,7 @@ public class AsmCommandRST extends AbstractAsmCommand {
         break;
     }
 
-    Assert.assertNotNull("Wrong RST argument [" + asm.getArgs()[0] + ']', result);
+    Assertions.assertNotNull("Wrong RST argument [" + asm.getArgs()[0] + ']', result);
 
     return result;
   }

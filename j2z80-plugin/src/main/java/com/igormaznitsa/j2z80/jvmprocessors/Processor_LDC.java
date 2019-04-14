@@ -16,7 +16,6 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import com.igormaznitsa.j2z80.utils.Assert;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantInteger;
 import org.apache.bcel.classfile.ConstantString;
@@ -55,7 +54,6 @@ public class Processor_LDC extends AbstractJvmCommandProcessor {
     if (cp_constant instanceof ConstantInteger) {
       final ConstantInteger constInt = (ConstantInteger) cp_constant;
       final int value = constInt.getBytes();
-      Assert.assertSignedShort(value);
       strvalue = Integer.toString(value);
     } else if (cp_constant instanceof ConstantUtf8 || cp_constant instanceof ConstantString) {
       strvalue = methodTranslator.registerUsedConstantPoolItem(index);

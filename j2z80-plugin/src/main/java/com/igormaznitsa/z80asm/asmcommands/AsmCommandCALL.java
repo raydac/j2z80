@@ -15,7 +15,8 @@
  */
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -25,12 +26,12 @@ public class AsmCommandCALL extends AbstractAsmCommand {
   public byte[] makeMachineCode(final AsmTranslator context, ParsedAsmLine asm) {
     if (asm.getArgs().length == 1) {
       final int address = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
-      Assert.assertAddress(address);
+      AsmAssertions.assertAddress(address);
       return new byte[] {(byte) 0xCD, (byte) address, (byte) (address >>> 8)};
     } else {
       final String flag = asm.getArgs()[0];
       final int address = new LightExpression(context, this, asm, asm.getArgs()[1]).calculate();
-      Assert.assertAddress(address);
+      AsmAssertions.assertAddress(address);
       byte command = 0;
 
       if ("NZ".equals(flag)) {
@@ -57,7 +58,7 @@ public class AsmCommandCALL extends AbstractAsmCommand {
 
       }
 
-      Assert.assertNonZero("Unsupported flag for CALL command [" + flag + ']', command);
+      Assertions.assertFalse("Unsupported flag for CALL command [" + flag + ']', command == 0);
 
       return new byte[] {command, (byte) address, (byte) (address >>> 8)};
     }

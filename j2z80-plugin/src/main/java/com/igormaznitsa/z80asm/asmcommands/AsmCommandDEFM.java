@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 
 public class AsmCommandDEFM extends AbstractAsmCommand {
@@ -25,8 +26,8 @@ public class AsmCommandDEFM extends AbstractAsmCommand {
       return str;
     }
 
-    Assert.assertTrue("DEFM takes a string as argument [" + str + ']', str.startsWith("\""));
-    Assert.assertTrue("String must be closed [" + str + ']', str.endsWith("\""));
+    Assertions.assertTrue("DEFM takes a string as argument [" + str + ']', str.startsWith("\""));
+    Assertions.assertTrue("String must be closed [" + str + ']', str.endsWith("\""));
     return str.substring(1, str.length() - 1);
   }
 

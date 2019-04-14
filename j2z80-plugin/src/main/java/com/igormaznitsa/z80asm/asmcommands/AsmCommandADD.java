@@ -15,7 +15,7 @@
  */
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -55,12 +55,12 @@ public class AsmCommandADD extends AbstractAsmCommand {
         if (!isRegisterName(arg1)) {
           if (isIndexRegisterReference(arg1)) {
             number = new LightExpression(context, this, asm, extractCalculatedPart(arg1)).calculate();
-            Assert.assertUnsignedByte(number);
+            AsmAssertions.assertUnsignedByte(number);
             return arg1.startsWith("(IX") ? new byte[] {(byte) 0xDD, (byte) 0x86, (byte) number} :
                 new byte[] {(byte) 0xFD, (byte) 0x86, (byte) number};
           } else {
             number = new LightExpression(context, this, asm, arg1).calculate();
-            Assert.assertUnsignedByte(number);
+            AsmAssertions.assertUnsignedByte(number);
             return new byte[] {(byte) 0xC6, (byte) number};
           }
         }

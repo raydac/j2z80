@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -28,9 +29,9 @@ public class AsmCommandDEFW extends AbstractAsmCommand {
     for (final String arg : asm.getArgs()) {
       final int value = new LightExpression(context, this, asm, arg).calculate();
       if (value < 0) {
-        Assert.assertSignedShort(value);
+        AsmAssertions.assertSignedShort(value);
       } else {
-        Assert.assertUnsignedShort(value);
+        AsmAssertions.assertUnsignedShort(value);
       }
 
       result[index++] = (byte) value;

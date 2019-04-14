@@ -15,7 +15,7 @@
  */
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -27,7 +27,7 @@ public class AsmCommandDEFB extends AbstractAsmCommand {
     int index = 0;
     for (final String arg : asm.getArgs()) {
       final int value = new LightExpression(context, this, asm, asm.getArgs()[index]).calculate();
-      Assert.assertUnsignedByte(value);
+      AsmAssertions.assertUnsignedByte(value);
       result[index++] = (byte) value;
     }
     return result;

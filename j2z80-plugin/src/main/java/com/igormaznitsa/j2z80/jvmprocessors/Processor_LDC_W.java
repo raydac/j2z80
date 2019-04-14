@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantInteger;
 import org.apache.bcel.classfile.ConstantString;
@@ -55,7 +56,7 @@ public class Processor_LDC_W extends AbstractJvmCommandProcessor {
     if (cp_constant instanceof ConstantInteger) {
       final ConstantInteger constInt = (ConstantInteger) cp_constant;
       final int value = constInt.getBytes();
-      Assert.assertSignedShort(value);
+      AsmAssertions.assertSignedShort(value);
       strvalue = Integer.toString(value);
     } else if (cp_constant instanceof ConstantUtf8 || cp_constant instanceof ConstantString) {
       strvalue = methodTranslator.registerUsedConstantPoolItem(index);

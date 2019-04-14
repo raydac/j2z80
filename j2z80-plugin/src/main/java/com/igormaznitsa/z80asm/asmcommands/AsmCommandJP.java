@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
+import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -37,18 +39,18 @@ public class AsmCommandJP extends AbstractAsmCommand {
           result = new byte[] {(byte) 0xFD, (byte) 0xE9};
         }
 
-        Assert.assertNotNull("Wrong register usage for JP command [" + arg + ']', result);
+        Assertions.assertNotNull("Wrong register usage for JP command [" + arg + ']', result);
 
         return result;
       } else {
         final int address = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
-        Assert.assertAddress(address);
+        AsmAssertions.assertAddress(address);
         return new byte[] {(byte) 0xC3, (byte) address, (byte) (address >>> 8)};
       }
     } else {
       final String flag = asm.getArgs()[0];
       final int address = new LightExpression(context, this, asm, asm.getArgs()[1]).calculate();
-      Assert.assertAddress(address);
+      AsmAssertions.assertAddress(address);
       byte command = 0;
 
       if ("NZ".equals(flag)) {
@@ -69,7 +71,7 @@ public class AsmCommandJP extends AbstractAsmCommand {
         command = (byte) 0xFA;
       }
 
-      Assert.assertNonZero("Unsupported flag for JP command [" + flag + ']', command);
+      Assertions.assertFalse("Unsupported flag for JP command [" + flag + ']', command == 0);
 
       return new byte[] {command, (byte) address, (byte) (address >>> 8)};
     }

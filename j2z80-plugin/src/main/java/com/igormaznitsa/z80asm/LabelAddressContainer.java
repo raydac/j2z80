@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm;
 
-import com.igormaznitsa.j2z80.utils.Assert;
+import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
+import com.igormaznitsa.meta.common.utils.Assertions;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -52,9 +54,9 @@ public class LabelAddressContainer {
   }
 
   public int getLabelAddress(final String labelName) {
-    Assert.assertNotNull("Name must not be null", labelName);
+    Assertions.assertNotNull("Name must not be null", labelName);
     final Integer address = labelMap.get(labelName);
-    Assert.assertNotNull("Only exist label must be requested", address);
+    Assertions.assertNotNull("Only exist label must be requested", address);
 
     return address;
   }
@@ -72,15 +74,15 @@ public class LabelAddressContainer {
   }
 
   public void registerLabel(final String labelName, final int address) {
-    Assert.assertNotNull("Must not be null", labelName);
-    Assert.assertAddress(address);
+    Assertions.assertNotNull("Must not be null", labelName);
+    AsmAssertions.assertAddress(address);
 
     final Integer addressAsInteger = address;
 
     if (flagAllowReplace) {
       labelMap.put(labelName, addressAsInteger);
     } else {
-      Assert.assertFalse("Label must not be defined already [" + labelName + ']', labelMap.containsKey(labelName));
+      Assertions.assertFalse("Label must not be defined already [" + labelName + ']', labelMap.containsKey(labelName));
       labelMap.put(labelName, addressAsInteger);
     }
   }
