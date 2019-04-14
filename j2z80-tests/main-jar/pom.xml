@@ -11,6 +11,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <asmFile>${project.build.directory}/source.a80</asmFile>
+    <netbeans.hint.license>apache20</netbeans.hint.license>
   </properties>
 
   <artifactId>main-jar</artifactId>
