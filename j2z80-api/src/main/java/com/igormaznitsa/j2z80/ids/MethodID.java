@@ -17,12 +17,11 @@ package com.igormaznitsa.j2z80.ids;
 
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.meta.common.utils.Assertions;
+import java.util.Arrays;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.Type;
-
-import java.util.Arrays;
 
 /**
  * The Class describes an identifier for a method
@@ -158,12 +157,12 @@ public class MethodID {
    * @return the method label as String
    */
   public String getMethodLabel() {
-    return methodLabel;
+    return this.methodLabel;
   }
 
   @Override
   public String toString() {
-    return methodId + "(" + methodLabel + ")";
+    return this.methodId + "(" + this.methodLabel + ")";
   }
 
   /**

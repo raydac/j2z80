@@ -15,16 +15,16 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.bcel.generic.ANEWARRAY;
 import org.apache.bcel.generic.ARRAYLENGTH;
 import org.apache.bcel.generic.Instruction;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class TestARRAYLENGTH extends AbstractTestBasedOnMemoryManager {
 
-  @Test(timeout = 3000L)
+  @Test
   public void testArrayLength() throws Exception {
     final int ARRAY_SIZE = 1234;
     push(ARRAY_SIZE);

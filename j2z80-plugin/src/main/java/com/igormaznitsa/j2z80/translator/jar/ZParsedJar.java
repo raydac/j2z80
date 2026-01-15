@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator.jar;
 
 import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
-import org.apache.bcel.classfile.ClassParser;
-import org.apache.bcel.generic.ClassGen;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.apache.bcel.classfile.ClassParser;
+import org.apache.bcel.generic.ClassGen;
 
 /**
  * The class allows to parse a Jar file and extract its entries.
@@ -40,15 +40,21 @@ import java.util.jar.JarFile;
  */
 public class ZParsedJar {
 
+  private final File file;
   private final JarFile jarFile;
 
   private final List<ClassGen> classes = new ArrayList<>();
   private final Map<String, byte[]> nativeCodeFiles = new HashMap<>();
   private final Map<String, byte[]> binaryResources = new HashMap<>();
 
-  public ZParsedJar(final File jarFile) throws IOException {
-    this.jarFile = new JarFile(jarFile);
-    extractAll();
+  public ZParsedJar(final File jarFile) {
+    this.file = jarFile;
+    try {
+      this.jarFile = new JarFile(jarFile);
+      this.extractAll();
+    } catch (IOException ex) {
+      throw new RuntimeException("Can't extract jar file: " + jarFile);
+    }
   }
 
   public static String normalizeEntryPath(final String path) {
@@ -60,6 +66,11 @@ public class ZParsedJar {
     return name;
   }
 
+  @Override
+  public String toString() {
+    return this.file.getAbsolutePath();
+  }
+
   private void extractAll() throws IOException {
     final Enumeration<JarEntry> entries = jarFile.entries();
     while (entries.hasMoreElements()) {
@@ -68,10 +79,12 @@ public class ZParsedJar {
         final byte[] entryData = extractEntry(entry);
         final String name = normalizeEntryPath(entry.getName());
         if (isJavaClass(entry)) {
-          final ClassGen classGen = new ClassGen(new ClassParser(new ByteArrayInputStream(entryData), entry.getName()).parse());
+          final ClassGen classGen = new ClassGen(
+              new ClassParser(new ByteArrayInputStream(entryData), entry.getName()).parse());
           final String message = ClassValidator.validateClass(classGen);
           if (message != null) {
-            throw new IOException("Disallowed class detected " + classGen.getClassName() + " [" + message + ']');
+            throw new IOException(
+                "Disallowed class detected " + classGen.getClassName() + " [" + message + ']');
           }
           classes.add(classGen);
         } else if (isNativeCodeFile(entry)) {
@@ -102,7 +115,8 @@ public class ZParsedJar {
   private boolean isNativeCodeFile(final JarEntry entry) {
     if (!entry.isDirectory()) {
       final String entryName = entry.getName();
-      return ClassUtils.isAllowedNativeSourceCodeName(entryName) || ClassUtils.isAllowedCompiledNativeCodeName(entryName);
+      return ClassUtils.isAllowedNativeSourceCodeName(entryName) ||
+          ClassUtils.isAllowedCompiledNativeCodeName(entryName);
     }
     return false;
   }

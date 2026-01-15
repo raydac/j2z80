@@ -1,39 +1,31 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.igormaznitsa</groupId>   
+    <groupId>com.igormaznitsa</groupId>
     <artifactId>ZXSpectrumHelloWorld</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>ZXSpectrumHelloWorld</name>
 
-    <description>A Small 'Hello world' demo-application to check possibilty of intercommunication with the ZX-Basic standard ROM subroutines</description>
-    <url>http://igormaznitsa.com/</url>
+    <description>A Small 'Hello world' demo-application to check possibility of intercommunication with the ZX-Basic
+        standard ROM subroutines
+    </description>
     <inceptionYear>2012</inceptionYear>
-   
-    <developers>
-        <developer>
-            <id>raydac</id>
-            <name>Igor Maznitsa</name>
-            <email>igor.maznitsa@igormaznitsa.com</email>
-            <url>http://www.igormaznitsa.com</url>
-            <timezone>+4</timezone>
-            <roles>
-                <role>Developer</role>
-            </roles>
-        </developer>
-    </developers>
+
+    <properties>
+        <j2z80.version>1.0.2-SNAPSHOT</j2z80.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.igormaznitsa.j2z80</groupId>
-            <artifactId>J2Z80-API</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <groupId>com.igormaznitsa</groupId>
+            <artifactId>j2z80-api</artifactId>
+            <version>${j2z80.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
-  
+
     <build>
         <directory>target</directory>
         <outputDirectory>target/classes</outputDirectory>
@@ -50,40 +42,44 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
                 <configuration>
                     <compilerArgument>-Xlint:all</compilerArgument>
                     <verbose>true</verbose>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>11</source>
+                    <target>11</target>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.igormaznitsa.j2z80</groupId>
-                <artifactId>J2Z80-Translator</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
-
+                <groupId>com.igormaznitsa</groupId>
+                <artifactId>j2z80-plugin</artifactId>
+                <version>${j2z80.version}</version>
                 <executions>
                     <execution>
                         <phase>install</phase>
                         <goals>
-                            <goal>translate2z80</goal>    
+                            <goal>translate</goal>
                         </goals>
-                    </execution>    
-                </executions>    
-                
+                        <configuration>
+                            <formats>
+                                <format>a80</format>
+                                <format>bin</format>
+                                <format>sna</format>
+                            </formats>
+                        </configuration>
+                    </execution>
+                </executions>
+
                 <dependencies>
                     <dependency>
                         <groupId>com.igormaznitsa</groupId>
                         <artifactId>ZXSpectrumDemoLib</artifactId>
-                        <version>1.0-SNAPSHOT</version>
+                        <version>0-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
-                
+
                 <configuration>
-                    <logAsmText>true</logAsmText>
                     <optimization>base</optimization>
                     <excludeResources>
                         <value>/**/*.xml</value>
@@ -93,5 +89,5 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>    
+    </build>
 </project>

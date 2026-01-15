@@ -18,10 +18,10 @@ package com.igormaznitsa.j2z80;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.MethodID;
+import java.io.IOException;
+import java.util.List;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.generic.Type;
-
-import java.io.IOException;
 
 /**
  * The interface describes the translator context
@@ -49,7 +49,8 @@ public interface TranslatorContext {
    * @return assembler text of translated Java classes
    * @throws IOException it will be thrown if there is any transport problem
    */
-  String[] translate(String mainClassName, int startAddress, int stackTopAddress, String[] excludeBinResPatterns) throws IOException;
+  List<String> translate(String mainClassName, int startAddress, int stackTopAddress,
+                         String[] excludeBinResPatterns) throws IOException;
 
   /**
    * Get the current class context

@@ -15,6 +15,10 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import org.apache.bcel.Const;
@@ -24,10 +28,6 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.NEW;
 import org.apache.bcel.generic.ObjectType;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.when;
 
 public class TestNEW extends AbstractTestBasedOnMemoryManager {
   public static final int CLASS_INDEX = CONSTANT_USER_DEFINED + 2;

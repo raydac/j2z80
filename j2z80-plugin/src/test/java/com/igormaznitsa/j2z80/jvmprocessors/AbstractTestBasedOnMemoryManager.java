@@ -15,18 +15,18 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.z80asm.Z80Asm;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Arrays;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.junit.Before;
 import org.powermock.reflect.Whitebox;
-
-import java.io.IOException;
-import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractTestBasedOnMemoryManager extends AbstractJvmCommandProcessorTest implements NeedsMemoryManager {
 
@@ -94,7 +94,7 @@ public abstract class AbstractTestBasedOnMemoryManager extends AbstractJvmComman
       System.out.println(str);
     }
 
-    final Z80Asm asm = new Z80Asm(asmText);
+    final Z80Asm asm = new Z80Asm(Arrays.asList(asmText));
 
     final byte[] compiled = asm.process();
 
@@ -127,7 +127,7 @@ public abstract class AbstractTestBasedOnMemoryManager extends AbstractJvmComman
       System.out.println(str);
     }
 
-    final Z80Asm asm = new Z80Asm(asmText);
+    final Z80Asm asm = new Z80Asm(Arrays.asList(asmText));
 
     final byte[] compiled = asm.process();
 

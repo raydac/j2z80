@@ -15,6 +15,15 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.MethodContext;
 import com.igormaznitsa.j2z80.TranslatorContext;
@@ -24,6 +33,9 @@ import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.z80asm.Z80Asm;
 import j80.cpu.Z80;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.bcel.Const;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantClass;
@@ -46,14 +58,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
 
 @SuppressWarnings("serial")
 public abstract class AbstractJvmCommandProcessorTest extends Z80 {
@@ -184,7 +188,7 @@ public abstract class AbstractJvmCommandProcessorTest extends Z80 {
       System.out.println(str);
     }
 
-    final Z80Asm z80asm = new Z80Asm(asmArray);
+    final Z80Asm z80asm = new Z80Asm(Arrays.asList(asmArray));
     final byte[] bindata = z80asm.process();
     endAddress = z80asm.findLabelAddress(END_LABEL).intValue();
 

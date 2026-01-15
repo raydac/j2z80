@@ -15,10 +15,18 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.InstanceofTable;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashSet;
 import org.apache.bcel.Const;
 import org.apache.bcel.classfile.ConstantClass;
 import org.apache.bcel.classfile.ConstantUtf8;
@@ -26,13 +34,6 @@ import org.apache.bcel.generic.INSTANCEOF;
 import org.apache.bcel.generic.InstructionHandle;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashSet;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
 
 public class TestINSTANCEOF extends AbstractTestBasedOnMemoryManager implements NeedsInstanceofManager {
   private static final String TEST_CLASS_NAME1 = "test.instanceof.class1";
@@ -99,31 +100,31 @@ public class TestINSTANCEOF extends AbstractTestBasedOnMemoryManager implements 
 
     switch (state) {
       case SUCESSOR: {
-        final InstanceofTable.InstanceofRow r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
+        final InstanceofTable.InstanceOfRow r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
         r1.addClass(new ClassID(TEST_CLASS_NAME5));
         r1.addClass(new ClassID(TEST_CLASS_NAME6));
 
-        final InstanceofTable.InstanceofRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
+        final InstanceofTable.InstanceOfRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
         r.addClass(new ClassID(TEST_CLASS_NAME2));
         r.addClass(new ClassID(TEST_CLASS_NAME3));
       }
       break;
       case NOT_SUCCESSOR: {
-        final InstanceofTable.InstanceofRow r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
+        final InstanceofTable.InstanceOfRow r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
         r1.addClass(new ClassID(TEST_CLASS_NAME5));
         r1.addClass(new ClassID(TEST_CLASS_NAME6));
         r1.addClass(new ClassID(TEST_CLASS_NAME3));
 
-        final InstanceofTable.InstanceofRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
+        final InstanceofTable.InstanceOfRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
         r.addClass(new ClassID(TEST_CLASS_NAME2));
       }
       break;
       case NOT_IN_LIST: {
-        final InstanceofTable.InstanceofRow r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
+        final InstanceofTable.InstanceOfRow r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
         r1.addClass(new ClassID(TEST_CLASS_NAME5));
         r1.addClass(new ClassID(TEST_CLASS_NAME6));
 
-        final InstanceofTable.InstanceofRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
+        final InstanceofTable.InstanceOfRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
         r.addClass(new ClassID(TEST_CLASS_NAME2));
       }
       break;

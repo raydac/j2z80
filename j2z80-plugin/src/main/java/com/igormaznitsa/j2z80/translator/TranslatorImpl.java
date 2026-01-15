@@ -16,6 +16,10 @@
 
 package com.igormaznitsa.j2z80.translator;
 
+import static com.igormaznitsa.j2z80.translator.utils.AsmAssertions.assertAddress;
+import static com.igormaznitsa.j2z80.utils.Utils.concatStringArrays;
+import static java.util.Collections.unmodifiableList;
+
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.MethodContext;
 import com.igormaznitsa.j2z80.TranslatorContext;
@@ -37,27 +41,16 @@ import com.igormaznitsa.j2z80.translator.jar.ZParsedJar;
 import com.igormaznitsa.j2z80.translator.optimizator.AsmOptimizerChain;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationChainFactory;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
-import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
 import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
 import com.igormaznitsa.j2z80.translator.utils.MethodUtils;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
-import org.apache.bcel.classfile.Constant;
-import org.apache.bcel.classfile.ConstantInteger;
-import org.apache.bcel.classfile.ConstantUtf8;
-import org.apache.bcel.classfile.Field;
-import org.apache.bcel.classfile.Method;
-import org.apache.bcel.generic.ClassGen;
-import org.apache.bcel.generic.INVOKESTATIC;
-import org.apache.bcel.generic.MethodGen;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -66,6 +59,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
+import org.apache.bcel.classfile.Constant;
+import org.apache.bcel.classfile.ConstantInteger;
+import org.apache.bcel.classfile.ConstantUtf8;
+import org.apache.bcel.classfile.Field;
+import org.apache.bcel.classfile.Method;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.INVOKESTATIC;
+import org.apache.bcel.generic.MethodGen;
 
 /**
  * The class is the Translator implementation. It is the core central class which implements the main work-flow.
@@ -80,28 +82,30 @@ public class TranslatorImpl implements TranslatorContext {
   private final MethodContextImpl methodContext = new MethodContextImpl(this);
 
   private final TranslatorLogger messageLogger;
-  private final List<MethodID> methodsToBeProcessed;
-  private final Set<MethodID> methodsUsedInInvokeinterface = new HashSet<>();
+  private final List<MethodID> methodsToProcess;
+  private final Set<MethodID> methodsUsedInInvokeInterface = new HashSet<>();
   private final Map<ClassMethodInfo, String[]> asmForMethods = new LinkedHashMap<>();
   private final Set<Class<? extends J2ZAdditionalBlock>> registeredAdditions = new HashSet<>();
-  private final Set<AbstractBootClass> usedBootstrapClassese = new HashSet<>();
+  private final Set<AbstractBootClass> usedBootstrapClasses = new HashSet<>();
   private final Map<String, Constant> classPoolConstants = new HashMap<>();
-  private final Set<ClassID> classesForCheckcast = new HashSet<>();
+  private final Set<ClassID> classesForCheckCast = new HashSet<>();
   private String[] excludeResourcePatterns;
-  private OptimizationLevel optimizationLevel;
+  private final OptimizationLevel optimizationLevel;
 
-  public TranslatorImpl(final TranslatorLogger logger, final OptimizationLevel optimization, final File... jarArchives) throws IOException {
+  public TranslatorImpl(final TranslatorLogger logger, final OptimizationLevel optimization,
+                        final List<File> jarArchives) throws IOException {
     this.optimizationLevel = optimization;
     this.messageLogger = logger == null ? new DefaultTranslatorLogger() : logger;
 
-    workingClassPath = new ZClassPath(this, parseJars(jarArchives));
+    this.workingClassPath = new ZClassPath(this,
+        jarArchives.stream().map(ZParsedJar::new).collect(Collectors.toList()));
 
-    if (workingClassPath.getAllClasses().isEmpty()) {
-      throw new IllegalArgumentException("The Class path doesn't have any class");
+    if (this.workingClassPath.getAllClasses().isEmpty()) {
+      throw new IllegalStateException("Class path hasn't classes: " + this.workingClassPath);
     }
 
-    classContext.init();
-    methodsToBeProcessed = Collections.unmodifiableList(methodContext.init());
+    this.classContext.init();
+    this.methodsToProcess = unmodifiableList(methodContext.init());
   }
 
   private static List<ParsedAsmLine> asParsedLines(final List<String> list) {
@@ -130,7 +134,8 @@ public class TranslatorImpl implements TranslatorContext {
     return result;
   }
 
-  public ClassGen findOverridenMethodOnPath(final String className, final String superClassName, final MethodGen method) {
+  public ClassGen findOverriddenMethodOnPath(final String className, final String superClassName,
+                                             final MethodGen method) {
     ClassGen classGen = workingClassPath.findClassForName(className);
     while (classGen != null) {
       if (superClassName.equals(classGen.getClassName())) {
@@ -146,24 +151,13 @@ public class TranslatorImpl implements TranslatorContext {
     return null;
   }
 
-  private ZParsedJar[] parseJars(final File... jarFiles) throws IOException {
-    final ZParsedJar[] result = new ZParsedJar[jarFiles.length];
-
-    int index = 0;
-    for (final File jarFile : jarFiles) {
-      result[index++] = new ZParsedJar(jarFile);
-    }
-
-    return result;
-  }
-
   private void reset() {
-    methodsUsedInInvokeinterface.clear();
-    asmForMethods.clear();
-    registeredAdditions.clear();
-    usedBootstrapClassese.clear();
-    classPoolConstants.clear();
-    classesForCheckcast.clear();
+    this.methodsUsedInInvokeInterface.clear();
+    this.asmForMethods.clear();
+    this.registeredAdditions.clear();
+    this.usedBootstrapClasses.clear();
+    this.classPoolConstants.clear();
+    this.classesForCheckCast.clear();
   }
 
   @Override
@@ -172,33 +166,34 @@ public class TranslatorImpl implements TranslatorContext {
   }
 
   @Override
-  public String[] translate(final String mainClassName, final int startAddress, final int stackTop, final String[] patternsExcludeBinResources) throws IOException {
-    reset();
+  public List<String> translate(final String mainClassName, final int startAddress,
+                                final int stackTop, final String[] patternsExcludeBinResources)
+      throws IOException {
+    this.reset();
 
-    AsmAssertions.assertAddress(startAddress);
-    AsmAssertions.assertAddress(stackTop);
+    assertAddress(startAddress);
+    assertAddress(stackTop);
 
-    getLogger().logInfo("The Start address for translation :" + Utils.intToString(startAddress));
-    getLogger().logInfo("The Stack Top address :" + Utils.intToString(stackTop));
+    this.getLogger()
+        .logInfo("The Start address for translation :" + Utils.intToString(startAddress));
+    this.getLogger().logInfo("The Stack Top address :" + Utils.intToString(stackTop));
 
 
     this.excludeResourcePatterns = patternsExcludeBinResources;
 
     final MethodID mainMethodID = findMainMethod(mainClassName);
-
     final ClassMethodInfo mainMethod = methodContext.findMethodInfo(mainMethodID);
-
     final String[] mainMethodAsm = translateMethod(mainMethodID);
-
     final MainPrefixPostfixGenerator prefixPostfixGenerator = new MainPrefixPostfixGenerator(mainMethod, startAddress, stackTop);
-
     final String[] staticInitBlocks = processStaticInitializingBlocks();
 
-    asmForMethods.put(mainMethod, Utils.concatStringArrays(prefixPostfixGenerator.generatePrefix(), staticInitBlocks, mainMethodAsm, prefixPostfixGenerator.generatePostfix()));
+    this.asmForMethods.put(mainMethod,
+        concatStringArrays(prefixPostfixGenerator.generatePrefix(), staticInitBlocks, mainMethodAsm,
+            prefixPostfixGenerator.generatePostfix()));
 
-    for (final MethodID methodToProcess : methodsToBeProcessed) {
+    for (final MethodID methodToProcess : this.methodsToProcess) {
       if (!mainMethodID.equals(methodToProcess)) {
-        translateMethod(methodToProcess);
+        this.translateMethod(methodToProcess);
       }
     }
 
@@ -223,27 +218,29 @@ public class TranslatorImpl implements TranslatorContext {
 
     result.addAll(makeClassSizeArray());
 
-    if (optimizationLevel != null && optimizationLevel != OptimizationLevel.NONE) {
-      getLogger().logWarning("Make optimization for the level \'" + optimizationLevel.getTextName() + "\'");
+    if (this.optimizationLevel != null && this.optimizationLevel != OptimizationLevel.NONE) {
+      this.getLogger().logWarning(
+          "Make optimization for the level '" + optimizationLevel.getTextName() + "'");
 
       final List<ParsedAsmLine> asmLines = asParsedLines(result);
       final AsmOptimizerChain chain = OptimizationChainFactory.getOptimizators(this, optimizationLevel);
       final List<String> optimizedAsString = asStringLines(chain.processSources(asmLines));
 
-      optimizedAsString.add(0, "; optimization level is \'" + optimizationLevel.getTextName() + '\'');
+      optimizedAsString.add(0,
+          "; optimization level is '" + optimizationLevel.getTextName() + '\'');
 
-      return optimizedAsString.toArray(new String[0]);
+      return optimizedAsString;
     } else {
       getLogger().logInfo("No optimization");
 
-      return result.toArray(new String[0]);
+      return result;
     }
   }
 
   private String[] processStaticInitializingBlocks() {
-    getLogger().logInfo("----PROCESS STATIC INITIALIZERS ----");
+    this.getLogger().logInfo("----PROCESS STATIC INITIALIZERS ----");
     final List<ClassID> classesContainStaticInitializing = new ArrayList<>();
-    for (final Entry<ClassID, ClassMethodInfo> id : classContext.getAllRegisteredClasses()) {
+    for (final Entry<ClassID, ClassMethodInfo> id : this.classContext.getAllFoundClasses()) {
       final ClassGen cgen = id.getValue().getClassInfo();
       for (final Method m : cgen.getMethods()) {
         if (MethodUtils.isStaticInitializer(m)) {
@@ -276,7 +273,7 @@ public class TranslatorImpl implements TranslatorContext {
 
     for (final ClassID id : classesContainStaticInitializing) {
       final ClassGen cgen = classContext.findClassForID(id);
-      result = Utils.concatStringArrays(result, invokeStaticProc.generateCallForStaticInitalizer(cgen));
+      result = concatStringArrays(result, invokeStaticProc.generateCallForStaticInitalizer(cgen));
     }
 
     return result;
@@ -284,12 +281,12 @@ public class TranslatorImpl implements TranslatorContext {
 
   private void processIDs(final List<String> out) {
     // class id
-    for (final Entry<ClassID, ClassMethodInfo> id : classContext.getAllRegisteredClasses()) {
+    for (final Entry<ClassID, ClassMethodInfo> id : this.classContext.getAllFoundClasses()) {
       out.add(LabelAndFrameUtils.makeLabelForClassID(id.getKey()) + ": EQU " + id.getValue().getUID());
     }
 
     // method id
-    for (final Entry<MethodID, ClassMethodInfo> id : methodContext.getMethods()) {
+    for (final Entry<MethodID, ClassMethodInfo> id : this.methodContext.getMethods()) {
       out.add(LabelAndFrameUtils.makeLabelForMethodID(id.getKey()) + ": EQU " + id.getValue().getUID());
     }
   }
@@ -328,7 +325,7 @@ public class TranslatorImpl implements TranslatorContext {
   }
 
   private void processUsedBootstrapClasses(final List<String> out) {
-    for (final AbstractBootClass processor : usedBootstrapClassese) {
+    for (final AbstractBootClass processor : usedBootstrapClasses) {
       final String[] text = processor.getAdditionalText();
       out.addAll(Arrays.asList(text));
     }
@@ -348,9 +345,10 @@ public class TranslatorImpl implements TranslatorContext {
 
   private void processJNIClasses(final List<String> text) throws IOException {
     getLogger().logInfo("----PROCESS JNI CLASSES----");
-    getLogger().logInfo("Detected " + classContext.getClassesWithDetectedJNI().size() + " class(es) contain(s) JNI methods");
+    getLogger().logInfo("Detected " + classContext.getClassesWithJni().size() +
+        " class(es) contain(s) JNI methods");
     final NativeClassProcessor processor = new NativeClassProcessor(this);
-    for (final ClassID classInfo : classContext.getClassesWithDetectedJNI()) {
+    for (final ClassID classInfo : classContext.getClassesWithJni()) {
       getLogger().logInfo("Process " + classInfo);
       text.addAll(Arrays.asList(processor.findNativeSources(classContext.findClassInfoForID(classInfo))));
     }
@@ -432,10 +430,10 @@ public class TranslatorImpl implements TranslatorContext {
     if (addition == NeedsINVOKEINTERFACEManager.class) {
       result = text.replace(NeedsINVOKEINTERFACEManager.MACROS_INVOKEINTERFACE_TABLE, prepareInvokeinterfaceMacrosContent());
     } else if (addition == NeedsINVOKEVIRTUALManager.class) {
-      final InvokevirtualTable table = new InvokevirtualTable(this);
+      final InvokeVirtualTable table = new InvokeVirtualTable(this);
       result = text.replace(NeedsINVOKEVIRTUALManager.MACROS_INVOKEVIRTUAL_TABLE, table.toAsm());
     } else if (addition == NeedsInstanceofManager.class) {
-      final InstanceofTable table = new InstanceofTable(this, classesForCheckcast);
+      final InstanceofTable table = new InstanceofTable(this, classesForCheckCast);
       result = text.replace(NeedsInstanceofManager.MACRO_INSTANCEOFTABLE, table.toAsm());
     }
 
@@ -443,7 +441,7 @@ public class TranslatorImpl implements TranslatorContext {
   }
 
   private String prepareInvokeinterfaceMacrosContent() {
-    final InvokeinterfaceTable table = new InvokeinterfaceTable(this, methodsUsedInInvokeinterface);
+    final InvokeinterfaceTable table = new InvokeinterfaceTable(this, methodsUsedInInvokeInterface);
     return table.generateAsm();
   }
 
@@ -484,13 +482,13 @@ public class TranslatorImpl implements TranslatorContext {
 
   @Override
   public Integer registerClassForCastCheck(final ClassID classId) {
-    classesForCheckcast.add(classId);
+    classesForCheckCast.add(classId);
     return classContext.findClassUID(classId);
   }
 
   @Override
   public Integer registerInterfaceMethodForINVOKEINTERFACE(final MethodID methodId) {
-    methodsUsedInInvokeinterface.add(methodId);
+    methodsUsedInInvokeInterface.add(methodId);
     return methodContext.findMethodUID(methodId);
   }
 
@@ -502,7 +500,7 @@ public class TranslatorImpl implements TranslatorContext {
   @Override
   public void registerCalledBootClassProcesser(AbstractBootClass bootClass) {
     Assertions.assertNotNull("Boot class must not be null", bootClass);
-    usedBootstrapClassese.add(bootClass);
+    usedBootstrapClasses.add(bootClass);
   }
 
   @Override

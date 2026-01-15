@@ -15,15 +15,17 @@
  */
 package com.igormaznitsa.z80asm.asmcommands.expression;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.LocalLabelExpectant;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 
 public class LightExpressionTest {
   @Test

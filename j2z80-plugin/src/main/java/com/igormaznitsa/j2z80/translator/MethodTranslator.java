@@ -20,6 +20,11 @@ import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.jvmprocessors.AbstractJvmCommandProcessor;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantString;
 import org.apache.bcel.classfile.ConstantUtf8;
@@ -29,12 +34,6 @@ import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.InstructionList;
 import org.apache.bcel.generic.InstructionTargeter;
 import org.apache.bcel.generic.MethodGen;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * The class is a method translator. It translates a parsed class method into Z80 assembler.
@@ -133,9 +132,10 @@ public class MethodTranslator {
     String result;
 
     if (item instanceof ConstantString) {
-      final ConstantUtf8 utfconst = (ConstantUtf8) getConstantPool().getConstant(((ConstantString) item).getStringIndex());
+      final ConstantUtf8 utfConst =
+          (ConstantUtf8) getConstantPool().getConstant(((ConstantString) item).getStringIndex());
       result = LabelAndFrameUtils.makeLabelForConstantPoolItem(theMethod.getClassInfo(), ((ConstantString) item).getStringIndex());
-      getTranslatorContext().registerConstantPoolItem(result, utfconst);
+      getTranslatorContext().registerConstantPoolItem(result, utfConst);
     } else {
       result = LabelAndFrameUtils.makeLabelForConstantPoolItem(theMethod.getClassInfo(), itemIndex);
       getTranslatorContext().registerConstantPoolItem(result, item);

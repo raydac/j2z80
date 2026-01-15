@@ -18,9 +18,6 @@ package com.igormaznitsa.j2z80.translator;
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
-import org.apache.bcel.classfile.Method;
-import org.apache.bcel.generic.ClassGen;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.apache.bcel.classfile.Method;
+import org.apache.bcel.generic.ClassGen;
 
 /**
  * The Class implements a class context handler
@@ -36,47 +35,47 @@ import java.util.Set;
  */
 class ClassContextImpl implements ClassContext {
 
-  private final TranslatorImpl theTranslator;
-  private final Map<ClassID, ClassMethodInfo> mapClassId = new HashMap<>();
-  private final Set<ClassID> setClassesWithJNI = new HashSet<>();
+  private final TranslatorImpl tranclator;
+  private final Map<ClassID, ClassMethodInfo> classIdToClassMethodInfos = new HashMap<>();
+  private final Set<ClassID> classesWithJni = new HashSet<>();
 
   public ClassContextImpl(final TranslatorImpl translator) {
-    this.theTranslator = translator;
+    this.tranclator = translator;
   }
 
   void init() {
-    int classIdCounter = 0;
+    int idCounter = 0;
 
     // map all classes from the translator and generate their ids
-    for (final ClassGen c : theTranslator.workingClassPath.getAllClasses().values()) {
+    for (final ClassGen c : this.tranclator.workingClassPath.getAllClasses().values()) {
       final ClassID classId = new ClassID(c);
-      final ClassMethodInfo classInfo = new ClassMethodInfo(c, null, classIdCounter);
-      mapClassId.put(classId, classInfo);
+      final ClassMethodInfo classInfo = new ClassMethodInfo(c, null, idCounter);
+      this.classIdToClassMethodInfos.put(classId, classInfo);
 
       if (!c.isInterface()) {
         for (final Method m : c.getMethods()) {
           if (m.isNative()) {
-            setClassesWithJNI.add(classId);
+            this.classesWithJni.add(classId);
             break;
           }
         }
       }
 
-      classIdCounter++;
+      idCounter++;
     }
   }
 
-  Set<ClassID> getClassesWithDetectedJNI() {
-    return setClassesWithJNI;
+  Set<ClassID> getClassesWithJni() {
+    return classesWithJni;
   }
 
-  Set<Entry<ClassID, ClassMethodInfo>> getAllRegisteredClasses() {
-    return mapClassId.entrySet();
+  Set<Entry<ClassID, ClassMethodInfo>> getAllFoundClasses() {
+    return this.classIdToClassMethodInfos.entrySet();
   }
 
   @Override
   public Integer findClassUID(final ClassID classId) {
-    final ClassMethodInfo info = mapClassId.get(classId);
+    final ClassMethodInfo info = classIdToClassMethodInfos.get(classId);
     if (info != null) {
       return info.getUID();
     }
@@ -90,7 +89,7 @@ class ClassContextImpl implements ClassContext {
     final ClassGen classGen = findClassForID(new ClassID(interfaceName));
     if (classGen.isInterface()) {
 
-      for (final ClassGen cgen : theTranslator.workingClassPath.getAllClasses().values()) {
+      for (final ClassGen cgen : tranclator.workingClassPath.getAllClasses().values()) {
         for (final String name : cgen.getInterfaceNames()) {
           if (interfaceName.equals(name)) {
             if (cgen.isInterface()) {
@@ -115,16 +114,16 @@ class ClassContextImpl implements ClassContext {
 
   @Override
   public Iterable<ClassID> getAllClasses() {
-    return mapClassId.keySet();
+    return classIdToClassMethodInfos.keySet();
   }
 
   ClassMethodInfo findClassInfoForID(final ClassID classID) {
-    return mapClassId.get(classID);
+    return classIdToClassMethodInfos.get(classID);
   }
 
   @Override
   public ClassGen findClassForID(final ClassID classID) {
-    final ClassMethodInfo classMethodInfo = mapClassId.get(classID);
+    final ClassMethodInfo classMethodInfo = classIdToClassMethodInfos.get(classID);
     return classMethodInfo == null ? null : classMethodInfo.getClassInfo();
   }
 
@@ -140,7 +139,7 @@ class ClassContextImpl implements ClassContext {
         return true;
       }
 
-      tmpClassGen = theTranslator.workingClassPath.findClassForName(superCName);
+      tmpClassGen = tranclator.workingClassPath.findClassForName(superCName);
     }
     return false;
   }
@@ -164,7 +163,7 @@ class ClassContextImpl implements ClassContext {
   @Override
   public List<String> findAllClassSuccessors(final String className) {
     final List<String> result = new ArrayList<>();
-    for (final ClassGen cls : theTranslator.workingClassPath.getAllClasses().values()) {
+    for (final ClassGen cls : tranclator.workingClassPath.getAllClasses().values()) {
       if (className.equals(cls.getClassName())) {
         continue;
       }

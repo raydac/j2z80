@@ -10,8 +10,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <asmFile>${project.build.directory}/source.a80</asmFile>
-    <netbeans.hint.license>apache20</netbeans.hint.license>
   </properties>
 
   <artifactId>main-jar</artifactId>
@@ -42,6 +40,12 @@
             <goals>
               <goal>translate</goal>
             </goals>
+            <configuration>
+              <formats>
+                <format>a80</format>
+                <format>bin</format>
+              </formats>
+            </configuration>
           </execution>
         </executions>
         <configuration>
@@ -54,14 +58,13 @@
           <startAddress>29000</startAddress>
           <stackTop>60000</stackTop>
           <logAsmText>true</logAsmText>
-          <asmOutFile>${asmFile}</asmOutFile>
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>3.5.4</version>
         <configuration>
           <excludes>
             <exclude>*/**/*ITCase.*</exclude>
@@ -71,12 +74,12 @@
 
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>3.5.4</version>
         <configuration>
           <encoding>UTF-8</encoding>
           <systemPropertyVariables>
-            <translatedBinFile>${project.build.directory}/${project.artifactId}-${project.version}.bin</translatedBinFile>
-            <asmFile>${asmFile}</asmFile>
+            <translatedBinFile>${project.build.directory}/${project.build.finalName}.bin</translatedBinFile>
+            <asmFile>${project.build.directory}/${project.build.finalName}.a80</asmFile>
           </systemPropertyVariables>
         </configuration>
         <executions>

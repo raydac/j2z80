@@ -18,10 +18,6 @@ package com.igormaznitsa.j2z80.translator;
 import com.igormaznitsa.j2z80.MethodContext;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.ids.MethodID;
-import org.apache.bcel.classfile.Method;
-import org.apache.bcel.generic.ClassGen;
-import org.apache.bcel.generic.MethodGen;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.apache.bcel.classfile.Method;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.MethodGen;
 
 /**
  * The class allows to work with parsed methods during translation.
@@ -36,24 +35,25 @@ import java.util.Set;
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 class MethodContextImpl implements MethodContext {
-  private final TranslatorImpl theTranslator;
+  private final TranslatorImpl translator;
   private final Map<MethodID, ClassMethodInfo> methodIds = new HashMap<>();
 
 
   public MethodContextImpl(final TranslatorImpl translator) {
-    this.theTranslator = translator;
+    this.translator = translator;
   }
 
   public List<MethodID> init() {
-    int methodIdCounter = 0;
+    int idCounter = 0;
 
     final List<MethodID> methodsToProcess = new ArrayList<>();
 
-    for (final ClassGen c : theTranslator.workingClassPath.getAllClasses().values()) {
+    for (final ClassGen c : this.translator.workingClassPath.getAllClasses().values()) {
       for (final Method m : c.getMethods()) {
         final MethodID methodId = new MethodID(c, m);
-        methodIds.put(methodId, new ClassMethodInfo(c, m, methodIdCounter));
-        methodIdCounter++;
+
+        this.methodIds.put(methodId, new ClassMethodInfo(c, m, idCounter));
+        idCounter++;
 
         if (!(c.isInterface() || c.isEnum()) && !(m.isNative() || m.isAbstract())) {
           methodsToProcess.add(methodId);
@@ -99,11 +99,11 @@ class MethodContextImpl implements MethodContext {
 
   public ClassMethodInfo findInheritedMethod(final MethodID method) {
     final String className = method.getClassName();
-    ClassGen cgen = theTranslator.workingClassPath.findClassForName(className);
+    ClassGen cgen = translator.workingClassPath.findClassForName(className);
     if (cgen == null) {
       return null;
     }
-    cgen = theTranslator.workingClassPath.findClassForName(cgen.getSuperclassName());
+    cgen = translator.workingClassPath.findClassForName(cgen.getSuperclassName());
 
     while (cgen != null) {
       final Method compatibleMethod = method.findCompatibleMethod(cgen);
@@ -111,7 +111,7 @@ class MethodContextImpl implements MethodContext {
         final MethodID thatMethodId = new MethodID(cgen, compatibleMethod);
         return methodIds.get(thatMethodId);
       }
-      cgen = theTranslator.workingClassPath.findClassForName(cgen.getSuperclassName());
+      cgen = translator.workingClassPath.findClassForName(cgen.getSuperclassName());
     }
     return null;
   }

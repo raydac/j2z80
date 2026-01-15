@@ -4,12 +4,12 @@ import static com.igormaznitsa.test.helloworld.ZXScreen.*;
 
 public class main {
     public static final void mainz(){
-        setTextColor(COLOR_RED, COLOR_WHITE);
-        clearWholeScreen();
-        System.out.println("Hello world!");
         setTextColor(COLOR_YELLOW, COLOR_BLUE);
+        clearWholeScreen();
+        System.out.println("Hello world 2026!");
+        setTextColor(COLOR_BLACK, COLOR_WHITE);
         clearServiceScreen();
-        System.err.println("Written in Java!!!");
-        setBorderColor(COLOR_RED);
+        System.err.println("Tervitused Eestist!");
+        setBorderColor(COLOR_GREEN);
     }
 }

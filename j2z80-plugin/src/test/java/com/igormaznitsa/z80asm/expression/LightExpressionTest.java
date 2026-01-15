@@ -15,15 +15,15 @@
  */
 package com.igormaznitsa.z80asm.expression;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.asmcommands.AbstractAsmCommand;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class LightExpressionTest {
   final AsmTranslator MOCK_TRANSLATOR = mock(AsmTranslator.class);

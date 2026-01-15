@@ -15,12 +15,21 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.InstanceofTable;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.z80asm.Z80Asm;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashSet;
 import org.apache.bcel.Const;
 import org.apache.bcel.classfile.ConstantClass;
 import org.apache.bcel.classfile.ConstantUtf8;
@@ -28,16 +37,6 @@ import org.apache.bcel.generic.CHECKCAST;
 import org.apache.bcel.generic.InstructionHandle;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashSet;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class TestCHECKCAST extends AbstractTestBasedOnMemoryManager implements NeedsInstanceofManager {
 
@@ -97,11 +96,11 @@ public class TestCHECKCAST extends AbstractTestBasedOnMemoryManager implements N
 
     final InstanceofTable table = new InstanceofTable(TRANSLATOR_MOCK, new HashSet<ClassID>());
     if (successor) {
-      final InstanceofTable.InstanceofRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
+      final InstanceofTable.InstanceOfRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
       r.addClass(new ClassID(TEST_CLASS_NAME2));
       r.addClass(new ClassID(TEST_CLASS_NAME3));
     } else {
-      final InstanceofTable.InstanceofRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
+      final InstanceofTable.InstanceOfRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
       r.addClass(new ClassID(TEST_CLASS_NAME2));
     }
 

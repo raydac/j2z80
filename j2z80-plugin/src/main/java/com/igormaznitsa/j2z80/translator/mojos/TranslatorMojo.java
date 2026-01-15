@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator.mojos;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.TranslatorLogger;
 import com.igormaznitsa.j2z80.translator.TranslatorImpl;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
-import com.igormaznitsa.j2z80.utils.Utils;
+import com.igormaznitsa.j2z80.translator.utils.Sna48Writer;
 import com.igormaznitsa.z80asm.Z80Asm;
-import lombok.Getter;
-import lombok.Setter;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
@@ -38,16 +44,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Maven mojo to translate a compiled Java classes from a Jar into Z80 binary
@@ -68,48 +64,24 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   @Component
   private ArtifactResolver artifactResolver;
 
-  @Getter
-  @Setter
   @Parameter(name = "jarFile", defaultValue = "${project.build.directory}${file.separator}${project.build.finalName}.jar")
   private File jarFile;
 
-  @Getter
-  @Setter
-  @Parameter(name = "result", defaultValue = "${project.build.directory}${file.separator}${project.build.finalName}.bin")
-  private File result;
+  @Parameter(name = "formats")
+  private List<String> formats = List.of("a80");
 
-  @Getter
-  @Setter
-  @Parameter(name = "format", defaultValue = "bin")
-  private String format;
-
-  @Getter
-  @Setter
   @Parameter(name = "startAddress", defaultValue = "28672")
   private int startAddress;
 
-  @Getter
-  @Setter
-  @Parameter(name = "stackTop", defaultValue = "65534")
+  @Parameter(name = "stackTop", defaultValue = "65533")
   private int stackTop;
 
-  @Getter
-  @Setter
   @Parameter(name = "logAsmText", defaultValue = "false")
   private boolean logAsmText;
 
-  @Getter
-  @Setter
-  @Parameter(name = "asmOutFile", defaultValue = "${project.build.directory}${file.separator}${project.build.finalName}.a80")
-  private File asmOutFile;
-
-  @Getter
-  @Setter
   @Parameter(name = "excludeResources")
   private String[] excludeResources;
 
-  @Getter
-  @Setter
   @Parameter(name = "optimization", defaultValue = "none")
   private String optimization;
 
@@ -122,23 +94,80 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   @Parameter(name = "execution", defaultValue = "${mojoExecution}", readonly = true, required = true)
   private MojoExecution execution;
 
+  public File getJarFile() {
+    return jarFile;
+  }
+
+  public void setJarFile(File jarFile) {
+    this.jarFile = jarFile;
+  }
+
+  public int getStartAddress() {
+    return startAddress;
+  }
+
+  public void setStartAddress(int startAddress) {
+    this.startAddress = startAddress;
+  }
+
+  public int getStackTop() {
+    return this.stackTop;
+  }
+
+  public void setStackTop(int stackTop) {
+    this.stackTop = stackTop;
+  }
+
+  public boolean isLogAsmText() {
+    return logAsmText;
+  }
+
+  public void setLogAsmText(boolean logAsmText) {
+    this.logAsmText = logAsmText;
+  }
+
+
+  public String[] getExcludeResources() {
+    return this.excludeResources;
+  }
+
+  public void setExcludeResources(String[] excludeResources) {
+    this.excludeResources = excludeResources;
+  }
+
+  public String getOptimization() {
+    return this.optimization;
+  }
+
+  public void setOptimization(String optimization) {
+    this.optimization = optimization;
+  }
+
+  public List<String> getFormats() {
+    return this.formats;
+  }
+
+  public void setFormats(List<String> formats) {
+    this.formats = formats;
+  }
+
   @Override
   public void execute() throws MojoExecutionException {
     try {
-      File[] classPath = getCompilationDependencies();
+      List<File> classPath = new ArrayList<>(this.getCompilationDependencies());
+      classPath.add(this.jarFile);
 
-      classPath = Arrays.copyOf(classPath, classPath.length + 1);
-      classPath[classPath.length - 1] = jarFile;
+      logInfo("Target formats : " + this.formats);
+      logInfo("Target final name : " + this.project.getBuild().getFinalName());
 
-      logInfo("The result file format : " + format);
-      logInfo("The result file name : " + result.getName());
-
-      final OptimizationLevel optimizationLevel = OptimizationLevel.findForTextName(getOptimization());
+      final OptimizationLevel optimizationLevel =
+          OptimizationLevel.findForTextName(this.optimization);
 
       final TranslatorContext translator = new TranslatorImpl(this, optimizationLevel, classPath);
-      final String[] translatedAsmText = translator.translate(null, startAddress, stackTop, getExcludeResources());
+      final List<String> translatedAsmText =
+          translator.translate(null, startAddress, stackTop, this.excludeResources);
 
-      if (logAsmText) {
+      if (this.logAsmText) {
         int lineIndex = 1;
         for (final String s : translatedAsmText) {
           logInfo("ASM: " + lineIndex + ": " + s);
@@ -146,41 +175,40 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
         }
       }
 
-      if (asmOutFile != null) {
-        logInfo("Save the result asm file as " + asmOutFile.getAbsolutePath());
-        final BufferedWriter writer = new BufferedWriter(new FileWriter(asmOutFile, false));
-        try {
-          for (final String s : translatedAsmText) {
-            writer.append(s);
-            writer.newLine();
-          }
-          writer.flush();
-        } finally {
-          Utils.silentlyClose(writer);
-        }
+      if (this.formats.contains("a80")) {
+        final Path pathA80 = this.makeTargetFilePath("a80");
+        this.logInfo("Writing A80 assembler file: " + pathA80);
+        Files.write(pathA80, translatedAsmText, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
       }
 
-      final Z80Asm asm = new Z80Asm(translatedAsmText);
-      final byte[] generated = asm.process();
+      final Z80Asm targetA80 = new Z80Asm(translatedAsmText);
+      final byte[] translatedBin = targetA80.process();
 
-      if ("bin".equalsIgnoreCase(format)) {
-        saveResultAsBin(generated);
-      } else {
-        throw new IllegalArgumentException("Usupported format [" + format + ']');
+      if (this.formats.contains("bin")) {
+        final Path pathBin = this.makeTargetFilePath("bin");
+        this.getLog().info("Writing BIN file: " + pathBin);
+        Files.write(pathBin, translatedBin);
       }
 
-      getLog().info("The result file has been saved as " + result.getAbsolutePath());
+      if (this.formats.contains("sna")) {
+        final Path pathSna = this.makeTargetFilePath("sna");
+        this.getLog().info("Writing SNA48 file: " + pathSna);
+        final byte[] sna48 =
+            new Sna48Writer(this.startAddress, this.stackTop, translatedBin).writeSna();
+        Files.write(pathSna, sna48);
+      }
     } catch (Exception ex) {
-      throw new MojoExecutionException("Exception during translation", ex);
+      throw new MojoExecutionException("Error during processing: " + ex.getMessage(), ex);
     }
   }
 
-  private File[] getCompilationDependencies() {
+  private List<File> getCompilationDependencies() {
     final List<File> dependencyList = new ArrayList<>();
     for (final Artifact arty : this.project.getDependencyArtifacts()) {
       if ("z80".equalsIgnoreCase(arty.getClassifier())) {
         try {
-          final ArtifactResult art = artifactResolver.resolveArtifact(project.getProjectBuildingRequest(), arty);
+          final ArtifactResult art =
+              artifactResolver.resolveArtifact(project.getProjectBuildingRequest(), arty);
           final File file = art.getArtifact().getFile();
           logInfo("Detected Z80 dependency :" + file.getAbsolutePath());
           dependencyList.add(file);
@@ -191,19 +219,12 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
       }
     }
 
-    return dependencyList.toArray(new File[0]);
+    return dependencyList;
   }
 
-  private void saveResultAsBin(final byte[] data) throws IOException {
-    logInfo("Save the binary result as BIN file");
-    final OutputStream out = new FileOutputStream(result);
-    try {
-      out.write(data);
-      out.flush();
-    } finally {
-      Utils.silentlyClose(out);
-    }
-    logInfo("The saved file size is " + data.length + " bytes");
+  private Path makeTargetFilePath(final String extension) {
+    return Path.of(this.project.getBuild().getDirectory() + File.separator +
+        this.project.getBuild().getFinalName() + '.' + extension);
   }
 
   @Override

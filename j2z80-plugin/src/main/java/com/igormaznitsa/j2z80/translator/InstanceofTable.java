@@ -19,21 +19,20 @@ import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
-import org.apache.bcel.generic.ClassGen;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.bcel.generic.ClassGen;
 
 public final class InstanceofTable {
-  private final List<InstanceofRow> rows = new ArrayList<>();
+  private final List<InstanceOfRow> rows = new ArrayList<>();
 
   public InstanceofTable(final TranslatorContext translator, final Set<ClassID> classesToBeChecked) {
     final ClassContext classContext = translator.getClassContext();
 
     for (final ClassID c : classesToBeChecked) {
-      final InstanceofRow row = addRow(c);
+      final InstanceOfRow row = addRow(c);
 
       final ClassGen classGen = classContext.findClassForID(c);
 
@@ -61,8 +60,8 @@ public final class InstanceofTable {
     return rows.size();
   }
 
-  public InstanceofRow addRow(final ClassID classId) {
-    InstanceofRow row = new InstanceofRow(classId);
+  public InstanceOfRow addRow(final ClassID classId) {
+    InstanceOfRow row = new InstanceOfRow(classId);
 
     final int existRowIndex = rows.indexOf(row);
     if (existRowIndex < 0) {
@@ -77,17 +76,17 @@ public final class InstanceofTable {
   public String toAsm() {
     final StringBuilder result = new StringBuilder();
     result.append("DEFB ").append(rows.size()).append('\n');
-    for (final InstanceofRow row : rows) {
+    for (final InstanceOfRow row : rows) {
       result.append(row.toAsm()).append('\n');
     }
     return result.toString();
   }
 
-  public final static class InstanceofRow {
+  public final static class InstanceOfRow {
     private final ClassID classId;
     private final Set<ClassID> compatibleClasses = new HashSet<>();
 
-    public InstanceofRow(final ClassID classId) {
+    public InstanceOfRow(final ClassID classId) {
       this.classId = classId;
     }
 
@@ -107,7 +106,8 @@ public final class InstanceofTable {
 
     public String toAsm() {
       final StringBuilder result = new StringBuilder();
-      result.append("DEFW ").append(LabelAndFrameUtils.makeLabelForClassID(classId)).append("\n");
+      result.append("DEFW ").append(LabelAndFrameUtils.makeLabelForClassID(this.classId))
+          .append("\n");
 
       result.append("DEFB ").append(compatibleClasses.size()).append("\n");
       result.append("DEFW ");
@@ -129,11 +129,11 @@ public final class InstanceofTable {
 
     @Override
     public boolean equals(final Object obj) {
-      if (obj == null || obj.getClass() != InstanceofRow.class) {
+      if (obj == null || obj.getClass() != InstanceOfRow.class) {
         return false;
       }
 
-      final InstanceofRow thatRow = (InstanceofRow) obj;
+      final InstanceOfRow thatRow = (InstanceOfRow) obj;
 
       return this.classId.equals(thatRow.classId);
     }

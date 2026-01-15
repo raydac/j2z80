@@ -21,10 +21,6 @@ import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
-import org.apache.bcel.classfile.Method;
-import org.apache.bcel.generic.ClassGen;
-import org.apache.bcel.generic.MethodGen;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,37 +28,41 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.bcel.classfile.Method;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.MethodGen;
 
 /**
- * The class describes a invoke virtual table.
+ * The class describes an invoke virtual table.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-public class InvokevirtualTable {
+public class InvokeVirtualTable {
 
   private final Map<String, Record> allVirtualMethods = new HashMap<>();
-  private final TranslatorContext theTranslator;
+  private final TranslatorContext translator;
 
-  public InvokevirtualTable(final TranslatorContext translator) {
-    theTranslator = translator;
+  public InvokeVirtualTable(final TranslatorContext translator) {
+    this.translator = translator;
 
     processClassesWithVirtualMethods();
   }
 
   private void processClassesWithVirtualMethods() {
-    for (final ClassID cg : theTranslator.getClassContext().getAllClasses()) {
+    for (final ClassID cg : translator.getClassContext().getAllClasses()) {
       processClass(cg);
     }
   }
 
   private void processClass(final ClassID classId) {
-    final ClassGen classGen = theTranslator.getClassContext().findClassForID(classId);
+    final ClassGen classGen = translator.getClassContext().findClassForID(classId);
 
     if (classGen.isInterface()) {
       return;
     }
 
-    final Map<String, ClassMethodInfo> visibleMethods = collectAllVisibledVirtualMethodsToRoot(classGen, new HashMap<>());
+    final Map<String, ClassMethodInfo> visibleMethods =
+        collectAllVisibleVirtualMethodsToRoot(classGen, new HashMap<>());
 
     if (!visibleMethods.isEmpty()) {
       makeRecordsForVirtualMethods(classGen, visibleMethods.values());
@@ -70,7 +70,7 @@ public class InvokevirtualTable {
   }
 
   private void makeRecordsForVirtualMethods(final ClassGen classGen, final Collection<ClassMethodInfo> methods) {
-    final ClassContext classContext = theTranslator.getClassContext();
+    final ClassContext classContext = translator.getClassContext();
 
     final List<String> allAncestors = new ArrayList<>(classContext.findAllClassAncestors(classGen.getClassName()));
     allAncestors.add(classGen.getClassName());
@@ -89,11 +89,11 @@ public class InvokevirtualTable {
   }
 
   private Record findRecord(final ClassID cid, final Method method) {
-    final String recorduid = cid.getClassName() + "!" + makeMethodUID(method);
-    Record record = allVirtualMethods.get(recorduid);
+    final String recordUid = cid.getClassName() + "!" + makeMethodUID(method);
+    Record record = this.allVirtualMethods.get(recordUid);
     if (record == null) {
       record = new Record(cid, method);
-      allVirtualMethods.put(recorduid, record);
+      this.allVirtualMethods.put(recordUid, record);
     }
     return record;
   }
@@ -102,36 +102,42 @@ public class InvokevirtualTable {
     return method.getName() + method.getSignature();
   }
 
-  private Map<String, ClassMethodInfo> collectAllVisibledVirtualMethodsToRoot(final ClassGen classGen, final Map<String, ClassMethodInfo> accum) {
-    if (classGen.isInterface()) {
-      return accum;
-    }
-
+  private Map<String, ClassMethodInfo> collectAllVisibleVirtualMethodsToRoot(
+      final ClassGen classGen, final Map<String, ClassMethodInfo> map) {
     for (final Method m : classGen.getMethods()) {
-      if (m.isStatic() || m.getName().equals("<init>") || m.isPrivate()) {
+      if (m.isStatic() || m.getName().equals("<init>") || m.isAbstract()) {
         continue;
       }
 
-      final String muid = makeMethodUID(m);
-      if (!accum.containsKey(muid)) {
-        accum.put(muid, theTranslator.getMethodContext().findMethodInfo(new MethodID(classGen, m)));
+      final String textMethodUid = this.makeMethodUID(m);
+      if (!map.containsKey(textMethodUid)) {
+        final MethodID methodId = new MethodID(classGen, m);
+        final ClassMethodInfo classMethodInfo =
+            this.translator.getMethodContext().findMethodInfo(methodId);
+        if (classMethodInfo == null) {
+          throw new IllegalStateException("Can't find method info: " + methodId);
+        }
+        map.put(textMethodUid, classMethodInfo);
       }
     }
 
     if ("java.lang.Object".equals(classGen.getSuperclassName())) {
-      return accum;
+      return map;
     }
 
-    return collectAllVisibledVirtualMethodsToRoot(theTranslator.getClassContext().findClassForID(new ClassID(classGen.getSuperclassName())), accum);
+    return this.collectAllVisibleVirtualMethodsToRoot(
+        this.translator.getClassContext().findClassForID(new ClassID(classGen.getSuperclassName())),
+        map);
   }
 
   public String toAsm() {
     final StringBuilder result = new StringBuilder("; GENERATED INVOKEVIRTUAL TABLE\n");
 
-    for (final Record r : allVirtualMethods.values()) {
-      final Method method = r.theMethod;
+    for (final Record r : this.allVirtualMethods.values()) {
+      final Method method = r.method;
       // make record label
-      result.append(LabelAndFrameUtils.makeLabelForVirtualMethodRecord(r.theClassId.getClassName(), method.getName(), method.getReturnType(), method.getArgumentTypes())).append(":\n");
+      result.append(LabelAndFrameUtils.makeLabelForVirtualMethodRecord(r.classId.getClassName(),
+          method.getName(), method.getReturnType(), method.getArgumentTypes())).append(":\n");
       // records
       result.append(r.toAsm());
     }
@@ -146,25 +152,24 @@ public class InvokevirtualTable {
    */
   private class Record {
 
-    private final ClassID theClassId;
-    private final Method theMethod;
+    private final ClassID classId;
+    private final Method method;
     private final Set<ClassMethodInfo> cases = new HashSet<>();
 
     private Record(final ClassID classId, final Method method) {
-      theClassId = classId;
-      theMethod = method;
+      this.classId = classId;
+      this.method = method;
     }
 
     private void addCase(final ClassMethodInfo classMethodInfo) {
-      cases.add(classMethodInfo);
+      this.cases.add(classMethodInfo);
     }
 
     private String toAsm() {
       final StringBuilder result = new StringBuilder();
+      result.append("DEFB ").append(this.cases.size()).append('\n');
 
-      result.append("DEFB ").append(cases.size()).append('\n');
-
-      for (final ClassMethodInfo r : cases) {
+      for (final ClassMethodInfo r : this.cases) {
         result.append(generateAsmForMethod(r));
       }
 
@@ -174,7 +179,8 @@ public class InvokevirtualTable {
     private String generateAsmForMethod(final ClassMethodInfo classMethodInfo) {
       final MethodGen methGen = classMethodInfo.getMethodGen();
       final String methodLabel = LabelAndFrameUtils.makeLabelNameForMethod(classMethodInfo);
-      final int classId = theTranslator.getClassContext().findClassUID(new ClassID(classMethodInfo.getClassInfo()));
+      final int classId =
+          translator.getClassContext().findClassUID(new ClassID(classMethodInfo.getClassInfo()));
       final int frameSize = LabelAndFrameUtils.calculateFrameSizeForMethod(methGen.getArgumentTypes().length, methGen.getMaxLocals(), false);
 
       return "DEFW " + classId + ','

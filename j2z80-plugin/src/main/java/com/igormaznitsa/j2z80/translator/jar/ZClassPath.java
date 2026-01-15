@@ -15,14 +15,20 @@
  */
 package com.igormaznitsa.j2z80.translator.jar;
 
-import com.igormaznitsa.j2z80.TranslatorContext;
-import org.apache.bcel.classfile.Method;
-import org.apache.bcel.generic.ClassGen;
+import static java.util.Collections.unmodifiableMap;
 
+import com.igormaznitsa.j2z80.TranslatorContext;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.bcel.classfile.Method;
+import org.apache.bcel.generic.ClassGen;
 
 /**
  * The class implements inside virtual class and resource storage for the translator.
@@ -36,18 +42,20 @@ public class ZClassPath {
   private final Map<String, byte[]> jniCodeStorage = new HashMap<>();
   private final Map<String, byte[]> binaryDataStorage = new HashMap<>();
   private final TranslatorContext context;
-  private final ZParsedJar[] jarFiles;
+  private final List<ZParsedJar> jarFiles;
   private ClassGen mainClass;
   private Method mainMethod;
 
-  public ZClassPath(final TranslatorContext context, final ZParsedJar... classPath) {
+  public ZClassPath(final TranslatorContext context, final List<ZParsedJar> classPath) {
     this.context = context;
     this.jarFiles = classPath;
+    classPath.forEach(this::processArchive);
+  }
 
-    for (final ZParsedJar archive : classPath) {
-      processArchive(archive);
-    }
-
+  @Override
+  public String toString() {
+    return Stream.of(this.jarFiles).map(Object::toString).collect(Collectors.joining(
+        File.pathSeparator));
   }
 
   public ClassGen findMainClass(final String mainClassName, final String mainMethod, final String mainMethodSignature) {
@@ -59,19 +67,20 @@ public class ZClassPath {
       return this.mainClass;
     }
 
-    for (int i = this.jarFiles.length - 1; i >= 0; i--) {
-      final ZParsedJar processingJar = this.jarFiles[i];
-      for (final ClassGen cgen : processingJar.getAllJavaClasses()) {
-        final Method foundMethod = findMainMethodInClass(cgen, mainMethod, mainMethodSignature);
-        if (foundMethod != null && isClassPresented(cgen)) {
-          this.mainClass = cgen;
+    final List<ZParsedJar> reversed = new ArrayList<>(this.jarFiles);
+    Collections.reverse(reversed);
+
+    return reversed.stream().flatMap(processingJar -> {
+      for (final ClassGen classGen : processingJar.getAllJavaClasses()) {
+        final Method foundMethod = findMainMethodInClass(classGen, mainMethod, mainMethodSignature);
+        if (foundMethod != null && isClassPresented(classGen)) {
+          this.mainClass = classGen;
           this.mainMethod = foundMethod;
-          return this.mainClass;
+          return Stream.of(this.mainClass);
         }
       }
-    }
-
-    return null;
+      return Stream.empty();
+    }).findFirst().orElse(null);
   }
 
   private boolean isClassPresented(final ClassGen classData) {
@@ -113,7 +122,7 @@ public class ZClassPath {
       final String className = classData.getClassName();
 
       if (classStorage.containsKey(className)) {
-        context.getLogger().logWarning("Detected overrided class " + className);
+        context.getLogger().logWarning("Detected overridden class " + className);
       }
       classStorage.put(className, classData);
     }
@@ -123,7 +132,7 @@ public class ZClassPath {
     for (final Entry<String, byte[]> jniData : archive.getAllJNIData().entrySet()) {
       final String resName = jniData.getKey();
       if (jniCodeStorage.containsKey(resName)) {
-        context.getLogger().logWarning("Detected overrided JNI resource " + resName);
+        context.getLogger().logWarning("Detected overridden JNI resource " + resName);
       }
       jniCodeStorage.put(resName, jniData.getValue());
     }
@@ -133,33 +142,33 @@ public class ZClassPath {
     for (final Entry<String, byte[]> binData : archive.getAllBinaryResources().entrySet()) {
       final String resName = binData.getKey();
       if (binaryDataStorage.containsKey(resName)) {
-        context.getLogger().logWarning("Detected overrided binary resource " + resName);
+        this.context.getLogger().logWarning("Detected overridden binary resource " + resName);
       }
-      binaryDataStorage.put(resName, binData.getValue());
+      this.binaryDataStorage.put(resName, binData.getValue());
     }
   }
 
-  public byte[] findJNICodeForPath(final String path) {
-    return jniCodeStorage.get(path);
+  public byte[] findJniCodeForPath(final String path) {
+    return this.jniCodeStorage.get(path);
   }
 
   public byte[] findNonClassForPath(final String path) {
-    byte[] result = jniCodeStorage.get(ZParsedJar.normalizeEntryPath(path));
+    byte[] result = this.jniCodeStorage.get(ZParsedJar.normalizeEntryPath(path));
     if (result == null) {
-      result = binaryDataStorage.get(path);
+      result = this.binaryDataStorage.get(path);
     }
     return result;
   }
 
   public Map<String, ClassGen> getAllClasses() {
-    return Collections.unmodifiableMap(classStorage);
+    return unmodifiableMap(this.classStorage);
   }
 
   public ClassGen findClassForName(final String name) {
-    return classStorage.get(name);
+    return this.classStorage.get(name);
   }
 
   public Map<String, byte[]> getAllBinaryResources() {
-    return Collections.unmodifiableMap(binaryDataStorage);
+    return unmodifiableMap(this.binaryDataStorage);
   }
 }
