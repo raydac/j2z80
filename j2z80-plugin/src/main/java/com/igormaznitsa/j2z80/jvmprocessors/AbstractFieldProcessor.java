@@ -18,6 +18,8 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.FieldInstruction;
 import org.apache.bcel.generic.GETFIELD;
@@ -26,9 +28,6 @@ import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUTFIELD;
 import org.apache.bcel.generic.PUTSTATIC;
 import org.apache.bcel.generic.Type;
-
-import java.io.IOException;
-import java.io.Writer;
 
 /**
  * The class is ancestor for all field processors
@@ -87,10 +86,8 @@ public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor
       out.write(NEXT_LINE);
 
       methodTranslator.getTranslatorContext().registerCalledBootClassProcesser(processor);
-
       return true;
     }
-
     return false;
   }
 }

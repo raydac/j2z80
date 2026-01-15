@@ -13,21 +13,19 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mvn.version>3.8.4</mvn.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <modules>
         <module>j2z80-api</module>
         <module>j2z80-plugin</module>
         <module>j2z80-tests</module>
+        <module>j2z80-examples</module>
     </modules>
 
     <name>J2Z80 maven plugin</name>
     <description>Maven plugin to translate Java classes into Z80 asm instructions</description>
 
     <inceptionYear>2019</inceptionYear>
-
     <url>https://github.com/raydac/j2z80</url>
 
     <issueManagement>
@@ -56,7 +54,7 @@
 
     <organization>
         <name>Igor Maznitsa</name>
-        <url>http://www.igormaznitsa.com</url>
+        <url>https://www.igormaznitsa.com</url>
     </organization>
 
     <licenses>
@@ -66,37 +64,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.13.1</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgument>-Xlint:all</compilerArgument>
-                    <source>11</source>
-                    <target>11</target>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencyManagement>
         <dependencies>
@@ -126,4 +93,33 @@
         </dependencies>
     </dependencyManagement>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.14.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>3.13.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgument>-Xlint:all</compilerArgument>
+                    <release>11</release>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

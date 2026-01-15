@@ -43,11 +43,11 @@ import org.apache.bcel.generic.MethodGen;
 public class MethodTranslator {
 
   private final TranslatorContext translatorContext;
-  private final ClassMethodInfo theMethod;
+  private final ClassMethodInfo method;
 
   public MethodTranslator(final TranslatorContext context, final ClassMethodInfo method) {
     this.translatorContext = context;
-    this.theMethod = method;
+    this.method = method;
   }
 
   public TranslatorContext getTranslatorContext() {
@@ -55,26 +55,24 @@ public class MethodTranslator {
   }
 
   public String[] translate() throws IOException {
-    final List<String> asm = methodToAsm();
+    final List<String> asm = this.method2asm();
     final List<String> result = new ArrayList<>();
     for (final String str : asm) {
-      final String[] splitted = Utils.breakToLines(str);
-      result.addAll(Arrays.asList(splitted));
+      result.addAll(Arrays.asList(Utils.breakToLines(str)));
     }
 
     return result.toArray(new String[0]);
   }
 
   public ClassMethodInfo getMethod() {
-    return theMethod;
+    return this.method;
   }
 
-  private List<String> methodToAsm() throws IOException {
-    final List<String> result = new ArrayList<>(1024);
+  private List<String> method2asm() throws IOException {
+    final List<String> result = new ArrayList<>();
+    result.add(LabelAndFrameUtils.makeLabelNameForMethod(this.method) + ':');
 
-    result.add(LabelAndFrameUtils.makeLabelNameForMethod(theMethod) + ':');
-
-    final MethodGen methodG = theMethod.getMethodGen();
+    final MethodGen methodG = this.method.getMethodGen();
 
     final InstructionList list = methodG.getInstructionList();
     list.setPositions();
@@ -82,11 +80,11 @@ public class MethodTranslator {
 
     for (final InstructionHandle handler : handles) {
       final Instruction instruction = handler.getInstruction();
-
       final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(instruction.getClass());
 
       if (processor == null) {
-        throw new IllegalArgumentException("Unsupported instruction detected [" + instruction.getName() + ']');
+        throw new UnsupportedOperationException(
+            "J2Z80 doesn't support JVM instruction: " + instruction.getName());
       }
 
       getTranslatorContext().registerAdditionsUsedByClass(processor.getClass());
@@ -95,13 +93,15 @@ public class MethodTranslator {
       try {
         processor.process(this, instruction, handler, writer);
       } catch (IllegalArgumentException ex) {
-        getTranslatorContext().getLogger().logError(theMethod.toString() + " [" + ex.getMessage() + ']');
+        getTranslatorContext().getLogger().logError(this.method + " [" + ex.getMessage() + ']');
         throw ex;
       }
 
       if (checkHandleForInstructionTargeters(handler)) {
         // the instruction is a jump target so we label it
-        final String methodJumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(theMethod.getClassInfo(), theMethod.getMethodGen(), handler.getPosition());
+        final String methodJumpLabel =
+            LabelAndFrameUtils.makeClassMethodJumpLabel(this.method.getClassInfo(),
+                this.method.getMethodGen(), handler.getPosition());
         result.add(methodJumpLabel + ":\r\n");
       }
 
@@ -123,21 +123,21 @@ public class MethodTranslator {
   }
 
   public ConstantPoolGen getConstantPool() {
-    return theMethod.getClassInfo().getConstantPool();
+    return method.getClassInfo().getConstantPool();
   }
 
   public String registerUsedConstantPoolItem(final int itemIndex) {
     final Constant item = getConstantPool().getConstant(itemIndex);
-
-    String result;
-
+    final String result;
     if (item instanceof ConstantString) {
       final ConstantUtf8 utfConst =
           (ConstantUtf8) getConstantPool().getConstant(((ConstantString) item).getStringIndex());
-      result = LabelAndFrameUtils.makeLabelForConstantPoolItem(theMethod.getClassInfo(), ((ConstantString) item).getStringIndex());
+      result = LabelAndFrameUtils.makeLabelForConstantPoolItem(this.method.getClassInfo(),
+          ((ConstantString) item).getStringIndex());
       getTranslatorContext().registerConstantPoolItem(result, utfConst);
     } else {
-      result = LabelAndFrameUtils.makeLabelForConstantPoolItem(theMethod.getClassInfo(), itemIndex);
+      result =
+          LabelAndFrameUtils.makeLabelForConstantPoolItem(this.method.getClassInfo(), itemIndex);
       getTranslatorContext().registerConstantPoolItem(result, item);
     }
     return result;

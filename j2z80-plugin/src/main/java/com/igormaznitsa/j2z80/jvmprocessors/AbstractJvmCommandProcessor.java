@@ -18,9 +18,6 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.meta.common.utils.Assertions;
-import org.apache.bcel.generic.Instruction;
-import org.apache.bcel.generic.MethodGen;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +26,8 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.bcel.generic.Instruction;
+import org.apache.bcel.generic.MethodGen;
 
 /**
  * The Class describes an abstract processor of a JVM command.
@@ -82,7 +81,7 @@ public abstract class AbstractJvmCommandProcessor {
 
   static {
     try {
-      // read the file containig all jvm commands, search processors and map them
+      // read the file containing all jvm commands, search processors and map them
       final String PROCESSOR_LIST_FILE = "processorlist.txt";
       final InputStream file = AbstractJvmCommandProcessor.class.getResourceAsStream(PROCESSOR_LIST_FILE);
       Assertions.assertNotNull("There must be " + PROCESSOR_LIST_FILE + " in the same directory", file);
@@ -106,7 +105,7 @@ public abstract class AbstractJvmCommandProcessor {
         Utils.silentlyClose(reader);
       }
     } catch (Exception ex) {
-      throw new RuntimeException("Can't init processors", ex);
+      throw new Error("Can't init processors", ex);
     }
   }
 

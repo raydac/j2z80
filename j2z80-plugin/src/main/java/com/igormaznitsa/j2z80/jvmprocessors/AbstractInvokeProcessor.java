@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
@@ -20,6 +21,8 @@ import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.INVOKESPECIAL;
 import org.apache.bcel.generic.InvokeInstruction;
@@ -27,15 +30,13 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
 
-import java.io.IOException;
-import java.io.Writer;
-
 /**
  * The class is the ancestor for all invoke command processors.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcessor implements NeedsMemoryManager {
+public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcessor
+    implements NeedsMemoryManager {
 
   /**
    * Calculate the size of memory block in bytes to keep arguments for a method.
@@ -59,7 +60,8 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @return the memory block size in bytes
    */
   public static int calculateArgumentBlockSize(final MethodGen invokingMethod) {
-    return calculateArgumentBlockSize(invokingMethod.getArgumentTypes().length, invokingMethod.isStatic());
+    return calculateArgumentBlockSize(invokingMethod.getArgumentTypes().length,
+        invokingMethod.isStatic());
   }
 
   /**
@@ -79,7 +81,8 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @return the whole memory frame size in bytes
    */
   public static int calculateTotalFrameSizeWithoutLocals(final MethodGen invokingMethod) {
-    return calculateArgumentBlockSize(invokingMethod.getArgumentTypes().length, invokingMethod.isStatic());
+    return calculateArgumentBlockSize(invokingMethod.getArgumentTypes().length,
+        invokingMethod.isStatic());
   }
 
   /**
@@ -114,7 +117,8 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @param isStatic  the flag shows that the method is a static one if it is true
    * @return the memory frame size in bytes
    */
-  public int calculateTotalFrameSizeWithLocals(final int args, final int maxLocals, final boolean isStatic) {
+  public int calculateTotalFrameSizeWithLocals(final int args, final int maxLocals,
+                                               final boolean isStatic) {
     int argNumber = args;
 
     if (!isStatic) {
@@ -137,7 +141,9 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @return true if the instruction invokes a bootstrap class and it has been processed by the method, else false
    * @throws IOException it will be thrown if any transport problem in the method
    */
-  protected boolean checkBootstrapCall(final MethodTranslator methodTranslator, final InvokeInstruction instruction, final Writer out) throws IOException {
+  protected boolean checkBootstrapCall(final MethodTranslator methodTranslator,
+                                       final InvokeInstruction instruction, final Writer out)
+      throws IOException {
 
     final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
     final ObjectType objType = getObjectType(methodTranslator, instruction);
@@ -145,7 +151,8 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
     final Type[] methodArgs = instruction.getArgumentTypes(constantPool);
     final Type methodResult = instruction.getReturnType(constantPool);
 
-    final MethodGen methodGen = methodTranslator.getTranslatorContext().getMethodContext().findMethod(new MethodID(objType.getClassName(), methodName, methodResult, methodArgs));
+    final MethodGen methodGen = methodTranslator.getTranslatorContext().getMethodContext()
+        .findMethod(new MethodID(objType.getClassName(), methodName, methodResult, methodArgs));
 
     if (methodGen != null) {
       return false;
@@ -158,19 +165,22 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
     if (processor != null) {
       final boolean isStaticCall = instruction instanceof INVOKESPECIAL;
       final int argAreaSize = calculateArgumentBlockSize(methodArgs.length, isStaticCall);
-      final int totalFrameSize = calculateTotalFrameSizeWithLocals(methodArgs.length, methodArgs.length + (isStaticCall ? 0 : 1), isStaticCall);
+      final int totalFrameSize = calculateTotalFrameSizeWithLocals(methodArgs.length,
+          methodArgs.length + (isStaticCall ? 0 : 1), isStaticCall);
 
       String prefix = "";
       String postfix = "";
 
-      if (processor.doesInvokeNeedFrame(methodTranslator.getTranslatorContext(), methodName, methodArgs, methodResult)) {
+      if (processor.doesInvokeNeedFrame(methodTranslator.getTranslatorContext(), methodName,
+          methodArgs, methodResult)) {
         prefix = generateFramePrefix(argAreaSize, totalFrameSize);
         postfix = generateFramePostfix(argAreaSize, totalFrameSize);
       }
 
       out.write(prefix);
       out.write(NEXT_LINE);
-      for (final String s : processor.generateInvocation(methodTranslator.getTranslatorContext(), methodName, methodArgs, methodResult)) {
+      for (final String s : processor.generateInvocation(methodTranslator.getTranslatorContext(),
+          methodName, methodArgs, methodResult)) {
         out.write(s);
         if (!s.endsWith("\n")) {
           out.write(NEXT_LINE);
@@ -197,10 +207,13 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @see MethodTranslator
    * @see MethodGen
    */
-  public MethodGen getInvokedMethod(final MethodTranslator methodTranslator, final InvokeInstruction instruction) {
+  public MethodGen getInvokedMethod(final MethodTranslator methodTranslator,
+                                    final InvokeInstruction instruction) {
     final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
     final ObjectType objType = getObjectType(methodTranslator, instruction);
-    return methodTranslator.getTranslatorContext().getMethodContext().findMethod(new MethodID(objType.getClassName(), instruction.getMethodName(constantPool), instruction.getReturnType(constantPool), instruction.getArgumentTypes(constantPool)));
+    return methodTranslator.getTranslatorContext().getMethodContext().findMethod(
+        new MethodID(objType.getClassName(), instruction.getMethodName(constantPool),
+            instruction.getReturnType(constantPool), instruction.getArgumentTypes(constantPool)));
   }
 
   /**
@@ -210,7 +223,8 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @param instruction      an invoke instruction, must not be null
    * @return the object type for the invoking instruction
    */
-  public ObjectType getObjectType(final MethodTranslator methodTranslator, final InvokeInstruction instruction) {
+  public ObjectType getObjectType(final MethodTranslator methodTranslator,
+                                  final InvokeInstruction instruction) {
     final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
     return (ObjectType) instruction.getReferenceType(constantPool);
   }
@@ -222,10 +236,13 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @param instruction      an invoke instruction, must not be null
    * @return the label name for the invoking method
    */
-  public String getMethodLabel(final MethodTranslator methodTranslator, final InvokeInstruction instruction) {
+  public String getMethodLabel(final MethodTranslator methodTranslator,
+                               final InvokeInstruction instruction) {
     final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
     final ObjectType objType = getObjectType(methodTranslator, instruction);
-    return LabelAndFrameUtils.makeLabelNameForMethod(objType.getClassName(), instruction.getMethodName(constantPool), instruction.getReturnType(constantPool), instruction.getArgumentTypes(constantPool));
+    return LabelAndFrameUtils.makeLabelNameForMethod(objType.getClassName(),
+        instruction.getMethodName(constantPool), instruction.getReturnType(constantPool),
+        instruction.getArgumentTypes(constantPool));
   }
 
   /**
@@ -235,11 +252,14 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @param methodTranslator a method translator, must not be null
    * @param instruction      an invoke instruction, must not be null
    */
-  public void assertMethodIsNotNull(final MethodGen method, final MethodTranslator methodTranslator, final InvokeInstruction instruction) {
+  public void assertMethodIsNotNull(final MethodGen method, final MethodTranslator methodTranslator,
+                                    final InvokeInstruction instruction) {
     if (method == null) {
       final String className = getObjectType(methodTranslator, instruction).getClassName();
       final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
-      final String message = "Can't find method " + className + '.' + instruction.getMethodName(constantPool) + " " + instruction.getSignature(constantPool);
+      final String message =
+          "Can't find method " + className + '.' + instruction.getMethodName(constantPool) + " " +
+              instruction.getSignature(constantPool);
       methodTranslator.getTranslatorContext().getLogger().logError(message);
       throw new NullPointerException(message);
     }

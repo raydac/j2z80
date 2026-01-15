@@ -16,6 +16,8 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantInteger;
 import org.apache.bcel.classfile.ConstantString;
@@ -24,9 +26,6 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.LDC;
 
-import java.io.IOException;
-import java.io.Writer;
-
 // class to process LDC with code 18
 public class Processor_LDC extends AbstractJvmCommandProcessor {
 
@@ -34,7 +33,7 @@ public class Processor_LDC extends AbstractJvmCommandProcessor {
 
   public Processor_LDC() {
     super();
-    template = loadResourceFileAsString("LDC.a80");
+    this.template = loadResourceFileAsString("LDC.a80");
   }
 
   @Override
@@ -45,24 +44,24 @@ public class Processor_LDC extends AbstractJvmCommandProcessor {
   @Override
   public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
     final LDC ldc = (LDC) instruction;
-
     final int index = ldc.getIndex();
+    final Constant cpConstant = methodTranslator.getConstantPool().getConstant(index);
 
-    String strvalue;
-    final Constant cp_constant = methodTranslator.getConstantPool().getConstant(index);
-
-    if (cp_constant instanceof ConstantInteger) {
-      final ConstantInteger constInt = (ConstantInteger) cp_constant;
+    final String stringValue;
+    if (cpConstant instanceof ConstantInteger) {
+      final ConstantInteger constInt = (ConstantInteger) cpConstant;
       final int value = constInt.getBytes();
-      strvalue = Integer.toString(value);
-    } else if (cp_constant instanceof ConstantUtf8 || cp_constant instanceof ConstantString) {
-      strvalue = methodTranslator.registerUsedConstantPoolItem(index);
+      stringValue = Integer.toString(value);
+    } else if (cpConstant instanceof ConstantUtf8 || cpConstant instanceof ConstantString) {
+      stringValue = methodTranslator.registerUsedConstantPoolItem(index);
     } else {
-      methodTranslator.getTranslatorContext().getLogger().logError("Unsupported constant pool element has been detected [" + cp_constant.toString() + ']');
-      throw new IllegalArgumentException("Unsupported constant pool item detected in LDC instruction [" + cp_constant.toString() + ']');
+      methodTranslator.getTranslatorContext().getLogger()
+          .logError("Unsupported constant pool element has been detected: " + cpConstant);
+      throw new IllegalArgumentException(
+          "Unsupported constant pool item found in a LDC instruction: " + cpConstant);
     }
 
-    out.write(template.replace(MACROS_ADDRESS, strvalue));
+    out.write(template.replace(MACROS_ADDRESS, stringValue));
     out.write(NEXT_LINE);
   }
 }
