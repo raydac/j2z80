@@ -9,9 +9,7 @@
     </parent>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <asmFile>${project.build.directory}/source.a80</asmFile>
-        <netbeans.hint.license>apache20</netbeans.hint.license>
     </properties>
 
     <artifactId>ext-jar</artifactId>
@@ -21,7 +19,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

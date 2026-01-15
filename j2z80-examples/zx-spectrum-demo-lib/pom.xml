@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.igormaznitsa</groupId>
             <artifactId>j2z80-api</artifactId>
-            <version>${j2z80.version}</version>
+            <version>${j2z80.test.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

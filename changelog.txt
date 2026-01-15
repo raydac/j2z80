@@ -1,0 +1,29 @@
+- 1.1.0 (SNAPSHOT)
+    - added SNA as a target format
+    - adaptation for JDK 11 and Maven 3.8+
+    - updated dependencies
+    - minor fix
+    - restructurisation of project
+
+- 1.0.1 (may 2012) hot fix
+    - removed the 'aux' word which was used as a package name, it has been changed to 'utils' because Windows doesn't support the folder name.
+
+- 1.0.0 (may 2012)
+    - bug fixing
+    - commenting
+    - added base optimization
+    - minor improvements
+
+- 0.2-SNAPSHOT (may 2012)
+    - added support to process JAR dependencies
+    - added support to include binary resources from JAR into compiled block as labeled byte arrays
+    - test improvements
+
+- 0.1-SNAPSHOT (march 2012)
+    - the first published sources
+    - it contains some examples of usage and mainly working plugin
+    - it's not refactored well
+
+- 0.0-SNAPSHOT (january 2012)
+    - only commands to show "Hello world" application was implemented
+    - only screenshots were published

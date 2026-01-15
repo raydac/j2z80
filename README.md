@@ -9,7 +9,7 @@ package com.igormaznitsa.test.helloworld;
 import static com.igormaznitsa.test.helloworld.ZXScreen.*;
 
 public class main {
-    public static final void mainz(){
+  public static void mainz() {
         setTextColor(COLOR_RED, COLOR_WHITE);
         clearWholeScreen();
         System.out.println("Hello world!");
@@ -24,12 +24,3 @@ public class main {
 As the input it uses JAR files  It takes a JAR file and translate all found classes into solid Z80 binary block which can be started on real device or under emulator. 
 
 It is not fully compatible with Java and has a lot of restrictions but it allows to use Java tool-chain and IDEs for Z80 developments.
-
-License
-========
-The Sources published under [GNU GPL 3](http://www.gnu.org/copyleft/gpl.html)
-
-Donation
-=========
-If you like the software you can make some donation to the author   
-[![https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AHWJHJFBAWGL2)

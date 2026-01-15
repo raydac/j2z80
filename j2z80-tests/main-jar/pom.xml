@@ -33,7 +33,7 @@
       <plugin>
         <groupId>${project.groupId}</groupId>
         <artifactId>j2z80-plugin</artifactId>
-        <version>${j2z80.version}</version>
+        <version>${j2z80.test.version}</version>
         <executions>
           <execution>
             <phase>integration-test</phase>
@@ -44,6 +44,7 @@
               <formats>
                 <format>a80</format>
                 <format>bin</format>
+                <format>sna</format>
               </formats>
             </configuration>
           </execution>
@@ -64,7 +65,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.5.4</version>
         <configuration>
           <excludes>
             <exclude>*/**/*ITCase.*</exclude>
@@ -73,8 +73,8 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.5.4</version>
         <configuration>
           <encoding>UTF-8</encoding>
           <systemPropertyVariables>

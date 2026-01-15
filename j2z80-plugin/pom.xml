@@ -11,6 +11,13 @@
   <artifactId>j2z80-plugin</artifactId>
   <packaging>maven-plugin</packaging>
 
+  <name>J2Z80 bytecode translator</name>
+  <description>Experimental maven plugin to translate Java byte code into Z80 assembler instructions</description>
+
+  <prerequisites>
+    <maven>${mvn.version}</maven>
+  </prerequisites>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -69,7 +76,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.7.1</version>
             <executions>
               <execution>
                 <id>make-bundle</id>
@@ -88,7 +94,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.3.1</version>
             <executions>
               <execution>
                 <id>generate-sources</id>
@@ -102,7 +107,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.12.0</version>
             <executions>
               <execution>
                 <id>generate-javadoc</id>
@@ -116,7 +120,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.2.8</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -124,6 +127,33 @@
                 <goals>
                   <goal>sign</goal>
                 </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>net.nicoulaj.maven.plugins</groupId>
+            <artifactId>checksum-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>files</goal>
+                </goals>
+                <configuration>
+                  <fileSets>
+                    <fileSet>
+                      <directory>${project.build.directory}</directory>
+                      <includes>
+                        <include>*.jar</include>
+                        <include>*.pom</include>
+                      </includes>
+                    </fileSet>
+                  </fileSets>
+                  <algorithms>
+                    <algorithm>SHA-1</algorithm>
+                    <algorithm>MD5</algorithm>
+                  </algorithms>
+                </configuration>
               </execution>
             </executions>
           </plugin>
@@ -144,21 +174,23 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>com.igormaznitsa</groupId>
-        <artifactId>uber-pom</artifactId>
-        <version>1.0.3</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
         <configuration>
-          <remove>
-            <section>parent</section>
-            <section>modules</section>
-            <section>profiles/profile/modules</section>
-          </remove>
-          <removeSiblingDuplications>true</removeSiblingDuplications>
+          <flattenMode>oss</flattenMode>
         </configuration>
         <executions>
           <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
             <goals>
-              <goal>upom</goal>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>flatten.clean</id>
+            <goals>
+              <goal>clean</goal>
             </goals>
           </execution>
         </executions>
@@ -166,7 +198,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.8.1</version>
         <configuration>
           <goalPrefix>j2z80</goalPrefix>
           <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
