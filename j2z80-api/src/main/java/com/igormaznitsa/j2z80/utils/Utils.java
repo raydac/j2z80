@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.utils;
 
+import com.igormaznitsa.j2z80.utils.antpm.AntPathMatcher;
 import com.igormaznitsa.meta.common.utils.Assertions;
-import org.springframework.util.AntPathMatcher;
-
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -27,21 +27,59 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
 /**
  * It is an Auxiliary class contains some useful methods.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-public enum Utils {
-
-  ;
-
-
+public final class Utils {
   public static final String NEXT_LINE = "\r\n";
   private static final AntPathMatcher ANT_MATCHER = new AntPathMatcher();
+  private static final String[] EMPTY_STRING_ARRAY = {};
+
+  private Utils() {
+
+  }
+
+  public static String[] toStringArray(Collection<String> collection) {
+    return (!collection.isEmpty() ? collection.toArray(EMPTY_STRING_ARRAY) :
+        EMPTY_STRING_ARRAY);
+  }
+
+  public static String[] tokenizeToStringArray(
+      String str,
+      String delimiters,
+      boolean trimTokens,
+      boolean ignoreEmptyTokens
+  ) {
+
+    if (str == null) {
+      return EMPTY_STRING_ARRAY;
+    }
+
+    StringTokenizer st = new StringTokenizer(str, delimiters);
+    List<String> tokens = new ArrayList<>();
+    while (st.hasMoreTokens()) {
+      String token = st.nextToken();
+      if (trimTokens) {
+        token = token.trim();
+      }
+      if (!ignoreEmptyTokens || !token.isEmpty()) {
+        tokens.add(token);
+      }
+    }
+    return toStringArray(tokens);
+  }
+
+
+  public static boolean hasText(String str) {
+    return (str != null && !str.isBlank());
+  }
 
   /**
    * Silently close any closeable object
@@ -65,8 +103,10 @@ public enum Utils {
    * @return a string array contains each text line as an element
    * @throws IOException it will be thrown if there is any transport problem
    */
-  public static String[] readTextFileAsStringArray(final File file, final String charSet) throws IOException {
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charSet));
+  public static String[] readTextFileAsStringArray(final File file, final String charSet)
+      throws IOException {
+    final BufferedReader reader =
+        new BufferedReader(new InputStreamReader(new FileInputStream(file), charSet));
     final List<String> readString = new ArrayList<String>(256);
     try {
       while (true) {
@@ -101,7 +141,8 @@ public enum Utils {
    * @throws IOException           it will be thrown if there is any transport error
    * @throws FileNotFoundException it will be thrown if the resource is not found
    */
-  public static String readTextResource(final Class<?> thisClass, final String resource) throws IOException {
+  public static String readTextResource(final Class<?> thisClass, final String resource)
+      throws IOException {
     final InputStream file = thisClass.getResourceAsStream(resource);
     if (file == null) {
       throw new FileNotFoundException("Can't find resource " + resource);
@@ -206,7 +247,8 @@ public enum Utils {
    * @param maxNumbersPerString the number of values allowed per a line, if -1 then it will be default value
    * @return a string of lines converted byte values into asm compatible representation
    */
-  public static String[] byteArrayToAsm(final String firstLine, final byte[] array, final int maxNumbersPerString) {
+  public static String[] byteArrayToAsm(final String firstLine, final byte[] array,
+                                        final int maxNumbersPerString) {
 
     final StringBuilder buffer = new StringBuilder(firstLine == null ? "" : firstLine);
     if (firstLine != null) {
@@ -222,7 +264,8 @@ public enum Utils {
         if (stringIntemCounter > 0) {
           buffer.append(',');
         }
-        buffer.append('#').append(Integer.toHexString(array[index++] & 0xFF).toUpperCase(Locale.ENGLISH));
+        buffer.append('#')
+            .append(Integer.toHexString(array[index++] & 0xFF).toUpperCase(Locale.ENGLISH));
 
         stringIntemCounter++;
         len--;
@@ -242,6 +285,7 @@ public enum Utils {
    */
   public static boolean checkPathForAntPattern(final String path, final String antPattern) {
     String newPath = path.startsWith("/") ? path : '/' + path;
-    return ANT_MATCHER.match(antPattern.toLowerCase(Locale.ENGLISH), newPath.toLowerCase(Locale.ENGLISH));
+    return ANT_MATCHER.match(antPattern.toLowerCase(Locale.ENGLISH),
+        newPath.toLowerCase(Locale.ENGLISH));
   }
 }
