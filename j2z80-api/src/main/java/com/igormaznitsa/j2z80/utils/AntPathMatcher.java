@@ -1,6 +1,5 @@
-package com.igormaznitsa.j2z80.utils.antpm;
+package com.igormaznitsa.j2z80.utils;
 
-import com.igormaznitsa.j2z80.utils.Utils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -12,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // copy from spring framework
-public class AntPathMatcher {
+class AntPathMatcher {
 
   public static final String DEFAULT_PATH_SEPARATOR = "/";
   private static final int CACHE_TURNOFF_THRESHOLD = 65536;
@@ -110,7 +109,6 @@ public class AntPathMatcher {
     int pathIdxStart = 0;
     int pathIdxEnd = pathDirs.length - 1;
 
-    // Match all elements up to the first **
     while (pattIdxStart <= pattIdxEnd && pathIdxStart <= pathIdxEnd) {
       String pattDir = pattDirs[pattIdxStart];
       if ("**".equals(pattDir)) {
@@ -124,7 +122,6 @@ public class AntPathMatcher {
     }
 
     if (pathIdxStart > pathIdxEnd) {
-      // Path is exhausted, only match if rest of pattern is * or **'s
       if (pattIdxStart > pattIdxEnd) {
         return (pattern.endsWith(this.pathSeparator) == path.endsWith(this.pathSeparator));
       }
@@ -142,14 +139,11 @@ public class AntPathMatcher {
       }
       return true;
     } else if (pattIdxStart > pattIdxEnd) {
-      // String not exhausted, but pattern is. Failure.
       return false;
     } else if (!fullMatch && "**".equals(pattDirs[pattIdxStart])) {
-      // Path start definitely matches due to "**" part in pattern.
       return true;
     }
 
-    // up to last '**'
     while (pattIdxStart <= pattIdxEnd && pathIdxStart <= pathIdxEnd) {
       String pattDir = pattDirs[pattIdxEnd];
       if (pattDir.equals("**")) {
@@ -166,7 +160,6 @@ public class AntPathMatcher {
       pathIdxEnd--;
     }
     if (pathIdxStart > pathIdxEnd) {
-      // String is exhausted
       for (int i = pattIdxStart; i <= pattIdxEnd; i++) {
         if (!pattDirs[i].equals("**")) {
           return false;
@@ -184,12 +177,9 @@ public class AntPathMatcher {
         }
       }
       if (patIdxTmp == pattIdxStart + 1) {
-        // '**/**' situation, so skip one
         pattIdxStart++;
         continue;
       }
-      // Find the pattern between padIdxStart & padIdxTmp in str between
-      // strIdxStart & strIdxEnd
       int patLength = (patIdxTmp - pattIdxStart - 1);
       int strLength = (pathIdxEnd - pathIdxStart + 1);
       int foundIdx = -1;
@@ -275,14 +265,6 @@ public class AntPathMatcher {
     return false;
   }
 
-  /**
-   * Tokenize the given path pattern into parts, based on this matcher's settings.
-   * <p>Performs caching based on {@link #setCachePatterns}, delegating to
-   * {@link #tokenizePath(String)} for the actual tokenization algorithm.
-   *
-   * @param pattern the pattern to tokenize
-   * @return the tokenized pattern parts
-   */
   protected String[] tokenizePattern(String pattern) {
     String[] tokenized = null;
     Boolean cachePatterns = this.cachePatterns;
@@ -311,7 +293,6 @@ public class AntPathMatcher {
 
   private boolean matchStrings(String pattern, String str,
                                Map<String, String> uriTemplateVariables) {
-
     return getStringMatcher(pattern).matchStrings(str, uriTemplateVariables);
   }
 
@@ -526,23 +507,9 @@ public class AntPathMatcher {
   }
 
 
-  /**
-   * The default {@link Comparator} implementation returned by
-   * {@link #getPatternComparator(String)}.
-   * <p>In order, the most "generic" pattern is determined by the following:
-   * <ul>
-   * <li>if it's null or a capture all pattern (i.e. it is equal to "/**")</li>
-   * <li>if the other pattern is an actual match</li>
-   * <li>if it's a catch-all pattern (i.e. it ends with "**"</li>
-   * <li>if it's got more "*" than the other pattern</li>
-   * <li>if it's got more "{foo}" than the other pattern</li>
-   * <li>if it's shorter than the other pattern</li>
-   * </ul>
-   */
   protected static class AntPatternComparator implements Comparator<String> {
 
     private final String path;
-
     private final String pathSeparator;
 
     public AntPatternComparator(String path) {
@@ -554,13 +521,6 @@ public class AntPathMatcher {
       this.pathSeparator = pathSeparator;
     }
 
-    /**
-     * Compare two patterns to determine which should match first, i.e. which
-     * is the most specific regarding the current path.
-     *
-     * @return a negative integer, zero, or a positive integer as pattern1 is
-     * more specific, equally specific, or less specific than pattern2.
-     */
     @Override
     public int compare(String pattern1, String pattern2) {
       PatternInfo info1 = new PatternInfo(pattern1, this.pathSeparator);
@@ -700,13 +660,9 @@ public class AntPathMatcher {
   }
 
 
-  /**
-   * A simple cache for patterns that depend on the configured path separator.
-   */
   private static class PathSeparatorPatternCache {
 
     private final String endsOnWildCard;
-
     private final String endsOnDoubleWildCard;
 
     public PathSeparatorPatternCache(String pathSeparator) {
