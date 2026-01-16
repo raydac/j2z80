@@ -100,31 +100,31 @@ public class TestINSTANCEOF extends AbstractTestBasedOnMemoryManager implements 
 
     switch (state) {
       case SUCESSOR: {
-        final InstanceofTable.InstanceOfRow r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
+        final InstanceofTable.RowInstance r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
         r1.addClass(new ClassID(TEST_CLASS_NAME5));
         r1.addClass(new ClassID(TEST_CLASS_NAME6));
 
-        final InstanceofTable.InstanceOfRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
+        final InstanceofTable.RowInstance r = table.addRow(new ClassID(TEST_CLASS_NAME1));
         r.addClass(new ClassID(TEST_CLASS_NAME2));
         r.addClass(new ClassID(TEST_CLASS_NAME3));
       }
       break;
       case NOT_SUCCESSOR: {
-        final InstanceofTable.InstanceOfRow r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
+        final InstanceofTable.RowInstance r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
         r1.addClass(new ClassID(TEST_CLASS_NAME5));
         r1.addClass(new ClassID(TEST_CLASS_NAME6));
         r1.addClass(new ClassID(TEST_CLASS_NAME3));
 
-        final InstanceofTable.InstanceOfRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
+        final InstanceofTable.RowInstance r = table.addRow(new ClassID(TEST_CLASS_NAME1));
         r.addClass(new ClassID(TEST_CLASS_NAME2));
       }
       break;
       case NOT_IN_LIST: {
-        final InstanceofTable.InstanceOfRow r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
+        final InstanceofTable.RowInstance r1 = table.addRow(new ClassID(TEST_CLASS_NAME4));
         r1.addClass(new ClassID(TEST_CLASS_NAME5));
         r1.addClass(new ClassID(TEST_CLASS_NAME6));
 
-        final InstanceofTable.InstanceOfRow r = table.addRow(new ClassID(TEST_CLASS_NAME1));
+        final InstanceofTable.RowInstance r = table.addRow(new ClassID(TEST_CLASS_NAME1));
         r.addClass(new ClassID(TEST_CLASS_NAME2));
       }
       break;

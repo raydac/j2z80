@@ -16,11 +16,10 @@
 package com.igormaznitsa.j2z80.bootstrap;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
-import org.apache.bcel.generic.Type;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.bcel.generic.Type;
 
 /**
  * The class is the parent for all bootstrap classes used by the translator, it automates their search and processing.
@@ -28,27 +27,25 @@ import java.util.Map;
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public abstract class AbstractBootClass {
-  private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
+  private static final String[] EMPTY_STRING_ARRAY = new String[0];
   private static final Map<String, AbstractBootClass> insideCache = new HashMap<String, AbstractBootClass>();
 
   public static AbstractBootClass findProcessor(final String className) {
     AbstractBootClass result = insideCache.get(className);
     if (result == null) {
-      final String newname = AbstractBootClass.class.getPackage().getName() + "." + className;
+      final String newName = AbstractBootClass.class.getPackage().getName() + "." + className;
       try {
-        final Class<? extends AbstractBootClass> japiClass = Class.forName(newname).asSubclass(AbstractBootClass.class);
+        final Class<? extends AbstractBootClass> japiClass =
+            Class.forName(newName).asSubclass(AbstractBootClass.class);
         result = japiClass.getDeclaredConstructor().newInstance();
         insideCache.put(className, result);
-      } catch (ClassNotFoundException ex) {
-
-      } catch (InvocationTargetException ex) {
-      } catch (NoSuchMethodException ex) {
-
+      } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException ex) {
+        // ignore
       } catch (IllegalAccessException ex) {
-        throw new RuntimeException("Can't get access to a bootstrap class [" + className + ']', ex);
+        throw new RuntimeException("Can't get access to a bootstrap class: " + className, ex);
       } catch (InstantiationException ex) {
-        throw new RuntimeException("Can't instantiate a bootstrap class [" + className + ']', ex);
+        throw new RuntimeException("Can't instantiate a bootstrap class: " + className, ex);
       }
     }
     return result;
@@ -73,7 +70,9 @@ public abstract class AbstractBootClass {
   public void throwBootClassExceptionForMethod(final String methodName, final Type result, final Type[] args) {
     final String className = extractEmulatedJavaClassName();
     final String methodSignature = Type.getMethodSignature(result, args);
-    throw new BootClassException("Unsupported method [" + className + '.' + methodName + " " + methodSignature + "]", className, methodName, methodSignature);
+    throw new BootClassException(
+        "Unsupported method: " + className + '.' + methodName + " " + methodSignature, className,
+        methodName, methodSignature);
   }
 
   /**
@@ -84,7 +83,9 @@ public abstract class AbstractBootClass {
    */
   public void throwBootClassExceptionForField(final String fieldName, final Type type) {
     final String className = extractEmulatedJavaClassName();
-    throw new BootClassException("Unsupported field [" + className + '.' + fieldName + " " + type.toString() + "]", className, fieldName, type.getSignature());
+    throw new BootClassException(
+        "Unsupported field: " + className + '.' + fieldName + " " + type.toString(), className,
+        fieldName, type.getSignature());
   }
 
   /**

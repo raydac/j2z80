@@ -35,19 +35,19 @@ import org.apache.bcel.generic.ClassGen;
  */
 class ClassContextImpl implements ClassContext {
 
-  private final TranslatorImpl tranclator;
+  private final TranslatorImpl translator;
   private final Map<ClassID, ClassMethodInfo> classIdToClassMethodInfos = new HashMap<>();
   private final Set<ClassID> classesWithJni = new HashSet<>();
 
   public ClassContextImpl(final TranslatorImpl translator) {
-    this.tranclator = translator;
+    this.translator = translator;
   }
 
   void init() {
     int idCounter = 0;
 
     // map all classes from the translator and generate their ids
-    for (final ClassGen c : this.tranclator.workingClassPath.getAllClasses().values()) {
+    for (final ClassGen c : this.translator.workingClassPath.getAllClasses().values()) {
       final ClassID classId = new ClassID(c);
       final ClassMethodInfo classInfo = new ClassMethodInfo(c, null, idCounter);
       this.classIdToClassMethodInfos.put(classId, classInfo);
@@ -75,7 +75,7 @@ class ClassContextImpl implements ClassContext {
 
   @Override
   public Integer findClassUID(final ClassID classId) {
-    final ClassMethodInfo info = classIdToClassMethodInfos.get(classId);
+    final ClassMethodInfo info = this.classIdToClassMethodInfos.get(classId);
     if (info != null) {
       return info.getUID();
     }
@@ -89,16 +89,16 @@ class ClassContextImpl implements ClassContext {
     final ClassGen classGen = findClassForID(new ClassID(interfaceName));
     if (classGen.isInterface()) {
 
-      for (final ClassGen cgen : tranclator.workingClassPath.getAllClasses().values()) {
-        for (final String name : cgen.getInterfaceNames()) {
+      for (final ClassGen c : this.translator.workingClassPath.getAllClasses().values()) {
+        for (final String name : c.getInterfaceNames()) {
           if (interfaceName.equals(name)) {
-            if (cgen.isInterface()) {
-              final Set<ClassID> thatInterface = findAllClassesImplementInterface(name);
+            if (c.isInterface()) {
+              final Set<ClassID> thatInterface = this.findAllClassesImplementInterface(name);
               result.addAll(thatInterface);
             } else {
-              result.add(new ClassID(cgen));
+              result.add(new ClassID(c));
 
-              final List<String> successors = findAllClassSuccessors(cgen.getClassName());
+              final List<String> successors = this.findAllClassSuccessors(c.getClassName());
               if (!successors.isEmpty()) {
                 for (final String className : successors) {
                   result.add(new ClassID(className));
@@ -114,16 +114,16 @@ class ClassContextImpl implements ClassContext {
 
   @Override
   public Iterable<ClassID> getAllClasses() {
-    return classIdToClassMethodInfos.keySet();
+    return this.classIdToClassMethodInfos.keySet();
   }
 
   ClassMethodInfo findClassInfoForID(final ClassID classID) {
-    return classIdToClassMethodInfos.get(classID);
+    return this.classIdToClassMethodInfos.get(classID);
   }
 
   @Override
   public ClassGen findClassForID(final ClassID classID) {
-    final ClassMethodInfo classMethodInfo = classIdToClassMethodInfos.get(classID);
+    final ClassMethodInfo classMethodInfo = this.classIdToClassMethodInfos.get(classID);
     return classMethodInfo == null ? null : classMethodInfo.getClassInfo();
   }
 
@@ -139,7 +139,7 @@ class ClassContextImpl implements ClassContext {
         return true;
       }
 
-      tmpClassGen = tranclator.workingClassPath.findClassForName(superCName);
+      tmpClassGen = this.translator.workingClassPath.findClassForName(superCName);
     }
     return false;
   }
@@ -163,7 +163,7 @@ class ClassContextImpl implements ClassContext {
   @Override
   public List<String> findAllClassSuccessors(final String className) {
     final List<String> result = new ArrayList<>();
-    for (final ClassGen cls : tranclator.workingClassPath.getAllClasses().values()) {
+    for (final ClassGen cls : this.translator.workingClassPath.getAllClasses().values()) {
       if (className.equals(cls.getClassName())) {
         continue;
       }

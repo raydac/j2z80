@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.ClassContext;
@@ -26,21 +27,25 @@ import java.util.Set;
 import org.apache.bcel.generic.ClassGen;
 
 public final class InstanceofTable {
-  private final List<InstanceOfRow> rows = new ArrayList<>();
 
-  public InstanceofTable(final TranslatorContext translator, final Set<ClassID> classesToBeChecked) {
+  private final List<RowInstance> rows = new ArrayList<>();
+
+  public InstanceofTable(final TranslatorContext translator,
+                         final Set<ClassID> classesToBeChecked) {
     final ClassContext classContext = translator.getClassContext();
 
     for (final ClassID c : classesToBeChecked) {
-      final InstanceOfRow row = addRow(c);
+      final RowInstance row = addRow(c);
 
       final ClassGen classGen = classContext.findClassForID(c);
 
-      final List<String> allSuccesors = classContext.findAllClassSuccessors(classGen.getClassName());
-      final Set<ClassID> allImplementingInterface = classContext.findAllClassesImplementInterface(classGen.getClassName());
+      final List<String> allSuccessors =
+          classContext.findAllClassSuccessors(classGen.getClassName());
+      final Set<ClassID> allImplementingInterface =
+          classContext.findAllClassesImplementInterface(classGen.getClassName());
 
       final Set<ClassID> allCompatible = new HashSet<>();
-      for (final String s : allSuccesors) {
+      for (final String s : allSuccessors) {
         allCompatible.add(new ClassID(s));
       }
       allCompatible.addAll(allImplementingInterface);
@@ -53,21 +58,21 @@ public final class InstanceofTable {
   }
 
   public void clear() {
-    rows.clear();
+    this.rows.clear();
   }
 
   public int size() {
-    return rows.size();
+    return this.rows.size();
   }
 
-  public InstanceOfRow addRow(final ClassID classId) {
-    InstanceOfRow row = new InstanceOfRow(classId);
+  public RowInstance addRow(final ClassID classId) {
+    RowInstance row = new RowInstance(classId);
 
-    final int existRowIndex = rows.indexOf(row);
+    final int existRowIndex = this.rows.indexOf(row);
     if (existRowIndex < 0) {
-      rows.add(row);
+      this.rows.add(row);
     } else {
-      row = rows.get(existRowIndex);
+      row = this.rows.get(existRowIndex);
     }
 
     return row;
@@ -75,18 +80,18 @@ public final class InstanceofTable {
 
   public String toAsm() {
     final StringBuilder result = new StringBuilder();
-    result.append("DEFB ").append(rows.size()).append('\n');
-    for (final InstanceOfRow row : rows) {
+    result.append("DEFB ").append(this.rows.size()).append('\n');
+    for (final RowInstance row : this.rows) {
       result.append(row.toAsm()).append('\n');
     }
     return result.toString();
   }
 
-  public final static class InstanceOfRow {
+  public final static class RowInstance {
     private final ClassID classId;
     private final Set<ClassID> compatibleClasses = new HashSet<>();
 
-    public InstanceOfRow(final ClassID classId) {
+    public RowInstance(final ClassID classId) {
       this.classId = classId;
     }
 
@@ -95,12 +100,12 @@ public final class InstanceofTable {
     }
 
     public void addClass(final ClassID classId) {
-      compatibleClasses.add(classId);
+      this.compatibleClasses.add(classId);
     }
 
     public void addClasses(final ClassID... ids) {
       for (final ClassID i : ids) {
-        addClass(i);
+        this.addClass(i);
       }
     }
 
@@ -124,18 +129,21 @@ public final class InstanceofTable {
 
     @Override
     public int hashCode() {
-      return classId.hashCode();
+      return this.classId.hashCode();
     }
 
     @Override
     public boolean equals(final Object obj) {
-      if (obj == null || obj.getClass() != InstanceOfRow.class) {
+      if (obj == null) {
         return false;
       }
-
-      final InstanceOfRow thatRow = (InstanceOfRow) obj;
-
-      return this.classId.equals(thatRow.classId);
+      if (this == obj) {
+        return true;
+      }
+      if (obj instanceof RowInstance) {
+        return this.classId.equals(((RowInstance) obj).classId);
+      }
+      return false;
     }
   }
 }

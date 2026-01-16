@@ -18,6 +18,7 @@ package com.igormaznitsa.j2z80.translator.mojos;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.TranslatorLogger;
+import com.igormaznitsa.j2z80.translator.Format;
 import com.igormaznitsa.j2z80.translator.TranslatorImpl;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
 import com.igormaznitsa.j2z80.translator.utils.Sna48Writer;
@@ -29,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
@@ -68,7 +70,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   private File jarFile;
 
   @Parameter(name = "formats")
-  private List<String> formats = List.of("a80");
+  private Set<Format> formats = Set.of(Format.A80);
 
   @Parameter(name = "startAddress", defaultValue = "28672")
   private int startAddress;
@@ -143,11 +145,11 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
     this.optimization = optimization;
   }
 
-  public List<String> getFormats() {
+  public Set<Format> getFormats() {
     return this.formats;
   }
 
-  public void setFormats(List<String> formats) {
+  public void setFormats(Set<Format> formats) {
     this.formats = formats;
   }
 
@@ -175,7 +177,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
         }
       }
 
-      if (this.formats.contains("a80")) {
+      if (this.formats.contains(Format.A80)) {
         final Path pathA80 = this.makeTargetFilePath("a80");
         this.logInfo("Writing A80 assembler file: " + pathA80);
         Files.write(pathA80, translatedAsmText, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
@@ -184,13 +186,13 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
       final Z80Asm targetA80 = new Z80Asm(translatedAsmText);
       final byte[] translatedBin = targetA80.process();
 
-      if (this.formats.contains("bin")) {
+      if (this.formats.contains(Format.BIN)) {
         final Path pathBin = this.makeTargetFilePath("bin");
         this.getLog().info("Writing BIN file: " + pathBin);
         Files.write(pathBin, translatedBin);
       }
 
-      if (this.formats.contains("sna")) {
+      if (this.formats.contains(Format.SNA)) {
         final Path pathSna = this.makeTargetFilePath("sna");
         this.getLog().info("Writing SNA48 file: " + pathSna);
         final byte[] sna48 =

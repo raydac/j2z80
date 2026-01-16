@@ -30,21 +30,21 @@ public class DefaultTranslatorLogger implements TranslatorLogger {
   @Override
   public void logInfo(final String message) {
     if (System.out != null) {
-      System.out.println(String.format(DEFAULT_LOG_PREFIX, "INFO", message));
+      System.out.printf((DEFAULT_LOG_PREFIX) + "%n", "INFO", message);
     }
   }
 
   @Override
   public void logWarning(final String message) {
     if (System.out != null) {
-      System.out.println(String.format(DEFAULT_LOG_PREFIX, "WARN", message));
+      System.out.printf((DEFAULT_LOG_PREFIX) + "%n", "WARN", message);
     }
   }
 
   @Override
   public void logError(final String message) {
     if (System.err != null) {
-      System.err.println(String.format(DEFAULT_LOG_PREFIX, "ERR", message));
+      System.err.printf((DEFAULT_LOG_PREFIX) + "%n", "ERR", message);
     }
   }
 }

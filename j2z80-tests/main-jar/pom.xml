@@ -42,9 +42,9 @@
             </goals>
             <configuration>
               <formats>
-                <format>a80</format>
-                <format>bin</format>
-                <format>sna</format>
+                <format>A80</format>
+                <format>BIN</format>
+                <format>SNA</format>
               </formats>
             </configuration>
           </execution>
