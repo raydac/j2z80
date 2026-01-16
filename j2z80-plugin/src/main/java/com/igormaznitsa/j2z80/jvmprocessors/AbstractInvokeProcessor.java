@@ -16,11 +16,12 @@
 
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.makeLabelNameForMethod;
+
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import java.io.IOException;
 import java.io.Writer;
 import org.apache.bcel.generic.ConstantPoolGen;
@@ -240,7 +241,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
                                final InvokeInstruction instruction) {
     final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
     final ObjectType objType = getObjectType(methodTranslator, instruction);
-    return LabelAndFrameUtils.makeLabelNameForMethod(objType.getClassName(),
+    return makeLabelNameForMethod(objType.getClassName(),
         instruction.getMethodName(constantPool), instruction.getReturnType(constantPool),
         instruction.getArgumentTypes(constantPool));
   }

@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.j2z80.ids;
 
+import java.util.Objects;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.MethodGen;
@@ -29,7 +30,7 @@ public class ClassMethodInfo {
   private final ClassGen classInfo;
   private final Method methodInfo;
   private final int id;
-  private MethodGen methodGen;
+  private MethodGen lazyMethodGen;
 
   /**
    * A Constructor
@@ -63,7 +64,7 @@ public class ClassMethodInfo {
    */
   public ClassMethodInfo(final ClassGen classInfo, final Method methodInfo, final MethodGen methodGen) {
     this(classInfo, methodInfo, -1);
-    this.methodGen = methodGen;
+    this.lazyMethodGen = methodGen;
   }
 
   /**
@@ -159,16 +160,16 @@ public class ClassMethodInfo {
     if (methodInfo == null) {
       return null;
     }
-    if (methodGen == null) {
-      methodGen = new MethodGen(methodInfo, classInfo.getClassName(), classInfo.getConstantPool());
+    if (this.lazyMethodGen == null) {
+      this.lazyMethodGen =
+          new MethodGen(methodInfo, classInfo.getClassName(), classInfo.getConstantPool());
     }
-    return methodGen;
+    return this.lazyMethodGen;
   }
 
   @Override
   public int hashCode() {
-    int hash = classInfo == null ? 0 : classInfo.hashCode();
-    return hash ^ (methodInfo == null ? 31 : methodInfo.hashCode());
+    return Objects.hash(this.classInfo, this.methodInfo);
   }
 
   @Override
@@ -176,9 +177,12 @@ public class ClassMethodInfo {
     if (obj == null) {
       return false;
     }
+    if (obj == this) {
+      return true;
+    }
     if (obj instanceof ClassMethodInfo) {
       final ClassMethodInfo info = (ClassMethodInfo) obj;
-      return classInfo.equals(info.classInfo) && methodInfo.equals(methodInfo);
+      return this.classInfo.equals(info.classInfo) && this.methodInfo.equals(info.methodInfo);
     }
     return false;
   }
@@ -186,11 +190,12 @@ public class ClassMethodInfo {
   @Override
   public String toString() {
     final StringBuilder result = new StringBuilder();
-    if (classInfo != null) {
-      result.append(classInfo.getClassName());
+    if (this.classInfo != null) {
+      result.append(this.classInfo.getClassName());
     }
     if (methodInfo != null) {
-      result.append('#').append(methodInfo.getName()).append(' ').append(methodInfo.getSignature());
+      result.append('#').append(this.methodInfo.getName()).append(' ')
+          .append(this.methodInfo.getSignature());
     }
     return result.toString();
   }
@@ -201,6 +206,6 @@ public class ClassMethodInfo {
    * @return returns true if the method is a native one
    */
   public boolean isNative() {
-    return methodInfo == null ? false : methodInfo.isNative();
+    return this.methodInfo != null && this.methodInfo.isNative();
   }
 }

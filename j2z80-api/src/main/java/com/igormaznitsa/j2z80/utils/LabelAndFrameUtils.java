@@ -30,9 +30,11 @@ import org.apache.bcel.generic.Type;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-public enum LabelAndFrameUtils {
+public final class LabelAndFrameUtils {
 
-  ;
+  private LabelAndFrameUtils() {
+
+  }
 
   /**
    * Generate a label name based on a java class instance

@@ -15,9 +15,10 @@
  */
 package com.igormaznitsa.j2z80.ids;
 
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import static java.util.Arrays.deepEquals;
+
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
-import com.igormaznitsa.meta.common.utils.Assertions;
-import java.util.Arrays;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.MethodGen;
@@ -40,10 +41,11 @@ public class MethodID {
   /**
    * A Constructor
    *
-   * @param m a MethodGen object, must not be null
+   * @param methodGen a MethodGen object, must not be null
    */
-  public MethodID(final MethodGen m) {
-    this(m.getClassName(), m.getName(), m.getReturnType(), m.getArgumentTypes());
+  public MethodID(final MethodGen methodGen) {
+    this(methodGen.getClassName(), methodGen.getName(), methodGen.getReturnType(),
+        methodGen.getArgumentTypes());
   }
 
   /**
@@ -75,17 +77,17 @@ public class MethodID {
    * @param argTypes   the argument type signatures for the method, must not be null
    */
   public MethodID(final String className, final String methodName, final Type returnType, final Type[] argTypes) {
-    Assertions.assertNotNull("ClassName must not contain null", className);
-    Assertions.assertNotNull("Method name must not be null", methodName);
-    Assertions.assertNotNull("ReturnType must not be null", returnType);
-    Assertions.assertNotNull("ArgTypes must not be null", argTypes);
+    assertNotNull("ClassName must not contain null", className);
+    assertNotNull("Method name must not be null", methodName);
+    assertNotNull("ReturnType must not be null", returnType);
+    assertNotNull("ArgTypes must not be null", argTypes);
     this.methodId = className + '.' + methodName + '.' + Type.getMethodSignature(returnType, argTypes);
     this.methodLabel = LabelAndFrameUtils.makeLabelNameForMethod(className, methodName, returnType, argTypes);
     this.className = className;
     this.methodName = methodName;
     this.returnType = returnType;
     this.argTypes = argTypes;
-    classId = new ClassID(className);
+    this.classId = new ClassID(className);
   }
 
   /**
@@ -94,7 +96,7 @@ public class MethodID {
    * @return the class id object
    */
   public ClassID getClassID() {
-    return classId;
+    return this.classId;
   }
 
   /**
@@ -103,7 +105,7 @@ public class MethodID {
    * @return the class name
    */
   public String getClassName() {
-    return className;
+    return this.className;
   }
 
   /**
@@ -112,7 +114,7 @@ public class MethodID {
    * @return the method name
    */
   public String getMethodName() {
-    return methodName;
+    return this.methodName;
   }
 
   /**
@@ -121,7 +123,7 @@ public class MethodID {
    * @return the return type
    */
   public Type getReturnType() {
-    return returnType;
+    return this.returnType;
   }
 
   /**
@@ -130,18 +132,22 @@ public class MethodID {
    * @return the argument types for the method
    */
   public Type[] getArgs() {
-    return argTypes;
+    return this.argTypes;
   }
 
   @Override
   public int hashCode() {
-    return methodId.hashCode();
+    return this.methodId.hashCode();
   }
 
   @Override
   public boolean equals(final Object obj) {
     if (obj == null) {
       return false;
+    }
+
+    if (this == obj) {
+      return true;
     }
 
     if (obj instanceof MethodID) {
@@ -172,9 +178,10 @@ public class MethodID {
    * @return a found compatible method if it is found or null if not found
    */
   public Method findCompatibleMethod(final ClassGen cgen) {
-    Assertions.assertNotNull("Class must not be null", cgen);
+    assertNotNull("Class must not be null", cgen);
     for (final Method m : cgen.getMethods()) {
-      if (methodName.equals(m.getName()) && Arrays.deepEquals(argTypes, m.getArgumentTypes()) && returnType.equals(m.getReturnType())) {
+      if (this.methodName.equals(m.getName()) && deepEquals(this.argTypes, m.getArgumentTypes()) &&
+          this.returnType.equals(m.getReturnType())) {
         return m;
       }
     }

@@ -16,8 +16,12 @@
 
 package com.igormaznitsa.j2z80.translator;
 
+import static com.igormaznitsa.j2z80.translator.optimizator.OptimizationChainFactory.getOptimizators;
 import static com.igormaznitsa.j2z80.translator.utils.AsmAssertions.assertAddress;
+import static com.igormaznitsa.j2z80.translator.utils.MethodUtils.isStaticInitializer;
+import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.makeLabelForClassSizeInfo;
 import static com.igormaznitsa.j2z80.utils.Utils.concatStringArrays;
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import static java.util.Collections.unmodifiableList;
 
 import com.igormaznitsa.j2z80.ClassContext;
@@ -39,13 +43,10 @@ import com.igormaznitsa.j2z80.jvmprocessors.Processor_INVOKESTATIC;
 import com.igormaznitsa.j2z80.translator.jar.ZClassPath;
 import com.igormaznitsa.j2z80.translator.jar.ZParsedJar;
 import com.igormaznitsa.j2z80.translator.optimizator.AsmOptimizerChain;
-import com.igormaznitsa.j2z80.translator.optimizator.OptimizationChainFactory;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
 import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
-import com.igormaznitsa.j2z80.translator.utils.MethodUtils;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import java.io.File;
 import java.io.IOException;
@@ -208,22 +209,22 @@ public class TranslatorImpl implements TranslatorContext {
       }
     }
 
-    processUsedBootstrapClasses(result);
-    processClassFields(result);
-    processConstantPool(result);
-    processJNIClasses(result);
-    processIDs(result);
-    processBinaryData(result);
-    processAdditionals(result);
+    this.processUsedBootstrapClasses(result);
+    this.processClassFields(result);
+    this.processConstantPool(result);
+    this.processJniClasses(result);
+    this.processIDs(result);
+    this.processBinaryData(result);
+    this.processAdditionals(result);
 
     result.addAll(makeClassSizeArray());
 
     if (this.optimizationLevel != null && this.optimizationLevel != OptimizationLevel.NONE) {
       this.getLogger().logWarning(
-          "Make optimization for the level '" + optimizationLevel.getTextName() + "'");
+          "Optimization level: " + optimizationLevel.getTextName());
 
       final List<ParsedAsmLine> asmLines = asParsedLines(result);
-      final AsmOptimizerChain chain = OptimizationChainFactory.getOptimizators(this, optimizationLevel);
+      final AsmOptimizerChain chain = getOptimizators(this, optimizationLevel);
       final List<String> optimizedAsString = asStringLines(chain.processSources(asmLines));
 
       optimizedAsString.add(0,
@@ -231,7 +232,7 @@ public class TranslatorImpl implements TranslatorContext {
 
       return optimizedAsString;
     } else {
-      getLogger().logInfo("No optimization");
+      this.getLogger().logInfo("No optimization");
 
       return result;
     }
@@ -241,15 +242,16 @@ public class TranslatorImpl implements TranslatorContext {
     this.getLogger().logInfo("----PROCESS STATIC INITIALIZERS ----");
     final List<ClassID> classesContainStaticInitializing = new ArrayList<>();
     for (final Entry<ClassID, ClassMethodInfo> id : this.classContext.getAllFoundClasses()) {
-      final ClassGen cgen = id.getValue().getClassInfo();
-      for (final Method m : cgen.getMethods()) {
-        if (MethodUtils.isStaticInitializer(m)) {
+      final ClassGen classGen = id.getValue().getClassInfo();
+      for (final Method method : classGen.getMethods()) {
+        if (isStaticInitializer(method)) {
           classesContainStaticInitializing.add(id.getKey());
         }
       }
     }
 
-    getLogger().logInfo("Static initialization method has been detected in " + classesContainStaticInitializing.size() + " class(es)");
+    this.getLogger().logInfo("Static initialization method has been detected in " +
+        classesContainStaticInitializing.size() + " class(es)");
 
     if (classesContainStaticInitializing.isEmpty()) {
       return new String[0];
@@ -260,7 +262,8 @@ public class TranslatorImpl implements TranslatorContext {
         return 0;
       }
 
-      if (classContext.isAccessible(classContext.findClassForID(arg1), classContext.findClassForID(arg0).getClassName())) {
+      if (this.classContext.isAccessible(this.classContext.findClassForID(arg1),
+          this.classContext.findClassForID(arg0).getClassName())) {
         return 1;
       } else {
         return -1;
@@ -272,39 +275,45 @@ public class TranslatorImpl implements TranslatorContext {
     String[] result = new String[] {";------ STATIC INITIALIZING BLOCK ------"};
 
     for (final ClassID id : classesContainStaticInitializing) {
-      final ClassGen cgen = classContext.findClassForID(id);
-      result = concatStringArrays(result, invokeStaticProc.generateCallForStaticInitalizer(cgen));
+      final ClassGen classGen = classContext.findClassForID(id);
+      result =
+          concatStringArrays(result, invokeStaticProc.generateCallForStaticInitalizer(classGen));
     }
 
     return result;
   }
 
-  private void processIDs(final List<String> out) {
+  private void processIDs(final List<String> list) {
     // class id
     for (final Entry<ClassID, ClassMethodInfo> id : this.classContext.getAllFoundClasses()) {
-      out.add(LabelAndFrameUtils.makeLabelForClassID(id.getKey()) + ": EQU " + id.getValue().getUID());
+      list.add(
+          LabelAndFrameUtils.makeLabelForClassID(id.getKey()) + ": EQU " + id.getValue().getUID());
     }
 
     // method id
     for (final Entry<MethodID, ClassMethodInfo> id : this.methodContext.getMethods()) {
-      out.add(LabelAndFrameUtils.makeLabelForMethodID(id.getKey()) + ": EQU " + id.getValue().getUID());
+      list.add(
+          LabelAndFrameUtils.makeLabelForMethodID(id.getKey()) + ": EQU " + id.getValue().getUID());
     }
   }
 
-  private void processClassFields(final List<String> out) {
+  private void processClassFields(final List<String> list) {
     for (final ClassGen currentClass : workingClassPath.getAllClasses().values()) {
       final List<Field> fieldList = ClassUtils.findAllFields(workingClassPath, currentClass);
       final String className = currentClass.getClassName();
       int offset = 0;
       for (final Field f : fieldList) {
-        out.add(LabelAndFrameUtils.makeLabelNameForFieldOffset(className, f.getName(), f.getType()) + ": EQU " + offset);
+        list.add(
+            LabelAndFrameUtils.makeLabelNameForFieldOffset(className, f.getName(), f.getType()) +
+                ": EQU " + offset);
         offset += 2;
       }
 
       // reservation cells for static fields
       for (final Field f : currentClass.getFields()) {
         if (f.isStatic()) {
-          out.add(LabelAndFrameUtils.makeLabelNameForField(className, f.getName(), f.getType()) + ": DEFW 0");
+          list.add(LabelAndFrameUtils.makeLabelNameForField(className, f.getName(), f.getType()) +
+              ": DEFW 0");
         }
       }
     }
@@ -337,25 +346,26 @@ public class TranslatorImpl implements TranslatorContext {
       if (curClass.isAbstract() || curClass.isInterface()) {
         continue;
       }
-      result.add(LabelAndFrameUtils.makeLabelForClassSizeInfo(curClass.getClassName()) + ": EQU " + ClassUtils.calculateNeededAreaForClassInstance(workingClassPath, curClass));
+      result.add(makeLabelForClassSizeInfo(curClass.getClassName()) + ": EQU " +
+          ClassUtils.calculateNeededAreaForClassInstance(workingClassPath, curClass));
     }
 
     return result;
   }
 
-  private void processJNIClasses(final List<String> text) throws IOException {
-    getLogger().logInfo("----PROCESS JNI CLASSES----");
-    getLogger().logInfo("Detected " + classContext.getClassesWithJni().size() +
+  private void processJniClasses(final List<String> text) throws IOException {
+    this.getLogger().logInfo("----PROCESS JNI CLASSES----");
+    this.getLogger().logInfo("Detected " + classContext.getClassesWithJni().size() +
         " class(es) contain(s) JNI methods");
     final NativeClassProcessor processor = new NativeClassProcessor(this);
     for (final ClassID classInfo : classContext.getClassesWithJni()) {
-      getLogger().logInfo("Process " + classInfo);
+      this.getLogger().logInfo("Process " + classInfo);
       text.addAll(Arrays.asList(processor.findNativeSources(classContext.findClassInfoForID(classInfo))));
     }
   }
 
   private void processBinaryData(final List<String> text) {
-    getLogger().logInfo("----PROCESS BINARY DATA----");
+    this.getLogger().logInfo("----PROCESS BINARY DATA----");
 
     text.add("");
     text.add("; Included binary resources section");
@@ -375,7 +385,7 @@ public class TranslatorImpl implements TranslatorContext {
         }
 
         if (matchedPattern != null) {
-          getLogger().logWarning("Excluded " + path + " for " + matchedPattern + " pattern");
+          this.getLogger().logWarning("Excluded " + path + " for " + matchedPattern + " pattern");
           continue;
         }
       }
@@ -388,7 +398,7 @@ public class TranslatorImpl implements TranslatorContext {
 
       final String label = LabelAndFrameUtils.makeLabelForBinaryResource(path);
 
-      getLogger().logInfo("Added the binary resource " + path + " as " + label);
+      this.getLogger().logInfo("Added the binary resource " + path + " as " + label);
 
       final String[] asmtext = Utils.byteArrayToAsm(label + ": ; binary resource " + path, data, -1);
       text.addAll(Arrays.asList(asmtext));
@@ -398,7 +408,7 @@ public class TranslatorImpl implements TranslatorContext {
   }
 
   private void processAdditionals(final List<String> text) throws IOException {
-    getLogger().logInfo("----PROCESS ADDITIONS----");
+    this.getLogger().logInfo("----PROCESS ADDITIONS----");
     boolean needMemoryManager = false;
     for (final Class<? extends J2ZAdditionalBlock> addition : registeredAdditions) {
       if (addition == NeedsMemoryManager.class) {
@@ -407,7 +417,7 @@ public class TranslatorImpl implements TranslatorContext {
         continue;
       }
 
-      getLogger().logInfo("Detected addition usage " + addition.getSimpleName());
+      this.getLogger().logInfo("Detected addition usage " + addition.getSimpleName());
 
       final AdditionPath path = addition.getAnnotation(AdditionPath.class);
       if (path == null) {
@@ -419,7 +429,8 @@ public class TranslatorImpl implements TranslatorContext {
     }
 
     if (needMemoryManager) {
-      getLogger().logInfo("Detected addition usage " + NeedsMemoryManager.class.getSimpleName());
+      this.getLogger()
+          .logInfo("Detected addition usage " + NeedsMemoryManager.class.getSimpleName());
       final String assemblerText = Utils.readTextResource(AbstractJvmCommandProcessor.class, (NeedsMemoryManager.class.getAnnotation(AdditionPath.class)).value());
       text.addAll(Arrays.asList(Utils.breakToLines(preprocessAdditionAssemblerText(NeedsMemoryManager.class, assemblerText))));
     }
@@ -446,7 +457,7 @@ public class TranslatorImpl implements TranslatorContext {
   }
 
   private String[] translateMethod(final MethodID methodId) throws IOException {
-    final ClassMethodInfo method = methodContext.findMethodInfo(methodId);
+    final ClassMethodInfo method = this.methodContext.findMethodInfo(methodId);
 
     String[] asmForTheMethod = null;
     try {
@@ -488,7 +499,7 @@ public class TranslatorImpl implements TranslatorContext {
 
   @Override
   public Integer registerInterfaceMethodForINVOKEINTERFACE(final MethodID methodId) {
-    methodsUsedInInvokeInterface.add(methodId);
+    this.methodsUsedInInvokeInterface.add(methodId);
     return methodContext.findMethodUID(methodId);
   }
 
@@ -499,27 +510,27 @@ public class TranslatorImpl implements TranslatorContext {
 
   @Override
   public void registerCalledBootClassProcesser(AbstractBootClass bootClass) {
-    Assertions.assertNotNull("Boot class must not be null", bootClass);
-    usedBootstrapClasses.add(bootClass);
+    assertNotNull("Boot class must not be null", bootClass);
+    this.usedBootstrapClasses.add(bootClass);
   }
 
   @Override
   public TranslatorLogger getLogger() {
-    return messageLogger;
+    return this.messageLogger;
   }
 
   @Override
   public byte[] loadResourceForPath(final String path) {
-    return workingClassPath.findNonClassForPath(path);
+    return this.workingClassPath.findNonClassForPath(path);
   }
 
   @Override
   public ClassContext getClassContext() {
-    return classContext;
+    return this.classContext;
   }
 
   @Override
   public MethodContext getMethodContext() {
-    return methodContext;
+    return this.methodContext;
   }
 }

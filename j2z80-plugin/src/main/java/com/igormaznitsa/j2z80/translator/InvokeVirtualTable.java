@@ -55,17 +55,13 @@ public class InvokeVirtualTable {
   }
 
   private void processClass(final ClassID classId) {
-    final ClassGen classGen = translator.getClassContext().findClassForID(classId);
-
-    if (classGen.isInterface()) {
-      return;
-    }
+    final ClassGen classGen = this.translator.getClassContext().findClassForID(classId);
 
     final Map<String, ClassMethodInfo> visibleMethods =
-        collectAllVisibleVirtualMethodsToRoot(classGen, new HashMap<>());
+        this.collectAllVisibleVirtualMethodsToRoot(classGen, new HashMap<>());
 
     if (!visibleMethods.isEmpty()) {
-      makeRecordsForVirtualMethods(classGen, visibleMethods.values());
+      this.makeRecordsForVirtualMethods(classGen, visibleMethods.values());
     }
   }
 
