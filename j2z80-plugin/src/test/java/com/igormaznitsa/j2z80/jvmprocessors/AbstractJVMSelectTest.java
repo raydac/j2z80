@@ -16,6 +16,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.StringWriter;
 import org.apache.bcel.generic.BranchHandle;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.LDC;
@@ -24,8 +25,6 @@ import org.apache.bcel.generic.Select;
 import org.apache.bcel.generic.TABLESWITCH;
 import org.mockito.Mockito;
 import org.powermock.reflect.Whitebox;
-
-import java.io.StringWriter;
 
 public abstract class AbstractJVMSelectTest extends AbstractJvmCommandProcessorTest {
 
@@ -58,7 +57,8 @@ public abstract class AbstractJVMSelectTest extends AbstractJvmCommandProcessorT
 
     final BranchHandle mockInstructionHandle = Whitebox.invokeMethod(BranchHandle.class, "getBranchHandle", instance);
 
-    processor.process(CLASS_PROCESSOR_MOCK, instance, mockInstructionHandle, out);
+    processor.process(CLASS_PROCESSOR_MOCK, instance, mockInstructionHandle,
+        this.getClass().getClassLoader(), out);
 
     for (int i = 0; i < targets.length; i++) {
       final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, targets[i].getPosition());

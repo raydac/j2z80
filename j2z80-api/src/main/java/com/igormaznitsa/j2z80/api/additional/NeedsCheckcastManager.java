@@ -21,10 +21,10 @@ package com.igormaznitsa.j2z80.api.additional;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-@AdditionPath("CHECKCAST_MANAGER.a80")
+@J2Z80AdditionPath("CHECKCAST_MANAGER.a80")
 public interface NeedsCheckcastManager extends J2ZAdditionalBlock {
   /**
    * The label of the subroutine processing checkcast commands
    */
-  public static final String SUB_CHECKCAST = "___CHECKCAST";
+  String SUB_CHECKCAST = "___CHECKCAST";
 }

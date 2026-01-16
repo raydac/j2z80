@@ -17,14 +17,13 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.GETSTATIC;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process GETSTATIC with code 178
 public class Processor_GETSTATIC extends AbstractFieldProcessor {
@@ -42,10 +41,12 @@ public class Processor_GETSTATIC extends AbstractFieldProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      final ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final GETSTATIC ins = (GETSTATIC) instruction;
 
-    if (!processBootClassCall(methodTranslator, ins, out)) {
+    if (!processBootstrapClassCall(methodTranslator, ins, bootstrapClassLoader, out)) {
       final ConstantPoolGen cpool = methodTranslator.getConstantPool();
       final ObjectType obj = (ObjectType) ins.getReferenceType(cpool);
       final String address = LabelAndFrameUtils.makeLabelNameForField(obj.getClassName(), ins.getFieldName(cpool), ins.getFieldType(cpool));

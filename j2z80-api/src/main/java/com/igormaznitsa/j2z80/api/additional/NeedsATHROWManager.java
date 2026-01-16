@@ -20,10 +20,10 @@ package com.igormaznitsa.j2z80.api.additional;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-@AdditionPath("ATHROW_MANAGER.a80")
+@J2Z80AdditionPath("ATHROW_MANAGER.a80")
 public interface NeedsATHROWManager extends J2ZAdditionalBlock {
   /**
    * The label name of the memory cells (two cells) where the exception processing procedure address should be placed
    */
-  public static final String ATHROW_PROCESSING_ADDRESS = "___ATHROW_PROCESSING_CODE_ADDRESS";
+  String ATHROW_PROCESSING_ADDRESS = "___ATHROW_PROCESSING_CODE_ADDRESS";
 }

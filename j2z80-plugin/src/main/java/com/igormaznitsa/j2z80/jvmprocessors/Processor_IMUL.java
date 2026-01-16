@@ -18,12 +18,11 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
 import com.igormaznitsa.j2z80.api.additional.NeedsINTArithmeticManager;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.IMUL;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process IMUL with code 104
 public class Processor_IMUL extends AbstractJvmCommandProcessor implements NeedsINTArithmeticManager, NeedsATHROWManager {
@@ -40,7 +39,9 @@ public class Processor_IMUL extends AbstractJvmCommandProcessor implements Needs
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final IMUL imul = (IMUL) instruction;
     out.write(template);
     out.write(NEXT_LINE);

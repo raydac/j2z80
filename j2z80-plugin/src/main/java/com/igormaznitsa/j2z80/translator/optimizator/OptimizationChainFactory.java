@@ -27,7 +27,7 @@ public class OptimizationChainFactory {
     switch (level) {
       case NONE:
         return new AsmOptimizerChain(context);
-      case BASE:
+      case BASIC:
         return new AsmOptimizerChain(context, new ReplacePatterns());
       default:
         throw new IllegalArgumentException("Unsupported optimization level " + level);

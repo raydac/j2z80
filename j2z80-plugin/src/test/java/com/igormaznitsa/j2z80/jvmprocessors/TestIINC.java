@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.IINC;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.IINC;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestIINC extends AbstractJvmCommandProcessorTest {
 
@@ -39,7 +38,9 @@ public class TestIINC extends AbstractJvmCommandProcessorTest {
     pokew(IX_ADDRESS - (INDEX << 1), VALUE);
 
     IX = IX_ADDRESS;
-    processor.process(CLASS_PROCESSOR_MOCK, new IINC(INDEX, INC_VALUE), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new IINC(INDEX, INC_VALUE),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VALUE + INC_VALUE, (short) peekw(IX_ADDRESS - (INDEX << 1)));

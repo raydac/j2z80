@@ -55,7 +55,7 @@
             <value>/**/*.properties</value>
             <value>/**/manifest.mf</value>
           </excludeResources>
-          <optimization>base</optimization>
+          <optimization>BASIC</optimization>
           <startAddress>29000</startAddress>
           <stackTop>60000</stackTop>
           <logAsmText>true</logAsmText>

@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.ACONST_NULL;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.ACONST_NULL;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestACONST_NULL extends AbstractJvmCommandProcessorTest {
 
@@ -32,7 +31,9 @@ public class TestACONST_NULL extends AbstractJvmCommandProcessorTest {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(ACONST_NULL.class);
     final StringWriter writer = new StringWriter();
 
-    processor.process(CLASS_PROCESSOR_MOCK, new ACONST_NULL(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new ACONST_NULL(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
     assertEquals(0, pop());
     assertEquals(INIT_SP, SP);

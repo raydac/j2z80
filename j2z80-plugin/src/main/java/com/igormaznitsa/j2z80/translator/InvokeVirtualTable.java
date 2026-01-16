@@ -15,6 +15,9 @@
  */
 package com.igormaznitsa.j2z80.translator;
 
+import static com.igormaznitsa.j2z80.translator.utils.ClassUtils.findBoostrapAwareMethods;
+import static com.igormaznitsa.j2z80.translator.utils.ClassUtils.isJ2Z80ObjectClass;
+
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.ids.ClassID;
@@ -44,13 +47,12 @@ public class InvokeVirtualTable {
 
   public InvokeVirtualTable(final TranslatorContext translator) {
     this.translator = translator;
-
-    processClassesWithVirtualMethods();
+    this.processClassesWithVirtualMethods();
   }
 
   private void processClassesWithVirtualMethods() {
-    for (final ClassID cg : translator.getClassContext().getAllClasses()) {
-      processClass(cg);
+    for (final ClassID cg : this.translator.getClassContext().getAllClasses()) {
+      this.processClass(cg);
     }
   }
 
@@ -100,7 +102,7 @@ public class InvokeVirtualTable {
 
   private Map<String, ClassMethodInfo> collectAllVisibleVirtualMethodsToRoot(
       final ClassGen classGen, final Map<String, ClassMethodInfo> map) {
-    for (final Method m : classGen.getMethods()) {
+    for (final Method m : findBoostrapAwareMethods(classGen)) {
       if (m.isStatic() || m.getName().equals("<init>") || m.isAbstract()) {
         continue;
       }
@@ -117,7 +119,7 @@ public class InvokeVirtualTable {
       }
     }
 
-    if ("java.lang.Object".equals(classGen.getSuperclassName())) {
+    if (isJ2Z80ObjectClass(classGen.getSuperclassName())) {
       return map;
     }
 

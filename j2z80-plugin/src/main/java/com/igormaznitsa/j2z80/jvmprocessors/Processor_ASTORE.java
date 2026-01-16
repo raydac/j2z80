@@ -16,12 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.ASTORE;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process ASTORE with code 75,76,77,78
 public class Processor_ASTORE extends AbstractJvmCommandProcessor {
@@ -38,7 +37,9 @@ public class Processor_ASTORE extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator classProcessor, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator classProcessor, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final ASTORE astore = (ASTORE) instruction;
     out.write(template.replace(MACROS_INDEX, Integer.toString(prepareLocalVariableIndex(astore.getIndex()))));
     out.write(NEXT_LINE);

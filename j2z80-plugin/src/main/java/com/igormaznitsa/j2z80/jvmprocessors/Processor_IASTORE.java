@@ -16,12 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.IASTORE;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process IASTORE with code 79
 public class Processor_IASTORE extends AbstractJvmCommandProcessor {
@@ -38,7 +37,9 @@ public class Processor_IASTORE extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final IASTORE iastore = (IASTORE) instruction;
     out.write(template);
     out.write(NEXT_LINE);

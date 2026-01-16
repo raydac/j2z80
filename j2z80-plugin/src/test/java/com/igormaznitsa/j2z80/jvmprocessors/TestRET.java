@@ -15,14 +15,13 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.InstructionHandle;
-import org.apache.bcel.generic.RET;
-import org.junit.Test;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.InstructionHandle;
+import org.apache.bcel.generic.RET;
+import org.junit.Test;
 
 public class TestRET extends AbstractJvmCommandProcessorTest {
 
@@ -34,7 +33,8 @@ public class TestRET extends AbstractJvmCommandProcessorTest {
     final int IX_ADDRESS = 0x8000;
     final int INDEX = 23;
 
-    processor.process(CLASS_PROCESSOR_MOCK, new RET(INDEX), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new RET(INDEX), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
 
     IX = IX_ADDRESS;
 

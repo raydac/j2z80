@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.IRETURN;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.IRETURN;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestIRETURN extends AbstractJvmCommandProcessorTest {
 
@@ -31,7 +30,8 @@ public class TestIRETURN extends AbstractJvmCommandProcessorTest {
   public void testExecution() throws IOException {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(IRETURN.class);
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new IRETURN(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new IRETURN(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
 
     assertLinearExecutionToEnd("ld hl," + END_LABEL + "\n push hl\n ld hl,#1234\n push hl\n" + writer.toString());
 

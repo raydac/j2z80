@@ -17,12 +17,11 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.TABLESWITCH;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process TABLESWITCH with code 170
 public class Processor_TABLESWITCH extends AbstractJvmCommandProcessor {
@@ -44,7 +43,9 @@ public class Processor_TABLESWITCH extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final TABLESWITCH tableswitch = (TABLESWITCH) handle.getInstruction();
 
     final int[] matchs = tableswitch.getMatchs();

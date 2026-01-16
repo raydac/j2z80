@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.ISHR;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.ISHR;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestISHR extends AbstractJvmCommandProcessorTest {
 
@@ -38,7 +37,8 @@ public class TestISHR extends AbstractJvmCommandProcessorTest {
     push(VAL);
     push(SHIFT);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new ISHR(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new ISHR(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VAL >> SHIFT, pop());
@@ -56,7 +56,8 @@ public class TestISHR extends AbstractJvmCommandProcessorTest {
     push(VAL);
     push(SHIFT);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new ISHR(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new ISHR(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VAL >> SHIFT, (short) pop());
@@ -74,7 +75,8 @@ public class TestISHR extends AbstractJvmCommandProcessorTest {
     push(VAL);
     push(SHIFT);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new ISHR(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new ISHR(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VAL >> SHIFT, (short) pop());

@@ -38,7 +38,7 @@ import org.apache.bcel.generic.ClassGen;
  */
 public class ZClassPath {
 
-  private final Map<String, ClassGen> classStorage = new HashMap<>();
+  private final Map<String, ClassGen> classMap = new HashMap<>();
   private final Map<String, byte[]> jniCodeStorage = new HashMap<>();
   private final Map<String, byte[]> binaryDataStorage = new HashMap<>();
   private final TranslatorContext context;
@@ -60,7 +60,7 @@ public class ZClassPath {
 
   public ClassGen findMainClass(final String mainClassName, final String mainMethod, final String mainMethodSignature) {
     if (mainClassName != null) {
-      this.mainClass = classStorage.get(mainClassName);
+      this.mainClass = classMap.get(mainClassName);
       if (this.mainClass != null) {
         this.mainMethod = findMainMethodInClass(mainClass, mainMethod, mainMethodSignature);
       }
@@ -84,7 +84,7 @@ public class ZClassPath {
   }
 
   private boolean isClassPresented(final ClassGen classData) {
-    for (final ClassGen cgen : classStorage.values()) {
+    for (final ClassGen cgen : classMap.values()) {
       if (cgen == classData) {
         return true;
       }
@@ -112,19 +112,19 @@ public class ZClassPath {
   }
 
   private void processArchive(final ZParsedJar archive) {
-    processClasses(archive);
-    processJniCode(archive);
-    processBinaryResource(archive);
+    this.processClasses(archive);
+    this.processJniCode(archive);
+    this.processBinaryResource(archive);
   }
 
   private void processClasses(final ZParsedJar archive) {
     for (final ClassGen classData : archive.getAllJavaClasses()) {
       final String className = classData.getClassName();
 
-      if (classStorage.containsKey(className)) {
-        context.getLogger().logWarning("Detected overridden class " + className);
+      if (this.classMap.containsKey(className)) {
+        this.context.getLogger().logWarning("Detected overridden class " + className);
       }
-      classStorage.put(className, classData);
+      this.classMap.put(className, classData);
     }
   }
 
@@ -161,11 +161,11 @@ public class ZClassPath {
   }
 
   public Map<String, ClassGen> getAllClasses() {
-    return unmodifiableMap(this.classStorage);
+    return unmodifiableMap(this.classMap);
   }
 
   public ClassGen findClassForName(final String name) {
-    return this.classStorage.get(name);
+    return this.classMap.get(name);
   }
 
   public Map<String, byte[]> getAllBinaryResources() {

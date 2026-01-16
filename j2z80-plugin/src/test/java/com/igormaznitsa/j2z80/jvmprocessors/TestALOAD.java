@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.ALOAD;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.ALOAD;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestALOAD extends AbstractJvmCommandProcessorTest {
 
@@ -39,7 +38,9 @@ public class TestALOAD extends AbstractJvmCommandProcessorTest {
     pokew(IX_BASE - (VAR_INDEX << 1), VALUE);
     IX = IX_BASE;
 
-    processor.process(CLASS_PROCESSOR_MOCK, new ALOAD(VAR_INDEX), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new ALOAD(VAR_INDEX), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VALUE, pop());
@@ -58,7 +59,9 @@ public class TestALOAD extends AbstractJvmCommandProcessorTest {
     pokew(IX_BASE - (VAR_INDEX << 1), VALUE);
     IX = IX_BASE;
 
-    processor.process(CLASS_PROCESSOR_MOCK, new ALOAD(VAR_INDEX), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new ALOAD(VAR_INDEX), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VALUE, pop());

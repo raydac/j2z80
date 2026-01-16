@@ -17,13 +17,12 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.BranchHandle;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.JSR_W;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process JSR_W with code 201
 public class Processor_JSR_W extends AbstractJvmCommandProcessor {
@@ -40,7 +39,9 @@ public class Processor_JSR_W extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final JSR_W jsrw = (JSR_W) instruction;
     final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), ((BranchHandle) handle).getTarget().getPosition());
     out.write(template.replace(MACROS_ADDRESS, label));

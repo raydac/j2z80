@@ -19,7 +19,7 @@ package com.igormaznitsa.j2z80.bootstrap;
  * An Exception to be thrown for problems during boot class processing problems
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
- * @see AbstractBootClass
+ * @see AbstractBootstrapClass
  */
 public class BootClassException extends RuntimeException {
   private static final long serialVersionUID = 982394812L;

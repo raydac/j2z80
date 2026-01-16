@@ -17,12 +17,11 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.ATHROW;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process ATHROW with code 191
 public class Processor_ATHROW extends AbstractJvmCommandProcessor implements NeedsATHROWManager {
@@ -39,7 +38,9 @@ public class Processor_ATHROW extends AbstractJvmCommandProcessor implements Nee
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     methodTranslator.getTranslatorContext().getLogger().logWarning("ATHROW in usage, don't forget define its processing");
     final ATHROW athrow = (ATHROW) instruction;
     out.write(template);

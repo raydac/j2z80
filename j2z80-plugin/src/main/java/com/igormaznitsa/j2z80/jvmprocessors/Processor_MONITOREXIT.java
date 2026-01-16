@@ -16,12 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MONITOREXIT;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process MONITOREXIT with code 195
 public class Processor_MONITOREXIT extends AbstractJvmCommandProcessor {
@@ -38,7 +37,9 @@ public class Processor_MONITOREXIT extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     methodTranslator.getTranslatorContext().getLogger().logWarning("A MONITOREXIT instruction has been met");
     final MONITOREXIT monitorexit = (MONITOREXIT) instruction;
     out.write(template);

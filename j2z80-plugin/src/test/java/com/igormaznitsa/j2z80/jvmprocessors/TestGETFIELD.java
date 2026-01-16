@@ -15,8 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.z80asm.Z80Asm;
+import java.io.IOException;
+import java.io.StringWriter;
 import org.apache.bcel.Const;
 import org.apache.bcel.classfile.ConstantClass;
 import org.apache.bcel.classfile.ConstantFieldref;
@@ -26,13 +32,6 @@ import org.apache.bcel.generic.GETFIELD;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.Type;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class TestGETFIELD extends AbstractJvmCommandProcessorTest {
 
@@ -77,7 +76,9 @@ public class TestGETFIELD extends AbstractJvmCommandProcessorTest {
 
     final GETFIELD testInstruction = new GETFIELD(CP_INDEX_FIELDREF);
 
-    processor.process(CLASS_PROCESSOR_MOCK, testInstruction, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, testInstruction, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
 
     pokew(OBJECT_ADDRESS + FIELD_OFFSET, VALUE);
 

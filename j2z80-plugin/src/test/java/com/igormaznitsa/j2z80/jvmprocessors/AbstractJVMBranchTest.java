@@ -15,17 +15,16 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.StringWriter;
 import org.apache.bcel.generic.BranchHandle;
 import org.apache.bcel.generic.BranchInstruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.powermock.reflect.Whitebox;
-
-import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public abstract class AbstractJVMBranchTest extends AbstractJvmCommandProcessorTest {
 
@@ -39,7 +38,8 @@ public abstract class AbstractJVMBranchTest extends AbstractJvmCommandProcessorT
     final BranchHandle branchHandle = Whitebox.invokeMethod(BranchHandle.class, "getBranchHandle", instructionInstance);
     final String jumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(CLASS_GEN_MOCK, mockupOfInvokedMethod, branchHandle.getTarget().getPosition());
 
-    processor.process(CLASS_PROCESSOR_MOCK, instructionInstance, branchHandle, writer);
+    processor.process(CLASS_PROCESSOR_MOCK, instructionInstance, branchHandle,
+        this.getClass().getClassLoader(), writer);
     return jumpLabel;
   }
 

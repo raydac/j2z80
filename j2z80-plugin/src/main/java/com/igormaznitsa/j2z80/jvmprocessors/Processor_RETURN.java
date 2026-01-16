@@ -16,12 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.RETURN;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process RETURN with code 177
 public class Processor_RETURN extends AbstractJvmCommandProcessor {
@@ -38,7 +37,9 @@ public class Processor_RETURN extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final RETURN ret = (RETURN) instruction;
     out.write(template);
     out.write(NEXT_LINE);

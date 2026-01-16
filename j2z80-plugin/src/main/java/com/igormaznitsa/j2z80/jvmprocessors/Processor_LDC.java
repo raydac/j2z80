@@ -42,7 +42,9 @@ public class Processor_LDC extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final LDC ldc = (LDC) instruction;
     final int index = ldc.getIndex();
     final Constant cpConstant = methodTranslator.getConstantPool().getConstant(index);

@@ -15,7 +15,7 @@
  */
 package com.igormaznitsa.j2z80;
 
-import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
+import com.igormaznitsa.j2z80.bootstrap.AbstractBootstrapClass;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import java.io.IOException;
@@ -46,11 +46,13 @@ public interface TranslatorContext {
    * @param startAddress          the start address for translation
    * @param stackTopAddress       the stack top address to be used by the compiled code
    * @param excludeBinResPatterns patterns to be used to exclude met resources in JAR files
+   * @param bootstrapClassLoader bootstrap class loader, must not be null
    * @return assembler text of translated Java classes
    * @throws IOException it will be thrown if there is any transport problem
    */
   List<String> translate(String mainClassName, int startAddress, int stackTopAddress,
-                         String[] excludeBinResPatterns) throws IOException;
+                         String[] excludeBinResPatterns, ClassLoader bootstrapClassLoader)
+      throws IOException;
 
   /**
    * Get the current class context
@@ -109,7 +111,7 @@ public interface TranslatorContext {
    *
    * @param classProcessor a boot class processor, must not be null
    */
-  void registerCalledBootClassProcesser(AbstractBootClass classProcessor);
+  void registerCalledBootClassProcesser(AbstractBootstrapClass classProcessor);
 
   /**
    * Load a resource from the inside virtual translation space

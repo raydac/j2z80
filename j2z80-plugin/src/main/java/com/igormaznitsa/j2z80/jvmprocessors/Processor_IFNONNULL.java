@@ -17,13 +17,12 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.BranchHandle;
 import org.apache.bcel.generic.IFNONNULL;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process IFNONNULL with code 199
 public class Processor_IFNONNULL extends AbstractJvmCommandProcessor {
@@ -40,7 +39,9 @@ public class Processor_IFNONNULL extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final IFNONNULL ifnonnul = (IFNONNULL) instruction;
     final BranchHandle branchHandler = (BranchHandle) handle;
     final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), branchHandler.getTarget().getPosition());

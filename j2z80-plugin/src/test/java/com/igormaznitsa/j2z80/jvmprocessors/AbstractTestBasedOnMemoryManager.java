@@ -66,7 +66,8 @@ public abstract class AbstractTestBasedOnMemoryManager extends AbstractJvmComman
     for (final Instruction instruction : instructions) {
       final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(instruction.getClass());
       final InstructionHandle mockInstructionHandle = Whitebox.invokeMethod(InstructionHandle.class, "getInstructionHandle", instruction);
-      processor.process(CLASS_PROCESSOR_MOCK, instruction, mockInstructionHandle, out);
+      processor.process(CLASS_PROCESSOR_MOCK, instruction, mockInstructionHandle,
+          this.getClass().getClassLoader(), out);
     }
     return out.toString();
   }

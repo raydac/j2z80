@@ -16,12 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.AASTORE;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process AASTORE with code 83
 public class Processor_AASTORE extends AbstractJvmCommandProcessor {
@@ -38,7 +37,9 @@ public class Processor_AASTORE extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator classProcessor, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator classProcessor, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final AASTORE aastore = (AASTORE) instruction;
     out.write(template);
     out.write(NEXT_LINE);

@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.BIPUSH;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.BIPUSH;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestBIPUSH extends AbstractJvmCommandProcessorTest {
 
@@ -33,7 +32,9 @@ public class TestBIPUSH extends AbstractJvmCommandProcessorTest {
     final StringWriter writer = new StringWriter();
     final int VALUE = 123;
 
-    processor.process(CLASS_PROCESSOR_MOCK, new BIPUSH((byte) VALUE), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new BIPUSH((byte) VALUE), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VALUE, pop());
@@ -46,7 +47,9 @@ public class TestBIPUSH extends AbstractJvmCommandProcessorTest {
     final StringWriter writer = new StringWriter();
     final int VALUE = -123;
 
-    processor.process(CLASS_PROCESSOR_MOCK, new BIPUSH((byte) VALUE), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new BIPUSH((byte) VALUE), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VALUE, (short) pop());

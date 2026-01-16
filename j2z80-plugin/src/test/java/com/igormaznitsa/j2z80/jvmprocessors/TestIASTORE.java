@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.IASTORE;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.IASTORE;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestIASTORE extends AbstractJvmCommandProcessorTest {
 
@@ -39,7 +38,8 @@ public class TestIASTORE extends AbstractJvmCommandProcessorTest {
     push(CELL_ADDRESS);
     push(CELL_VALUE);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new IASTORE(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new IASTORE(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(CELL_VALUE, peekw(ARRAY_ADDRESS + (CELL_ADDRESS << 1)));

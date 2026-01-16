@@ -17,12 +17,11 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsBREAKPOINTManager;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.BREAKPOINT;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process BREAKPOINT with code 202
 public class Processor_BREAKPOINT extends AbstractJvmCommandProcessor implements NeedsBREAKPOINTManager {
@@ -39,7 +38,9 @@ public class Processor_BREAKPOINT extends AbstractJvmCommandProcessor implements
   }
 
   @Override
-  public void process(final MethodTranslator classProcessor, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator classProcessor, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     classProcessor.getTranslatorContext().getLogger().logWarning("a BREAKPOINT has been met");
     final BREAKPOINT breakpoint = (BREAKPOINT) instruction;
     out.write(template);

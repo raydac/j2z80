@@ -16,12 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.RET;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process RET with code 169
 public class Processor_RET extends AbstractJvmCommandProcessor {
@@ -38,7 +37,9 @@ public class Processor_RET extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final RET ret = (RET) instruction;
     out.write(template.replace(MACROS_INDEX, Integer.toString(ret.getIndex() << 1)));
     out.write(NEXT_LINE);

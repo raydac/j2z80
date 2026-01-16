@@ -15,21 +15,22 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEVIRTUALManager;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
+import java.io.IOException;
+import java.io.StringWriter;
 import javassist.bytecode.AccessFlag;
 import org.apache.bcel.generic.INVOKEVIRTUAL;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.Type;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
 
 public class TestINVOKEVIRTUAL extends AbstractInvokeTest implements NeedsINVOKEVIRTUALManager {
 
@@ -82,7 +83,9 @@ public class TestINVOKEVIRTUAL extends AbstractInvokeTest implements NeedsINVOKE
     prepareVirtualTable();
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(null, writer);
 
     IX(INITIAL_IX);
@@ -109,7 +112,9 @@ public class TestINVOKEVIRTUAL extends AbstractInvokeTest implements NeedsINVOKE
     prepareVirtualTable();
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint("NOLABEL", writer);
 
     push(FAKE_OBJECT_ADDRESS);
@@ -127,7 +132,9 @@ public class TestINVOKEVIRTUAL extends AbstractInvokeTest implements NeedsINVOKE
     prepareVirtualTable();
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_333_LABEL, writer);
 
     registerBreakPoint(TEST_333_LABEL);
@@ -150,7 +157,9 @@ public class TestINVOKEVIRTUAL extends AbstractInvokeTest implements NeedsINVOKE
     prepareVirtualTable();
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_333_LABEL, writer);
 
     registerBreakPoint(TEST_333_LABEL);
@@ -173,7 +182,9 @@ public class TestINVOKEVIRTUAL extends AbstractInvokeTest implements NeedsINVOKE
     prepareVirtualTable();
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_EXPRESSION_4_LABEL, writer);
 
     final int arg1 = 0xCAFE;
@@ -204,7 +215,9 @@ public class TestINVOKEVIRTUAL extends AbstractInvokeTest implements NeedsINVOKE
     prepareVirtualTable();
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_EXPRESSION_4_LABEL, writer);
 
     final int arg1 = 0xCAFE;

@@ -15,14 +15,13 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.InstructionHandle;
-import org.apache.bcel.generic.MONITORENTER;
-import org.junit.Test;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.InstructionHandle;
+import org.apache.bcel.generic.MONITORENTER;
+import org.junit.Test;
 
 public class TestMONITORENTER extends AbstractJvmCommandProcessorTest {
 
@@ -34,7 +33,9 @@ public class TestMONITORENTER extends AbstractJvmCommandProcessorTest {
 
     push(VALUE);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new MONITORENTER(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new MONITORENTER(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
     assertStackEmpty();
   }

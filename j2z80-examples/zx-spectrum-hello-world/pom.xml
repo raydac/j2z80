@@ -19,9 +19,9 @@
     <dependencies>
         <dependency>
             <groupId>com.igormaznitsa</groupId>
-            <artifactId>j2z80-api</artifactId>
-            <version>${j2z80.test.version}</version>
-            <scope>compile</scope>
+            <artifactId>zx-spectrum-demo-lib</artifactId>
+            <version>${project.version}</version>
+            <classifier>z80</classifier>
         </dependency>
     </dependencies>
 
@@ -52,20 +52,13 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <optimization>base</optimization>
+                    <optimization>BASIC</optimization>
                     <excludeResources>
                         <value>/**/*.xml</value>
                         <value>/**/*.properties</value>
                         <value>/**/*.mf</value>
                     </excludeResources>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.igormaznitsa</groupId>
-                        <artifactId>zx-spectrum-demo-lib</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

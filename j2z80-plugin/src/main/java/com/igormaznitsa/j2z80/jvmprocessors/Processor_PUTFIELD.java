@@ -17,14 +17,13 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUTFIELD;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process PUTFIELD with code 181
 public class Processor_PUTFIELD extends AbstractFieldProcessor {
@@ -42,10 +41,12 @@ public class Processor_PUTFIELD extends AbstractFieldProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      final ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final PUTFIELD putfield = (PUTFIELD) instruction;
 
-    if (!processBootClassCall(methodTranslator, putfield, out)) {
+    if (!processBootstrapClassCall(methodTranslator, putfield, bootstrapClassLoader, out)) {
       final ConstantPoolGen const_pool = methodTranslator.getConstantPool();
       final ObjectType objType = (ObjectType) putfield.getReferenceType(const_pool);
 

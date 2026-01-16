@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.ICONST;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.ICONST;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestICONST extends AbstractJvmCommandProcessorTest {
 
@@ -34,7 +33,9 @@ public class TestICONST extends AbstractJvmCommandProcessorTest {
 
     final int VALUE = 5;
 
-    processor.process(CLASS_PROCESSOR_MOCK, new ICONST(VALUE), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new ICONST(VALUE), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VALUE, pop());
@@ -48,7 +49,9 @@ public class TestICONST extends AbstractJvmCommandProcessorTest {
 
     final int VALUE = -1;
 
-    processor.process(CLASS_PROCESSOR_MOCK, new ICONST(VALUE), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new ICONST(VALUE), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VALUE, (short) pop());

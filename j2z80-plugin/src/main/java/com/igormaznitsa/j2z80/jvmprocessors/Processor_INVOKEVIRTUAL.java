@@ -18,15 +18,14 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEVIRTUALManager;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Locale;
 import org.apache.bcel.generic.INVOKEVIRTUAL;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.Type;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Locale;
 
 // class to process INVOKEVIRTUAL with code 182
 public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements NeedsINVOKEVIRTUALManager {
@@ -35,7 +34,7 @@ public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements 
 
   public Processor_INVOKEVIRTUAL() {
     super();
-    template = loadResourceFileAsString("INVOKEVIRTUAL.a80");
+    this.template = loadResourceFileAsString("INVOKEVIRTUAL.a80");
   }
 
   @Override
@@ -44,20 +43,20 @@ public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements 
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final INVOKEVIRTUAL inv = (INVOKEVIRTUAL) instruction;
 
-    final MethodGen invokedMethod = getInvokedMethod(methodTranslator, inv);
+    final MethodGen invokedMethod = this.getInvokedMethod(methodTranslator, inv);
 
-    if (!checkBootstrapCall(methodTranslator, inv, out)) {
+    if (!this.isBootstrapCall(methodTranslator, inv, bootstrapClassLoader, out)) {
       assertMethodIsNotNull(invokedMethod, methodTranslator, inv);
-
       assertMethodIsNotNull(invokedMethod, methodTranslator, inv);
 
       final String recordLabel = LabelAndFrameUtils.makeLabelForVirtualMethodRecord(invokedMethod.getClassName(), invokedMethod.getName(), invokedMethod.getReturnType(), invokedMethod.getArgumentTypes());
 
       final int argumentsBlockSize = calculateArgumentBlockSize(invokedMethod);
-
       final int offsetOnStackToTheObjectRef = calculateObjectOffsetOnStack(argumentsBlockSize);
 
       String postfix = "";
@@ -73,7 +72,6 @@ public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements 
 
       out.write(res);
       out.write(NEXT_LINE);
-
     }
   }
 }

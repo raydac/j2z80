@@ -15,16 +15,17 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.api.additional.AdditionPath;
+import static org.junit.Assert.assertNotNull;
+
+import com.igormaznitsa.j2z80.api.additional.J2Z80AdditionPath;
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-
-public class AdditionPathTest {
+public class J2Z80AdditionPathTest {
 
   @Test
   public void testAccessible() {
-    assertNotNull("Must not be null", NeedsMemoryManager.class.getAnnotation(AdditionPath.class));
+    assertNotNull("Must not be null",
+        NeedsMemoryManager.class.getAnnotation(J2Z80AdditionPath.class));
   }
 }

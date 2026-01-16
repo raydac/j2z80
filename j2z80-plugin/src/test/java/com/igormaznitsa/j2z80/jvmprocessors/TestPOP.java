@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.InstructionHandle;
-import org.apache.bcel.generic.POP;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.InstructionHandle;
+import org.apache.bcel.generic.POP;
+import org.junit.Test;
 
 public class TestPOP extends AbstractJvmCommandProcessorTest {
 
@@ -34,7 +33,8 @@ public class TestPOP extends AbstractJvmCommandProcessorTest {
 
     push(0);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new POP(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new POP(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(INIT_SP, SP);

@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.IOR;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.IOR;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestIOR extends AbstractJvmCommandProcessorTest {
 
@@ -38,7 +37,8 @@ public class TestIOR extends AbstractJvmCommandProcessorTest {
     push(VAL1);
     push(VAL2);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new IOR(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new IOR(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VAL1 | VAL2, pop());

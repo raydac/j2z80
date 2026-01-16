@@ -121,7 +121,9 @@ public class TestCHECKCAST extends AbstractTestBasedOnMemoryManager implements N
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(CHECKCAST.class);
     final StringWriter writer = new StringWriter();
 
-    processor.process(CLASS_PROCESSOR_MOCK, new CHECKCAST(CLASS_INDEX), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new CHECKCAST(CLASS_INDEX),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString(), (CLASS_FIELD_NUMBER << 1) + 4);
     final int stacktop = pop();
     assertStackEmpty();
@@ -135,7 +137,9 @@ public class TestCHECKCAST extends AbstractTestBasedOnMemoryManager implements N
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(CHECKCAST.class);
     final StringWriter writer = new StringWriter();
 
-    processor.process(CLASS_PROCESSOR_MOCK, new CHECKCAST(CLASS_INDEX), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new CHECKCAST(CLASS_INDEX),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     final Z80Asm asm = assertLinearExecutionToEnd(writer.toString(), (CLASS_FIELD_NUMBER << 1) + 4);
     final int returnAddress = pop();
     final int objref = pop();

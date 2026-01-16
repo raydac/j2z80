@@ -1,10 +1,9 @@
-package com.igormaznitsa.j2z80.bootstrap.java.lang;
+package j2z80.bootstrap.java.lang;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import org.apache.bcel.generic.Type;
 
-public class System extends AbstractBootClass {
+public class System extends Object {
 
   private static final String[] OUT_STREAM = new String[] {"LD BC,#2", "PUSH BC"};
   private static final String[] ERR_STREAM = new String[] {"LD BC,#1", "PUSH BC"};

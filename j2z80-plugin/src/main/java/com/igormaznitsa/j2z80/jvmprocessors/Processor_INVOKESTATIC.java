@@ -17,8 +17,11 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.INVOKESTATIC;
@@ -26,9 +29,6 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.Type;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process INVOKESTATIC with code 184
 public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements NeedsMemoryManager {
@@ -48,7 +48,7 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
   public String[] generateCallForStaticInitalizer(final ClassGen classGen) {
     MethodGen initingMethod = null;
 
-    for (final Method method : classGen.getMethods()) {
+    for (final Method method : ClassUtils.findBoostrapAwareMethods(classGen)) {
       if (method.isStatic() && "<clinit>".equals(method.getName()) && method.getArgumentTypes().length == 0 && method.getReturnType().getType() == Type.VOID.getType()) {
         initingMethod = new MethodGen(method, classGen.getClassName(), classGen.getConstantPool());
         break;
@@ -82,12 +82,14 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      final ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final INVOKESTATIC inv = (INVOKESTATIC) instruction;
 
     final MethodGen invokedMethod = getInvokedMethod(methodTranslator, inv);
 
-    if (!checkBootstrapCall(methodTranslator, inv, out)) {
+    if (!isBootstrapCall(methodTranslator, inv, bootstrapClassLoader, out)) {
       assertMethodIsNotNull(invokedMethod, methodTranslator, inv);
 
       final int argumentMemorySize = calculateArgumentBlockSize(invokedMethod);

@@ -15,16 +15,15 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
+import java.io.StringWriter;
 import javassist.bytecode.AccessFlag;
 import org.apache.bcel.generic.INVOKESPECIAL;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.Type;
 import org.junit.Test;
-
-import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class TestINVOKESPECIAL extends AbstractInvokeTest {
 
@@ -44,7 +43,9 @@ public class TestINVOKESPECIAL extends AbstractInvokeTest {
     mockupOfInvokedMethod = registerMockMethod(CONSTANT_MOCK_METHOD, TEST_INVOKED_CLASS, TEST_INVOKED_METHOD, AccessFlag.PUBLIC, 0, ARGS_NULL, RESULT_TYPE);
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(null, writer);
 
     IX(INITIAL_IX);
@@ -70,7 +71,9 @@ public class TestINVOKESPECIAL extends AbstractInvokeTest {
     mockupOfInvokedMethod = registerMockMethod(CONSTANT_MOCK_METHOD, TEST_INVOKED_CLASS, TEST_INVOKED_METHOD, AccessFlag.PUBLIC, TEST_LOCALS_NUMBER, ARGS_NULL, RESULT_TYPE);
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint("NOLABEL", writer);
 
     push(FAKE_OBJECT_ADDRESS);
@@ -87,7 +90,9 @@ public class TestINVOKESPECIAL extends AbstractInvokeTest {
     mockupOfInvokedMethod = registerMockMethod(CONSTANT_MOCK_METHOD, TEST_INVOKED_CLASS, TEST_INVOKED_METHOD, AccessFlag.PUBLIC, 0, ARGS_NULL, RESULT_TYPE);
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_333_LABEL, writer);
 
     registerBreakPoint(TEST_333_LABEL);
@@ -110,7 +115,9 @@ public class TestINVOKESPECIAL extends AbstractInvokeTest {
     mockupOfInvokedMethod = registerMockMethod(CONSTANT_MOCK_METHOD, TEST_INVOKED_CLASS, TEST_INVOKED_METHOD, AccessFlag.PUBLIC, TEST_LOCALS_NUMBER, ARGS_NULL, RESULT_TYPE);
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_333_LABEL, writer);
 
     registerBreakPoint(TEST_333_LABEL);
@@ -132,7 +139,9 @@ public class TestINVOKESPECIAL extends AbstractInvokeTest {
     mockupOfInvokedMethod = registerMockMethod(CONSTANT_MOCK_METHOD, TEST_INVOKED_CLASS, TEST_INVOKED_METHOD, AccessFlag.PUBLIC, 0, ARGS_FOUR_INT, RESULT_TYPE);
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_EXPRESSION_4_LABEL, writer);
 
     final int arg1 = 0xCAFE;
@@ -162,7 +171,9 @@ public class TestINVOKESPECIAL extends AbstractInvokeTest {
     mockupOfInvokedMethod = registerMockMethod(CONSTANT_MOCK_METHOD, TEST_INVOKED_CLASS, TEST_INVOKED_METHOD, AccessFlag.PUBLIC, TEST_LOCALS_NUMBER, ARGS_FOUR_INT, RESULT_TYPE);
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_EXPRESSION_4_LABEL, writer);
 
     final int arg1 = 0xCAFE;

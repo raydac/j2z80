@@ -1,20 +1,25 @@
-package com.igormaznitsa.j2z80.bootstrap.java.io;
+package j2z80.bootstrap.java.io;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
 import com.igormaznitsa.j2z80.utils.Utils;
+import j2z80.bootstrap.java.lang.Object;
 import java.io.IOException;
 import org.apache.bcel.generic.Type;
 
-public class PrintStream extends AbstractBootClass {
+@SuppressWarnings("unused")
+public class PrintStream extends Object {
 
   @Override
-  public String[] generateInvocation(final TranslatorContext translator, final String methodName,
-                                     final Type[] methodArguments, final Type resultType) {
+  public String[] generateInvocation(
+      final TranslatorContext translator,
+      final String methodName,
+      final Type[] methodArguments,
+      final Type resultType
+  ) {
     if (methodName.equals("println")) {
       return new String[] {"CALL JAVA.LANG.SYSTEN.PRINTLN"};
     } else {
-      throwBootClassExceptionForMethod(methodName, resultType, methodArguments);
+      this.throwBootClassExceptionForMethod(methodName, resultType, methodArguments);
       return null;
     }
   }
@@ -28,14 +33,14 @@ public class PrintStream extends AbstractBootClass {
   @Override
   public String[] generateFieldSetter(final TranslatorContext translator, final String fieldName,
                                       final Type fieldType, final boolean isStatic) {
-    throwBootClassExceptionForField(fieldName, fieldType);
+    this.throwBootClassExceptionForField(fieldName, fieldType);
     return null;
   }
 
   @Override
   public String[] generateFieldGetter(final TranslatorContext translator, final String fieldName,
                                       final Type fieldType, final boolean isStatic) {
-    throwBootClassExceptionForField(fieldName, fieldType);
+    this.throwBootClassExceptionForField(fieldName, fieldType);
     return null;
   }
 

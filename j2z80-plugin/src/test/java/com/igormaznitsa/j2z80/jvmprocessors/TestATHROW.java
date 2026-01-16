@@ -15,19 +15,18 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
-import com.igormaznitsa.j2z80.utils.Utils;
-import com.igormaznitsa.z80asm.Z80Asm;
-import org.apache.bcel.generic.ATHROW;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.io.StringWriter;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+
+import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
+import com.igormaznitsa.j2z80.utils.Utils;
+import com.igormaznitsa.z80asm.Z80Asm;
+import java.io.IOException;
+import java.io.StringWriter;
+import org.apache.bcel.generic.ATHROW;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestATHROW extends AbstractJvmCommandProcessorTest {
 
@@ -39,7 +38,8 @@ public class TestATHROW extends AbstractJvmCommandProcessorTest {
 
     push(VALUE);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new ATHROW(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new ATHROW(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
     final Z80Asm asm = assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(asm.findLabelAddress(END_LABEL).intValue(), HL());

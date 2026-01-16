@@ -17,12 +17,11 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.ANEWARRAY;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process ANEWARRAY with code 189
 public class Processor_ANEWARRAY extends AbstractJvmCommandProcessor implements NeedsMemoryManager {
@@ -39,7 +38,9 @@ public class Processor_ANEWARRAY extends AbstractJvmCommandProcessor implements 
   }
 
   @Override
-  public void process(final MethodTranslator classProcessor, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator classProcessor, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final ANEWARRAY anewarray = (ANEWARRAY) instruction;
     out.write(template.replace(MACROS_ADDRESS, SUB_ALLOCATE_WORDARRAY));
     out.write(NEXT_LINE);

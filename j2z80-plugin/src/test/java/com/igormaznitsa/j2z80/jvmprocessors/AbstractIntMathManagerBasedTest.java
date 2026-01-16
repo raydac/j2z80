@@ -15,17 +15,16 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
-import com.igormaznitsa.j2z80.utils.Utils;
-import org.apache.bcel.generic.Instruction;
-import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.StringWriter;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+
+import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
+import com.igormaznitsa.j2z80.utils.Utils;
+import java.io.IOException;
+import java.io.StringWriter;
+import org.apache.bcel.generic.Instruction;
+import org.apache.bcel.generic.InstructionHandle;
 
 public abstract class AbstractIntMathManagerBasedTest extends AbstractJvmCommandProcessorTest {
 
@@ -35,7 +34,8 @@ public abstract class AbstractIntMathManagerBasedTest extends AbstractJvmCommand
   public String prepareForTest(final Instruction instruction) throws Exception {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(instruction.getClass());
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, instruction, mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, instruction, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
     return writer.toString();
   }
 

@@ -15,7 +15,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
+import com.igormaznitsa.j2z80.bootstrap.AbstractBootstrapClass;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.IOException;
@@ -42,11 +42,17 @@ public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor
    *
    * @param methodTranslator a method translator, must not be null
    * @param instruction      a field instruction, must not be null
+   * @param bootstrapClassLoader bootstrap class loader, must not be null
    * @param out              a writer to make output for assembler instructions, must not be null
    * @return true if the field instruction processes a bootstrap class field, else false
    * @throws IOException it will be thrown if there is any transport level error
    */
-  protected boolean processBootClassCall(final MethodTranslator methodTranslator, final FieldInstruction instruction, final Writer out) throws IOException {
+  protected boolean processBootstrapClassCall(
+      final MethodTranslator methodTranslator,
+      final FieldInstruction instruction,
+      final ClassLoader bootstrapClassLoader,
+      final Writer out
+  ) throws IOException {
 
     final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
     final ObjectType objType = (ObjectType) instruction.getReferenceType(constantPool);
@@ -60,7 +66,8 @@ public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor
       return false;
     }
 
-    final AbstractBootClass processor = AbstractBootClass.findProcessor(className);
+    final AbstractBootstrapClass processor =
+        AbstractBootstrapClass.findProcessor(className, bootstrapClassLoader);
 
     if (processor != null) {
       final boolean isStaticCall = (instruction instanceof PUTSTATIC) || (instruction instanceof GETSTATIC);

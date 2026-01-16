@@ -17,14 +17,13 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.INVOKESPECIAL;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.Type;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process INVOKESPECIAL with code 183
 public class Processor_INVOKESPECIAL extends AbstractInvokeProcessor implements NeedsMemoryManager {
@@ -33,7 +32,7 @@ public class Processor_INVOKESPECIAL extends AbstractInvokeProcessor implements 
 
   public Processor_INVOKESPECIAL() {
     super();
-    template = loadResourceFileAsString("INVOKESPECIAL.a80");
+    this.template = loadResourceFileAsString("INVOKESPECIAL.a80");
   }
 
   @Override
@@ -42,11 +41,13 @@ public class Processor_INVOKESPECIAL extends AbstractInvokeProcessor implements 
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final INVOKESPECIAL inv = (INVOKESPECIAL) instruction;
     final MethodGen invokingMethod = getInvokedMethod(methodTranslator, inv);
 
-    if (!checkBootstrapCall(methodTranslator, inv, out)) {
+    if (!isBootstrapCall(methodTranslator, inv, bootstrapClassLoader, out)) {
       assertMethodIsNotNull(invokingMethod, methodTranslator, inv);
 
       final String labelForMethod = getMethodLabel(methodTranslator, inv);

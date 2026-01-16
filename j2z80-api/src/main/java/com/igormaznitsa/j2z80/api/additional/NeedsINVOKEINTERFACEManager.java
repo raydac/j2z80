@@ -21,14 +21,14 @@ package com.igormaznitsa.j2z80.api.additional;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-@AdditionPath("INVOKEINTERFACE_MANAGER.a80")
+@J2Z80AdditionPath("INVOKEINTERFACE_MANAGER.a80")
 public interface NeedsINVOKEINTERFACEManager extends J2ZAdditionalBlock {
   /**
    * The label of the subroutine processing invoke interface calls.
    */
-  public static final String SUB_INVOKE_INTERFACE = "___INVOKEINTERFACE";
+  String SUB_INVOKE_INTERFACE = "___INVOKEINTERFACE";
   /**
    * The name of the macros which should be replaced by an the invoke address table label
    */
-  public static final String MACROS_INVOKEINTERFACE_TABLE = "%invokeinterfacetable%";
+  String MACROS_INVOKEINTERFACE_TABLE = "%invokeinterfacetable%";
 }

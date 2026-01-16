@@ -15,6 +15,11 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
 import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEINTERFACEManager;
 import com.igormaznitsa.j2z80.ids.ClassID;
@@ -23,19 +28,15 @@ import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.MutableObjectContainer;
 import com.igormaznitsa.j2z80.utils.Utils;
 import com.igormaznitsa.z80asm.Z80Asm;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Locale;
 import javassist.bytecode.AccessFlag;
 import org.apache.bcel.generic.INVOKEINTERFACE;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.Type;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Locale;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
 
 public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVOKEINTERFACEManager, NeedsATHROWManager {
 
@@ -153,7 +154,9 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
     invokeinterfaceTable = generateInvokeInterfaceTable(LABEL_METHOD_ID, packedClassFrameInfo, MOCK_METHOD_ID.get().getMethodLabel());
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, 1), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, 1),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(null, MOCK_CLASS_NAME, TEST_METHOD, ARGS_NULL, RESULT_TYPE, writer);
 
     IX(INITIAL_IX);
@@ -183,7 +186,9 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
     invokeinterfaceTable = generateInvokeInterfaceTable(LABEL_METHOD_ID, packedClassFrameInfo, MOCK_METHOD_ID.get().getMethodLabel());
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, 1), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, 1),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint("NOLABEL", MOCK_CLASS_NAME, TEST_METHOD, ARGS_NULL, RESULT_TYPE, writer);
 
     push(FAKE_OBJECT_ADDRESS);
@@ -206,7 +211,9 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
     invokeinterfaceTable = generateInvokeInterfaceTable(LABEL_METHOD_ID, packedClassFrameInfo, MOCK_METHOD_ID.get().getMethodLabel());
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, 1), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, 1),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_333_LABEL, MOCK_CLASS_NAME, TEST_METHOD, ARGS_NULL, RESULT_TYPE, writer);
 
     registerBreakPoint(TEST_333_LABEL);
@@ -233,7 +240,9 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
     invokeinterfaceTable = generateInvokeInterfaceTable(LABEL_METHOD_ID, packedClassFrameInfo, MOCK_METHOD_ID.get().getMethodLabel());
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, 1), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, 1),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_333_LABEL, MOCK_CLASS_NAME, TEST_METHOD, ARGS_NULL, RESULT_TYPE, writer);
 
     registerBreakPoint(TEST_333_LABEL);
@@ -262,7 +271,10 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
     invokeinterfaceTable = generateInvokeInterfaceTable(LABEL_METHOD_ID, packedClassFrameInfo, MOCK_METHOD_ID.get().getMethodLabel());
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, args.length + 1), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK,
+        new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, args.length + 1),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_EXPRESSION_4_LABEL, MOCK_CLASS_NAME, TEST_METHOD, args, RESULT_TYPE, writer);
 
     final int arg1 = 0xCAFE;
@@ -299,7 +311,10 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
     invokeinterfaceTable = generateInvokeInterfaceTable(LABEL_METHOD_ID, packedClassFrameInfo, MOCK_METHOD_ID.get().getMethodLabel());
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, args.length + 1), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK,
+        new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, args.length + 1),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_EXPRESSION_4_LABEL, MOCK_CLASS_NAME, TEST_METHOD, args, RESULT_TYPE, writer);
 
     final int arg1 = 0xCAFE;
@@ -335,7 +350,10 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
     asmPrefix = EXCEPTION_PROCESSING_BLOCK;
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, args.length + 1), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK,
+        new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, args.length + 1),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_EXPRESSION_4_LABEL, MOCK_CLASS_NAME, TEST_METHOD, args, RESULT_TYPE, writer);
 
     final int arg1 = 0xCAFE;
@@ -374,7 +392,10 @@ public class TestINVOKEINTERFACE extends AbstractInvokeTest implements NeedsINVO
     asmPrefix = EXCEPTION_PROCESSING_BLOCK;
 
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, args.length + 1), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK,
+        new INVOKEINTERFACE(MOCK_INTERFACE_METHOD_INDEX, args.length + 1),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     makePostfixWithBreakPoint(TEST_EXPRESSION_4_LABEL, MOCK_CLASS_NAME, TEST_METHOD, args, RESULT_TYPE, writer);
 
     final int arg1 = 0xCAFE;

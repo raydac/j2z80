@@ -42,6 +42,13 @@ public class DefaultTranslatorLogger implements TranslatorLogger {
   }
 
   @Override
+  public void logDebug(final String message) {
+    if (System.out != null) {
+      System.out.printf((DEFAULT_LOG_PREFIX) + "%n", "DEBUG", message);
+    }
+  }
+
+  @Override
   public void logError(final String message) {
     if (System.err != null) {
       System.err.printf((DEFAULT_LOG_PREFIX) + "%n", "ERR", message);

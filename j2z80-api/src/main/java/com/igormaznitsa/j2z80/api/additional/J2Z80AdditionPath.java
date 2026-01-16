@@ -29,6 +29,6 @@ import java.lang.annotation.Target;
 @Target(value = {ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface AdditionPath {
+public @interface J2Z80AdditionPath {
   String value();
 }

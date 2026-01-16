@@ -19,7 +19,7 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.makeLabelNameForMethod;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
-import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
+import com.igormaznitsa.j2z80.bootstrap.AbstractBootstrapClass;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.IOException;
@@ -138,16 +138,19 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    *
    * @param methodTranslator a method translator called the method, must not be null
    * @param instruction      an invoke instruction to be checked, must not be null
+   * @param bootstrapClassLoader bootstrap class loader, must not be null
    * @param out              the output stream to write commands
    * @return true if the instruction invokes a bootstrap class and it has been processed by the method, else false
    * @throws IOException it will be thrown if any transport problem in the method
    */
-  protected boolean checkBootstrapCall(final MethodTranslator methodTranslator,
-                                       final InvokeInstruction instruction, final Writer out)
-      throws IOException {
-
+  protected boolean isBootstrapCall(
+      final MethodTranslator methodTranslator,
+      final InvokeInstruction instruction,
+      final ClassLoader bootstrapClassLoader,
+      final Writer out
+  ) throws IOException {
     final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
-    final ObjectType objType = getObjectType(methodTranslator, instruction);
+    final ObjectType objType = this.getObjectType(methodTranslator, instruction);
     final String methodName = instruction.getMethodName(constantPool);
     final Type[] methodArgs = instruction.getArgumentTypes(constantPool);
     final Type methodResult = instruction.getReturnType(constantPool);
@@ -159,10 +162,11 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
       return false;
     }
 
-    final AbstractBootClass processor = AbstractBootClass.findProcessor(objType.getClassName());
+    final String className = objType.getClassName();
+    final AbstractBootstrapClass processor =
+        AbstractBootstrapClass.findProcessor(className, bootstrapClassLoader);
 
     boolean result = false;
-
     if (processor != null) {
       final boolean isStaticCall = instruction instanceof INVOKESPECIAL;
       final int argAreaSize = calculateArgumentBlockSize(methodArgs.length, isStaticCall);
@@ -211,10 +215,16 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
   public MethodGen getInvokedMethod(final MethodTranslator methodTranslator,
                                     final InvokeInstruction instruction) {
     final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
-    final ObjectType objType = getObjectType(methodTranslator, instruction);
-    return methodTranslator.getTranslatorContext().getMethodContext().findMethod(
-        new MethodID(objType.getClassName(), instruction.getMethodName(constantPool),
-            instruction.getReturnType(constantPool), instruction.getArgumentTypes(constantPool)));
+    final ObjectType objType = this.getObjectType(methodTranslator, instruction);
+
+    String className = objType.getClassName();
+    final String methodName = instruction.getMethodName(constantPool);
+
+    return methodTranslator.getTranslatorContext()
+        .getMethodContext().findMethod(
+            new MethodID(className, methodName,
+                instruction.getReturnType(constantPool),
+                instruction.getArgumentTypes(constantPool)));
   }
 
   /**

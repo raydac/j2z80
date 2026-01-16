@@ -21,18 +21,18 @@ package com.igormaznitsa.j2z80.api.additional;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-@AdditionPath("INT_ARITHMETIC_MANAGER.a80")
+@J2Z80AdditionPath("INT_ARITHMETIC_MANAGER.a80")
 public interface NeedsINTArithmeticManager extends J2ZAdditionalBlock {
   /**
    * The label of the MUL emulating subroutine
    */
-  public static final String SUB_INT_MUL = "___INT_MATH_MUL";
+  String SUB_INT_MUL = "___INT_MATH_MUL";
   /**
    * The label of the DIV emulating subroutine
    */
-  public static final String SUB_INT_DIV = "___INT_MATH_DIV";
+  String SUB_INT_DIV = "___INT_MATH_DIV";
   /**
    * The label of the REM emulating subroutine
    */
-  public static final String SUB_INT_REM = "___INT_MATH_REM";
+  String SUB_INT_REM = "___INT_MATH_REM";
 }

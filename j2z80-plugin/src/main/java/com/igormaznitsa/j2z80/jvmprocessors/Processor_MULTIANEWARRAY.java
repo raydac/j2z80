@@ -17,12 +17,11 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MULTIANEWARRAY;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process MULTIANEWARRAY with code 197
 public class Processor_MULTIANEWARRAY extends AbstractJvmCommandProcessor implements NeedsMemoryManager {
@@ -39,7 +38,9 @@ public class Processor_MULTIANEWARRAY extends AbstractJvmCommandProcessor implem
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final MULTIANEWARRAY multiarraynew = (MULTIANEWARRAY) instruction;
     out.write(template.replace(MACROS_VALUE, Integer.toString(multiarraynew.getDimensions())));
     out.write(NEXT_LINE);

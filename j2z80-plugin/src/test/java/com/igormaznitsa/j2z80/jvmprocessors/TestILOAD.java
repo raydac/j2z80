@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.ILOAD;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.ILOAD;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestILOAD extends AbstractJvmCommandProcessorTest {
 
@@ -39,7 +38,10 @@ public class TestILOAD extends AbstractJvmCommandProcessorTest {
 
     writeLocalFrameVariable(VAR_INDEX, VALUE);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new ILOAD(VAR_INDEX), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new ILOAD(VAR_INDEX), mock(InstructionHandle.class),
+        this.getClass()
+            .getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VALUE, pop());

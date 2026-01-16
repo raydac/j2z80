@@ -15,15 +15,17 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.StringWriter;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.LDC;
 import org.junit.Test;
-
-import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
 
 public class TestLDC extends AbstractJvmCommandProcessorTest {
 
@@ -31,7 +33,9 @@ public class TestLDC extends AbstractJvmCommandProcessorTest {
   public void testInt() throws Exception {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(LDC.class);
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_INT), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_INT), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString());
     assertEquals(ETALON_CONSTANT_INTEGER, (short) pop());
     assertStackEmpty();
@@ -47,7 +51,9 @@ public class TestLDC extends AbstractJvmCommandProcessorTest {
     final String etalonLabel = LabelAndFrameUtils.makeLabelForConstantPoolItem(JCLASS_GEN_MOCK, CONSTANT_UTF8);
     when(CLASS_PROCESSOR_MOCK.registerUsedConstantPoolItem(CONSTANT_UTF8)).thenReturn(etalonLabel);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_UTF8), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_UTF8), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
 
     final String labelName = LabelAndFrameUtils.makeLabelForConstantPoolItem(CLASS_GEN_MOCK.getJavaClass(), CONSTANT_UTF8);
     final int labelAddress = assertLinearExecutionToEnd(writer.toString()).findLabelAddress(labelName).intValue();
@@ -67,7 +73,9 @@ public class TestLDC extends AbstractJvmCommandProcessorTest {
     when(CLASS_PROCESSOR_MOCK.registerUsedConstantPoolItem(CONSTANT_UTF8)).thenReturn(labelName);
     when(CLASS_PROCESSOR_MOCK.registerUsedConstantPoolItem(CONSTANT_STR)).thenReturn(labelName);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_STR), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_STR), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
 
     final int labelAddress = assertLinearExecutionToEnd(writer.toString()).findLabelAddress(labelName).intValue();
     assertEquals(labelAddress, pop());
@@ -81,21 +89,27 @@ public class TestLDC extends AbstractJvmCommandProcessorTest {
   public void testDouble() throws Exception {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(LDC.class);
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_DOUBLE), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_DOUBLE), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testFloat() throws Exception {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(LDC.class);
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_FLOAT), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_FLOAT), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testLong() throws Exception {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(LDC.class);
     final StringWriter writer = new StringWriter();
-    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_LONG), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_LONG), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
   }
 
   @Override

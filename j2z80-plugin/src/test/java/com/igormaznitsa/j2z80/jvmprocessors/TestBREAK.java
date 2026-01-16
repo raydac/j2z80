@@ -15,19 +15,18 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import com.igormaznitsa.j2z80.api.additional.NeedsBREAKPOINTManager;
-import com.igormaznitsa.j2z80.utils.Utils;
-import com.igormaznitsa.z80asm.Z80Asm;
-import org.apache.bcel.generic.BREAKPOINT;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.io.StringWriter;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+
+import com.igormaznitsa.j2z80.api.additional.NeedsBREAKPOINTManager;
+import com.igormaznitsa.j2z80.utils.Utils;
+import com.igormaznitsa.z80asm.Z80Asm;
+import java.io.IOException;
+import java.io.StringWriter;
+import org.apache.bcel.generic.BREAKPOINT;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestBREAK extends AbstractJvmCommandProcessorTest {
   private static final int VALUE = 0xCAFE;
@@ -39,7 +38,9 @@ public class TestBREAK extends AbstractJvmCommandProcessorTest {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(BREAKPOINT.class);
     final StringWriter writer = new StringWriter();
 
-    processor.process(CLASS_PROCESSOR_MOCK, new BREAKPOINT(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new BREAKPOINT(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
     final Z80Asm asm = assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(asm.findLabelAddress(BREAK_POINT_START_ADDRESS).intValue(), peekw(TEST_ADDRESS));

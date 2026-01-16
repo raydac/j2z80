@@ -18,6 +18,8 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantInteger;
 import org.apache.bcel.classfile.ConstantString;
@@ -25,9 +27,6 @@ import org.apache.bcel.classfile.ConstantUtf8;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.LDC_W;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process LDC_W with code 19
 public class Processor_LDC_W extends AbstractJvmCommandProcessor {
@@ -45,7 +44,9 @@ public class Processor_LDC_W extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final LDC_W ldcw = (LDC_W) instruction;
 
     final int index = ldcw.getIndex();

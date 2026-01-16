@@ -21,10 +21,10 @@ package com.igormaznitsa.j2z80.api.additional;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-@AdditionPath("INVOKEVIRTUAL_MANAGER.a80")
+@J2Z80AdditionPath("INVOKEVIRTUAL_MANAGER.a80")
 public interface NeedsINVOKEVIRTUALManager extends J2ZAdditionalBlock {
   /**
    * The macros name which should be replaced by either label or address of an invoke virtual table
    */
-  public static final String MACROS_INVOKEVIRTUAL_TABLE = "%invokevirtualtable%";
+  String MACROS_INVOKEVIRTUAL_TABLE = "%invokevirtualtable%";
 }

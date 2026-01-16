@@ -15,15 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
-import org.apache.bcel.generic.DUP_X1;
-import org.apache.bcel.generic.InstructionHandle;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import org.apache.bcel.generic.DUP_X1;
+import org.apache.bcel.generic.InstructionHandle;
+import org.junit.Test;
 
 public class TestDUP_X1 extends AbstractJvmCommandProcessorTest {
 
@@ -37,7 +36,8 @@ public class TestDUP_X1 extends AbstractJvmCommandProcessorTest {
     push(VALUE2);
     push(VALUE1);
 
-    processor.process(CLASS_PROCESSOR_MOCK, new DUP_X1(), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new DUP_X1(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(VALUE1, pop());

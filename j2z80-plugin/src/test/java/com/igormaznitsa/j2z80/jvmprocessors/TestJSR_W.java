@@ -15,17 +15,16 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.StringWriter;
 import org.apache.bcel.generic.BranchHandle;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.JSR_W;
 import org.apache.bcel.generic.NOP;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
-
-import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
 
 public class TestJSR_W extends AbstractJvmCommandProcessorTest {
 
@@ -46,7 +45,8 @@ public class TestJSR_W extends AbstractJvmCommandProcessorTest {
 
     branchHandle.setTarget(targetHandle);
 
-    processor.process(CLASS_PROCESSOR_MOCK, instruction, branchHandle, writer);
+    processor.process(CLASS_PROCESSOR_MOCK, instruction, branchHandle,
+        this.getClass().getClassLoader(), writer);
 
     assertLinearExecutionToEnd(writer.toString());
 

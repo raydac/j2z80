@@ -18,6 +18,7 @@ package com.igormaznitsa.j2z80.translator;
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
+import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,7 +151,7 @@ class ClassContextImpl implements ClassContext {
 
     String tmpClassName = className;
 
-    while (!"java.lang.Object".equals(tmpClassName)) {
+    while (!ClassUtils.isJ2Z80ObjectClass(tmpClassName)) {
       if (!className.equals(tmpClassName)) {
         result.add(tmpClassName);
       }

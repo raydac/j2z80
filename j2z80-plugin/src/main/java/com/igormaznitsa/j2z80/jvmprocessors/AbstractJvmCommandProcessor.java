@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.bcel.generic.Instruction;
+import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
 
 /**
@@ -175,11 +176,16 @@ public abstract class AbstractJvmCommandProcessor {
   /**
    * Process an instruction allowed by the processor
    *
-   * @param methodTranslator a translator translating the method, must not be null
-   * @param instruction      an instruction to be processed, must not be null
-   * @param handle           the instruction handle for the processing instruction, must not be null
-   * @param out              the writer to out the result, must not be null
+   * @param methodTranslator     a translator translating the method, must not be null
+   * @param instruction          an instruction to be processed, must not be null
+   * @param handle               the instruction handle for the processing instruction, must not be null
+   * @param bootstrapClassLoader bootstrap class loader, must not be null
+   * @param out                  the writer to out the result, must not be null
    * @throws IOException it will be thrown if there is any problem during processing
    */
-  public abstract void process(MethodTranslator methodTranslator, Instruction instruction, org.apache.bcel.generic.InstructionHandle handle, Writer out) throws IOException;
+  public abstract void process(
+      MethodTranslator methodTranslator,
+      Instruction instruction,
+      InstructionHandle handle,
+      ClassLoader bootstrapClassLoader, Writer out) throws IOException;
 }

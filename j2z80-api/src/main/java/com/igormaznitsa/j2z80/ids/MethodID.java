@@ -180,8 +180,11 @@ public class MethodID {
   public Method findCompatibleMethod(final ClassGen cgen) {
     assertNotNull("Class must not be null", cgen);
     for (final Method m : cgen.getMethods()) {
-      if (this.methodName.equals(m.getName()) && deepEquals(this.argTypes, m.getArgumentTypes()) &&
-          this.returnType.equals(m.getReturnType())) {
+      if (
+          this.methodName.equals(m.getName())
+              && deepEquals(this.argTypes, m.getArgumentTypes())
+              && this.returnType.equals(m.getReturnType())
+      ) {
         return m;
       }
     }

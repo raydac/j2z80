@@ -54,8 +54,8 @@ public class MethodTranslator {
     return this.translatorContext;
   }
 
-  public String[] translate() throws IOException {
-    final List<String> asm = this.method2asm();
+  public String[] translate(final ClassLoader bootstrapClassLoader) throws IOException {
+    final List<String> asm = this.method2asm(bootstrapClassLoader);
     final List<String> result = new ArrayList<>();
     for (final String str : asm) {
       result.addAll(Arrays.asList(Utils.breakToLines(str)));
@@ -68,7 +68,7 @@ public class MethodTranslator {
     return this.method;
   }
 
-  private List<String> method2asm() throws IOException {
+  private List<String> method2asm(final ClassLoader bootstrapClassLoader) throws IOException {
     final List<String> result = new ArrayList<>();
     result.add(LabelAndFrameUtils.makeLabelNameForMethod(this.method) + ':');
 
@@ -91,7 +91,7 @@ public class MethodTranslator {
 
       final StringWriter writer = new StringWriter(256);
       try {
-        processor.process(this, instruction, handler, writer);
+        processor.process(this, instruction, handler, bootstrapClassLoader, writer);
       } catch (IllegalArgumentException ex) {
         getTranslatorContext().getLogger().logError(this.method + " [" + ex.getMessage() + ']');
         throw ex;
@@ -123,7 +123,7 @@ public class MethodTranslator {
   }
 
   public ConstantPoolGen getConstantPool() {
-    return method.getClassInfo().getConstantPool();
+    return this.method.getClassInfo().getConstantPool();
   }
 
   public String registerUsedConstantPoolItem(final int itemIndex) {

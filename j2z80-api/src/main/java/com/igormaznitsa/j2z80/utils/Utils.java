@@ -16,7 +16,8 @@
 
 package com.igormaznitsa.j2z80.utils;
 
-import com.igormaznitsa.meta.common.utils.Assertions;
+import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -170,14 +172,12 @@ public final class Utils {
    * @return a string array contains all content of arrays as the arguments
    */
   public static String[] concatStringArrays(final String[]... arrays) {
-    Assertions.assertNotNull("Concatenated arrays must not contain null", (Object[]) arrays);
-    final List<String> result = new ArrayList<String>();
+    assertNotNull("Concatenated arrays must not contain null", (Object[]) arrays);
+    final List<String> result = new ArrayList<>();
     for (final String[] arg : arrays) {
-      for (final String s : arg) {
-        result.add(s);
-      }
+      result.addAll(Arrays.asList(arg));
     }
-    return result.toArray(new String[result.size()]);
+    return result.toArray(new String[0]);
   }
 
   /**
@@ -187,11 +187,7 @@ public final class Utils {
    * @return a hex string representation of the integer
    */
   public static String intToString(final int value) {
-    final StringBuilder result = new StringBuilder();
-
-    result.append(value).append("(#").append(Integer.toHexString(value).toUpperCase()).append(')');
-
-    return result.toString();
+    return value + "(#" + Integer.toHexString(value).toUpperCase() + ')';
   }
 
   /**

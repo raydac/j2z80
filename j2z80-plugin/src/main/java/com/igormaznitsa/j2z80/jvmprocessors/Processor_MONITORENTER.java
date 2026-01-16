@@ -16,12 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MONITORENTER;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process MONITORENTER with code 194
 public class Processor_MONITORENTER extends AbstractJvmCommandProcessor {
@@ -38,7 +37,9 @@ public class Processor_MONITORENTER extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     methodTranslator.getTranslatorContext().getLogger().logWarning("A MONITORENTER instruction has been met");
     final MONITORENTER monitorenter = (MONITORENTER) instruction;
     out.write(template);

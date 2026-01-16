@@ -22,13 +22,12 @@ import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.CHECKCAST;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process CHECKCAST with code 192
 public class Processor_CHECKCAST extends AbstractJvmCommandProcessor implements NeedsMemoryManager, NeedsCheckcastManager, NeedsInstanceofManager, NeedsATHROWManager {
@@ -46,7 +45,9 @@ public class Processor_CHECKCAST extends AbstractJvmCommandProcessor implements 
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final CHECKCAST checkcast = (CHECKCAST) instruction;
 
     final ObjectType type = checkcast.getLoadClassType(methodTranslator.getConstantPool());

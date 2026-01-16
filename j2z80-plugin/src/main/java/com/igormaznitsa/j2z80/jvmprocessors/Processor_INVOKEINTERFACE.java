@@ -20,15 +20,14 @@ import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEINTERFACEManager;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Locale;
 import org.apache.bcel.generic.INVOKEINTERFACE;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.Type;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Locale;
 
 // class to process INVOKEINTERFACE with code 185
 public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor implements NeedsATHROWManager, NeedsINVOKEINTERFACEManager {
@@ -36,8 +35,7 @@ public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor implement
   private final String template;
 
   public Processor_INVOKEINTERFACE() {
-    super();
-    template = loadResourceFileAsString("INVOKEINTERFACE.a80");
+    this.template = loadResourceFileAsString("INVOKEINTERFACE.a80");
   }
 
   @Override
@@ -46,12 +44,14 @@ public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor implement
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final INVOKEINTERFACE inv = (INVOKEINTERFACE) instruction;
 
     final MethodGen invokedMethod = getInvokedMethod(methodTranslator, inv);
 
-    if (!checkBootstrapCall(methodTranslator, inv, out)) {
+    if (!isBootstrapCall(methodTranslator, inv, bootstrapClassLoader, out)) {
       assertMethodIsNotNull(invokedMethod, methodTranslator, inv);
       final MethodID interfaceMethodId = new MethodID(invokedMethod);
       methodTranslator.getTranslatorContext().registerInterfaceMethodForINVOKEINTERFACE(interfaceMethodId);

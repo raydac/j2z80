@@ -16,12 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.ALOAD;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process ALOAD with code 42,43,44,45
 public class Processor_ALOAD extends AbstractJvmCommandProcessor {
@@ -38,7 +37,9 @@ public class Processor_ALOAD extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator classProcessor, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator classProcessor, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final ALOAD aload = (ALOAD) instruction;
     out.write(template.replace(MACROS_INDEX, Integer.toString(prepareLocalVariableIndex(aload.getIndex()))));
     out.write(NEXT_LINE);

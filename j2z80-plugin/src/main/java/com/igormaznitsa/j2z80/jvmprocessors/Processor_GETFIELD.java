@@ -17,14 +17,13 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.GETFIELD;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process GETFIELD with code 180
 public class Processor_GETFIELD extends AbstractFieldProcessor {
@@ -42,10 +41,12 @@ public class Processor_GETFIELD extends AbstractFieldProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      final ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final GETFIELD getfield = (GETFIELD) instruction;
 
-    if (!processBootClassCall(methodTranslator, getfield, out)) {
+    if (!processBootstrapClassCall(methodTranslator, getfield, bootstrapClassLoader, out)) {
 
       final ConstantPoolGen const_pool = methodTranslator.getConstantPool();
       final ObjectType objType = (ObjectType) getfield.getReferenceType(const_pool);

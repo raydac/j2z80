@@ -16,11 +16,14 @@
 
 package com.igormaznitsa.j2z80.translator.mojos;
 
+import static java.util.stream.Stream.concat;
+
 import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.TranslatorLogger;
 import com.igormaznitsa.j2z80.translator.Format;
 import com.igormaznitsa.j2z80.translator.TranslatorImpl;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
+import com.igormaznitsa.j2z80.translator.utils.JarClassLoaderFactory;
 import com.igormaznitsa.j2z80.translator.utils.Sna48Writer;
 import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.File;
@@ -31,6 +34,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
@@ -77,8 +82,8 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   @Parameter(name = "excludeResources")
   private String[] excludeResources;
 
-  @Parameter(name = "optimization", defaultValue = "none")
-  private String optimization;
+  @Parameter(name = "optimization")
+  private OptimizationLevel optimization;
 
   @Inject
   public TranslatorMojo(
@@ -129,11 +134,11 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
     this.excludeResources = excludeResources;
   }
 
-  public String getOptimization() {
+  public OptimizationLevel getOptimization() {
     return this.optimization;
   }
 
-  public void setOptimization(String optimization) {
+  public void setOptimization(OptimizationLevel optimization) {
     this.optimization = optimization;
   }
 
@@ -148,18 +153,26 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   @Override
   public void execute() throws MojoExecutionException {
     try {
-      List<File> classPath = new ArrayList<>(this.getCompilationDependencies());
-      classPath.add(this.jarFile);
+
+
+      final List<Path> z80ClassPath =
+          concat(this.getDependencyFilePaths().stream(), Stream.of(this.jarFile.toPath())).collect(
+              Collectors.toList());
+      final ClassLoader z80classLoader =
+          JarClassLoaderFactory.create(z80ClassPath, this.getClass().getClassLoader());
 
       logInfo("Target formats : " + this.formats);
       logInfo("Target final name : " + this.project.getBuild().getFinalName());
+      logInfo("Z80 Class loader path: " + z80ClassPath);
 
       final OptimizationLevel optimizationLevel =
-          OptimizationLevel.findForTextName(this.optimization);
+          this.optimization == null ? OptimizationLevel.NONE : this.optimization;
 
-      final TranslatorContext translator = new TranslatorImpl(this, optimizationLevel, classPath);
+      final TranslatorContext translator =
+          new TranslatorImpl(this, optimizationLevel, z80ClassPath);
       final List<String> translatedAsmText =
-          translator.translate(null, startAddress, stackTop, this.excludeResources);
+          translator.translate(null, this.startAddress, this.stackTop, this.excludeResources,
+              z80classLoader);
 
       if (this.logAsmText) {
         int lineIndex = 1;
@@ -196,8 +209,8 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
     }
   }
 
-  private List<File> getCompilationDependencies() {
-    final List<File> dependencyList = new ArrayList<>();
+  private List<Path> getDependencyFilePaths() {
+    final List<Path> foundFiles = new ArrayList<>();
     for (final Artifact artifact : this.project.getArtifacts()) {
       if ("z80".equalsIgnoreCase(artifact.getClassifier())) {
         try {
@@ -205,16 +218,15 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
               this.artifactResolver.resolveArtifact(this.project.getProjectBuildingRequest(),
                   artifact);
           final File file = art.getArtifact().getFile();
-          logInfo("Detected Z80 dependency :" + file.getAbsolutePath());
-          dependencyList.add(file);
+          foundFiles.add(file.toPath());
         } catch (ArtifactResolverException ex) {
-          logError("Can't resolve Z80 dependency artifact: " + artifact);
+          this.logError("Can't resolve Z80 dependency artifact: " + artifact);
           throw new RuntimeException(ex);
         }
       }
     }
 
-    return dependencyList;
+    return foundFiles;
   }
 
   private Path makeTargetFilePath(final String extension) {
@@ -224,16 +236,21 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
 
   @Override
   public void logInfo(final String str) {
-    getLog().info(str);
+    this.getLog().info(str);
+  }
+
+  @Override
+  public void logDebug(final String s) {
+    this.getLog().debug(s);
   }
 
   @Override
   public void logWarning(final String str) {
-    getLog().warn(str);
+    this.getLog().warn(str);
   }
 
   @Override
   public void logError(final String str) {
-    getLog().error(str);
+    this.getLog().error(str);
   }
 }

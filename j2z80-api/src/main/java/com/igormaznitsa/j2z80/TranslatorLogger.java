@@ -24,21 +24,28 @@ public interface TranslatorLogger {
   /**
    * Print an information message
    *
-   * @param str an information message, it can be null
+   * @param s an information message, it can be null
    */
-  void logInfo(String str);
+  void logInfo(String s);
 
   /**
    * Print a warning message
    *
-   * @param str a warning message, it can be null
+   * @param s a warning message, it can be null
    */
-  void logWarning(String str);
+  void logWarning(String s);
+
+  /**
+   * Print debug message
+   *
+   * @param s a debug message, it can be null
+   */
+  void logDebug(String s);
 
   /**
    * Print an error message
    *
-   * @param str an error message, it can be null
+   * @param s an error message, it can be null
    */
-  void logError(String str);
+  void logError(String s);
 }

@@ -153,7 +153,9 @@ public class TestINSTANCEOF extends AbstractTestBasedOnMemoryManager implements 
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(INSTANCEOF.class);
     final StringWriter writer = new StringWriter();
 
-    processor.process(CLASS_PROCESSOR_MOCK, new INSTANCEOF(CLASS_INDEX), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new INSTANCEOF(CLASS_INDEX),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString(), (CLASS_FIELD_NUMBER << 1) + 4);
     final int stacktop = pop();
     assertStackEmpty();
@@ -167,7 +169,9 @@ public class TestINSTANCEOF extends AbstractTestBasedOnMemoryManager implements 
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(INSTANCEOF.class);
     final StringWriter writer = new StringWriter();
 
-    processor.process(CLASS_PROCESSOR_MOCK, new INSTANCEOF(CLASS_INDEX), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new INSTANCEOF(CLASS_INDEX),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString(), (CLASS_FIELD_NUMBER << 1) + 4);
     final int stacktop = pop();
     assertStackEmpty();
@@ -181,7 +185,9 @@ public class TestINSTANCEOF extends AbstractTestBasedOnMemoryManager implements 
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(INSTANCEOF.class);
     final StringWriter writer = new StringWriter();
 
-    processor.process(CLASS_PROCESSOR_MOCK, new INSTANCEOF(CLASS_INDEX), mock(InstructionHandle.class), writer);
+    processor.process(CLASS_PROCESSOR_MOCK, new INSTANCEOF(CLASS_INDEX),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
     assertLinearExecutionToEnd(writer.toString(), (CLASS_FIELD_NUMBER << 1) + 4);
     final int stacktop = pop();
     assertStackEmpty();

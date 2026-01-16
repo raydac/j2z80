@@ -16,12 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.POP2;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process POP2 with code 88
 public class Processor_POP2 extends AbstractJvmCommandProcessor {
@@ -38,7 +37,9 @@ public class Processor_POP2 extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator classProcessor, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator classProcessor, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final POP2 pop2 = (POP2) instruction;
     out.write(template);
     out.write(NEXT_LINE);

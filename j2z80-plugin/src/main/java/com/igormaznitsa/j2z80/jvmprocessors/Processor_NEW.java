@@ -21,13 +21,12 @@ import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.meta.common.utils.Assertions;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.NEW;
 import org.apache.bcel.generic.ObjectType;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process NEW with code 187
 public class Processor_NEW extends AbstractJvmCommandProcessor implements NeedsMemoryManager {
@@ -44,7 +43,9 @@ public class Processor_NEW extends AbstractJvmCommandProcessor implements NeedsM
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final NEW newins = (NEW) instruction;
     final ObjectType type = newins.getLoadClassType(methodTranslator.getConstantPool());
     final String className = type.getClassName();

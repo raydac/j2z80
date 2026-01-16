@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2019 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.bootstrap;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.bcel.generic.Type;
 
 /**
@@ -26,20 +27,28 @@ import org.apache.bcel.generic.Type;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-public abstract class AbstractBootClass {
+public abstract class AbstractBootstrapClass {
+  public static final String J2Z80_BOOTSTRAP_PACKAGE_PREFIX = "j2z80.bootstrap";
 
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
-  private static final Map<String, AbstractBootClass> insideCache = new HashMap<String, AbstractBootClass>();
+  private static final Map<String, AbstractBootstrapClass> internalCache =
+      new ConcurrentHashMap<>();
 
-  public static AbstractBootClass findProcessor(final String className) {
-    AbstractBootClass result = insideCache.get(className);
+  public static AbstractBootstrapClass findProcessor(final String className,
+                                                     final ClassLoader classLoader) {
+    AbstractBootstrapClass result = internalCache.get(className);
     if (result == null) {
-      final String newName = AbstractBootClass.class.getPackage().getName() + "." + className;
+      final String normalizedName;
+      if (className.startsWith("java.") || className.startsWith("javax.")) {
+        normalizedName = J2Z80_BOOTSTRAP_PACKAGE_PREFIX + '.' + className;
+      } else {
+        normalizedName = className;
+      }
       try {
-        final Class<? extends AbstractBootClass> japiClass =
-            Class.forName(newName).asSubclass(AbstractBootClass.class);
+        final Class<? extends AbstractBootstrapClass> japiClass =
+            classLoader.loadClass(normalizedName).asSubclass(AbstractBootstrapClass.class);
         result = japiClass.getDeclaredConstructor().newInstance();
-        insideCache.put(className, result);
+        internalCache.put(className, result);
       } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException ex) {
         // ignore
       } catch (IllegalAccessException ex) {
@@ -57,7 +66,8 @@ public abstract class AbstractBootClass {
    * @return the class name part of the emulated bootstrap class
    */
   protected String extractEmulatedJavaClassName() {
-    return this.getClass().getCanonicalName().substring(AbstractBootClass.class.getPackage().getName().length() + 1);
+    return this.getClass().getCanonicalName().substring(
+        AbstractBootstrapClass.class.getPackage().getName().length() + 1);
   }
 
   /**
@@ -67,7 +77,8 @@ public abstract class AbstractBootClass {
    * @param result     the method result signature, must not be null
    * @param args       the method argument signatures, must not be null
    */
-  public void throwBootClassExceptionForMethod(final String methodName, final Type result, final Type[] args) {
+  public void throwBootClassExceptionForMethod(final String methodName, final Type result,
+                                               final Type[] args) {
     final String className = extractEmulatedJavaClassName();
     final String methodSignature = Type.getMethodSignature(result, args);
     throw new BootClassException(
@@ -97,7 +108,8 @@ public abstract class AbstractBootClass {
    * @param resultType      the method result type signature, must not be null
    * @return it returns true if the method needs a stack frame for its work
    */
-  public abstract boolean doesInvokeNeedFrame(TranslatorContext context, String methodName, Type[] methodArguments, Type resultType);
+  public abstract boolean doesInvokeNeedFrame(TranslatorContext context, String methodName,
+                                              Type[] methodArguments, Type resultType);
 
   /**
    * Generate method invocation code
@@ -108,7 +120,8 @@ public abstract class AbstractBootClass {
    * @param resultType      the method result signature, must not be null
    * @return a string array contains assembler commands to invoke the method
    */
-  public abstract String[] generateInvocation(TranslatorContext context, String methodName, Type[] methodArguments, Type resultType);
+  public abstract String[] generateInvocation(TranslatorContext context, String methodName,
+                                              Type[] methodArguments, Type resultType);
 
   /**
    * Generate a field getter
@@ -119,7 +132,8 @@ public abstract class AbstractBootClass {
    * @param isStatic  the flag shows that the field is static if the flag is true
    * @return a string array contains assembler commands to read the field
    */
-  public abstract String[] generateFieldGetter(TranslatorContext context, String fieldName, Type fieldType, boolean isStatic);
+  public abstract String[] generateFieldGetter(TranslatorContext context, String fieldName,
+                                               Type fieldType, boolean isStatic);
 
   /**
    * Generate a field setter
@@ -130,7 +144,8 @@ public abstract class AbstractBootClass {
    * @param isStatic  the flag shows that the field is a static one if the flag is true
    * @return a string array contains assembler commands to set the field
    */
-  public abstract String[] generateFieldSetter(TranslatorContext context, String fieldName, Type fieldType, boolean isStatic);
+  public abstract String[] generateFieldSetter(TranslatorContext context, String fieldName,
+                                               Type fieldType, boolean isStatic);
 
   /**
    * The method is called once after translation and a boot class can add some assembler text in the special section if it needs

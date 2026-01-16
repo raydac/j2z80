@@ -16,12 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.ICONST;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process ICONST with code 02,03,04,05,06,07,08
 public class Processor_ICONST extends AbstractJvmCommandProcessor {
@@ -38,7 +37,9 @@ public class Processor_ICONST extends AbstractJvmCommandProcessor {
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final ICONST iconst = (ICONST) instruction;
     out.write(template.replace(MACROS_VALUE, Integer.toString(iconst.getValue().intValue())));
     out.write(NEXT_LINE);

@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.igormaznitsa.j2z80.bootstrap.java.lang;
+
+package j2z80.bootstrap.java.lang;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
-import com.igormaznitsa.j2z80.bootstrap.AbstractBootClass;
+import com.igormaznitsa.j2z80.bootstrap.AbstractBootstrapClass;
 import org.apache.bcel.generic.Type;
 
 /**
@@ -25,7 +26,7 @@ import org.apache.bcel.generic.Type;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-public class Object extends AbstractBootClass {
+public class Object extends AbstractBootstrapClass {
 
   @Override
   public boolean doesInvokeNeedFrame(final TranslatorContext translator, final String methodName, final Type[] methodArguments, final Type resultType) {
@@ -45,19 +46,19 @@ public class Object extends AbstractBootClass {
         }
       }
     }
-    throwBootClassExceptionForMethod(methodName, resultType, methodArguments);
+    this.throwBootClassExceptionForMethod(methodName, resultType, methodArguments);
     return null;
   }
 
   @Override
   public String[] generateFieldGetter(final TranslatorContext context, final String fieldName, final Type fieldType, final boolean isStatic) {
-    throwBootClassExceptionForField(fieldName, fieldType);
+    this.throwBootClassExceptionForField(fieldName, fieldType);
     return null;
   }
 
   @Override
   public String[] generateFieldSetter(final TranslatorContext context, final String fieldName, final Type fieldType, final boolean isStatic) {
-    throwBootClassExceptionForField(fieldName, fieldType);
+    this.throwBootClassExceptionForField(fieldName, fieldType);
     return null;
   }
 

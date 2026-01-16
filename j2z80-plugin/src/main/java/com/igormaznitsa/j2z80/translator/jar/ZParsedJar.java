@@ -19,9 +19,9 @@ package com.igormaznitsa.j2z80.translator.jar;
 import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -40,17 +40,17 @@ import org.apache.bcel.generic.ClassGen;
  */
 public class ZParsedJar {
 
-  private final File file;
+  private final Path path;
   private final JarFile jarFile;
 
-  private final List<ClassGen> classes = new ArrayList<>();
+  private final List<ClassGen> classList = new ArrayList<>();
   private final Map<String, byte[]> nativeCodeFiles = new HashMap<>();
   private final Map<String, byte[]> binaryResources = new HashMap<>();
 
-  public ZParsedJar(final File jarFile) {
-    this.file = jarFile;
+  public ZParsedJar(final Path jarFile) {
+    this.path = jarFile;
     try {
-      this.jarFile = new JarFile(jarFile);
+      this.jarFile = new JarFile(jarFile.toFile());
       this.extractAll();
     } catch (IOException ex) {
       throw new RuntimeException("Can't extract jar file: " + jarFile);
@@ -68,7 +68,7 @@ public class ZParsedJar {
 
   @Override
   public String toString() {
-    return this.file.getAbsolutePath();
+    return this.path.toAbsolutePath().toString();
   }
 
   private void extractAll() throws IOException {
@@ -86,7 +86,7 @@ public class ZParsedJar {
             throw new IOException(
                 "Disallowed class detected " + classGen.getClassName() + " [" + message + ']');
           }
-          classes.add(classGen);
+          this.classList.add(classGen);
         } else if (isNativeCodeFile(entry)) {
           nativeCodeFiles.put(name, entryData);
         } else {
@@ -97,7 +97,7 @@ public class ZParsedJar {
   }
 
   public List<ClassGen> getAllJavaClasses() {
-    return Collections.unmodifiableList(classes);
+    return Collections.unmodifiableList(this.classList);
   }
 
   public Map<String, byte[]> getAllJNIData() {

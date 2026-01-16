@@ -20,13 +20,12 @@ import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
+import java.io.IOException;
+import java.io.Writer;
 import org.apache.bcel.generic.INSTANCEOF;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
-
-import java.io.IOException;
-import java.io.Writer;
 
 // class to process INSTANCEOF with code 193
 public class Processor_INSTANCEOF extends AbstractJvmCommandProcessor implements NeedsMemoryManager, NeedsInstanceofManager {
@@ -43,7 +42,9 @@ public class Processor_INSTANCEOF extends AbstractJvmCommandProcessor implements
   }
 
   @Override
-  public void process(final MethodTranslator methodTranslator, final Instruction instruction, final InstructionHandle handle, final Writer out) throws IOException {
+  public void process(final MethodTranslator methodTranslator, final Instruction instruction,
+                      final InstructionHandle handle,
+                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final INSTANCEOF instof = (INSTANCEOF) instruction;
 
     final ObjectType objectType = instof.getLoadClassType(methodTranslator.getConstantPool());

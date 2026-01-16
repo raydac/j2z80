@@ -17,6 +17,7 @@ package com.igormaznitsa.j2z80;
 
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.ids.MethodID;
+import java.util.Map;
 import org.apache.bcel.generic.MethodGen;
 
 /**
@@ -40,6 +41,13 @@ public interface MethodContext {
    * @return null if the info is not found or a method info object if it is found
    */
   ClassMethodInfo findMethodInfo(MethodID methodID);
+
+  /**
+   * Get all registered methods.
+   *
+   * @return map of registered methods.
+   */
+  Map<MethodID, ClassMethodInfo> getMethods();
 
   /**
    * Find the method uid
