@@ -31,13 +31,10 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -57,14 +54,9 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
     requiresDependencyResolution = ResolutionScope.COMPILE)
 public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
 
-  /**
-   * Current maven project.
-   */
-  @Parameter(defaultValue = "${project}", readonly = true, required = true)
-  private MavenProject project;
+  private final MavenProject project;
 
-  @Component
-  private ArtifactResolver artifactResolver;
+  private final ArtifactResolver artifactResolver;
 
   @Parameter(name = "jarFile", defaultValue = "${project.build.directory}${file.separator}${project.build.finalName}.jar")
   private File jarFile;
@@ -87,14 +79,14 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   @Parameter(name = "optimization", defaultValue = "none")
   private String optimization;
 
-  @Parameter(name = "remoteRepositories", defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
-  private List<ArtifactRepository> remoteRepositories;
-
-  @Parameter(name = "session", defaultValue = "${session}", readonly = true, required = true)
-  private MavenSession session;
-
-  @Parameter(name = "execution", defaultValue = "${mojoExecution}", readonly = true, required = true)
-  private MojoExecution execution;
+  @Inject
+  public TranslatorMojo(
+      final MavenProject project,
+      final ArtifactResolver artifactResolver
+  ) {
+    this.project = project;
+    this.artifactResolver = artifactResolver;
+  }
 
   public File getJarFile() {
     return jarFile;
@@ -127,7 +119,6 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   public void setLogAsmText(boolean logAsmText) {
     this.logAsmText = logAsmText;
   }
-
 
   public String[] getExcludeResources() {
     return this.excludeResources;
