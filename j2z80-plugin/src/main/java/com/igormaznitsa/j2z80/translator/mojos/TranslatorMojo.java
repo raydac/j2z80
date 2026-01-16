@@ -48,10 +48,11 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
  * Maven mojo to translate a compiled Java classes from a Jar into Z80 binary
  * code through assembler stage.
  */
+@SuppressWarnings("unused")
 @Mojo(name = "translate",
     defaultPhase = LifecyclePhase.INSTALL,
     threadSafe = true,
-    requiresDependencyResolution = ResolutionScope.COMPILE)
+    requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
 
   private final MavenProject project;
@@ -197,16 +198,17 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
 
   private List<File> getCompilationDependencies() {
     final List<File> dependencyList = new ArrayList<>();
-    for (final Artifact arty : this.project.getDependencyArtifacts()) {
-      if ("z80".equalsIgnoreCase(arty.getClassifier())) {
+    for (final Artifact artifact : this.project.getArtifacts()) {
+      if ("z80".equalsIgnoreCase(artifact.getClassifier())) {
         try {
           final ArtifactResult art =
-              artifactResolver.resolveArtifact(project.getProjectBuildingRequest(), arty);
+              this.artifactResolver.resolveArtifact(this.project.getProjectBuildingRequest(),
+                  artifact);
           final File file = art.getArtifact().getFile();
           logInfo("Detected Z80 dependency :" + file.getAbsolutePath());
           dependencyList.add(file);
         } catch (ArtifactResolverException ex) {
-          logError("Can't resolve Z80 dependency artifact: " + arty);
+          logError("Can't resolve Z80 dependency artifact: " + artifact);
           throw new RuntimeException(ex);
         }
       }
