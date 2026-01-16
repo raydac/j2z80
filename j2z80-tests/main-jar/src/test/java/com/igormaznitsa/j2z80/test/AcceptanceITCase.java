@@ -52,7 +52,7 @@ public class AcceptanceITCase extends Z80 {
     public boolean step() {
         cycle = Integer.MAX_VALUE;
         if (PC == endAddress) {
-            System.out.println("The end address has been met successfuly");
+            System.out.println("The end address found successfully");
             return true;
         }
         return false;
@@ -92,8 +92,6 @@ public class AcceptanceITCase extends Z80 {
             if ((short) peekw(Main.FLAG_ADDRESS) != Main.FLAG_DATA) {
                 throw new IllegalArgumentException("Successful flag doesn't have needed value [#" + Integer.toHexString(peekw(Main.FLAG_ADDRESS)).toUpperCase() + ']');
             }
-
-
 
             assertOnlyIncludedTextResource("Check included text resource", "hello from resource", compiledBlock);
             assertPatternedArea("Must be ODD patterned", new OddPatternGenerator(), Main.START_ADDRESS_1 + 2, Main.BLOCK_LENGTH - 2);

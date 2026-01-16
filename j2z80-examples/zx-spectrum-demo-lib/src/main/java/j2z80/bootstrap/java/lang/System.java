@@ -18,10 +18,10 @@ public class System extends Object {
       } else if ("err".equals(fieldName)) {
         data = ERR_STREAM;
       } else {
-        throwBootClassExceptionForField(fieldName, fieldType);
+        this.throwBootClassExceptionForField(fieldName, fieldType);
       }
     } else {
-      throwBootClassExceptionForField(fieldName, fieldType);
+      this.throwBootClassExceptionForField(fieldName, fieldType);
     }
     return data;
   }
@@ -29,14 +29,14 @@ public class System extends Object {
   @Override
   public String[] generateInvocation(final TranslatorContext translator, final String methodName,
                                      final Type[] methodArguments, final Type resultType) {
-    throwBootClassExceptionForMethod(methodName, resultType, methodArguments);
+    this.throwBootClassExceptionForMethod(methodName, resultType, methodArguments);
     return null;
   }
 
   @Override
   public String[] generateFieldSetter(final TranslatorContext translator, final String fieldName,
                                       final Type methodSignature, final boolean isStatic) {
-    throwBootClassExceptionForField(fieldName, methodSignature);
+    this.throwBootClassExceptionForField(fieldName, methodSignature);
     return null;
   }
 
