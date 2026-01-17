@@ -88,7 +88,6 @@ public class TranslatorImpl implements TranslatorContext {
   private final MethodContextImpl methodContext = new MethodContextImpl(this);
 
   private final TranslatorLogger messageLogger;
-  private final List<MethodID> methodsToProcess;
   private final Set<MethodID> methodsUsedInInvokeInterface = new HashSet<>();
   private final Map<ClassMethodInfo, String[]> asmForMethods = new LinkedHashMap<>();
   private final Set<Class<? extends J2ZAdditionalBlock>> registeredAdditions = new HashSet<>();
@@ -99,7 +98,7 @@ public class TranslatorImpl implements TranslatorContext {
   private final OptimizationLevel optimizationLevel;
 
   public TranslatorImpl(final TranslatorLogger logger, final OptimizationLevel optimization,
-                        final List<Path> jarArchives) throws IOException {
+                        final List<Path> jarArchives) {
     this.optimizationLevel = optimization;
     this.messageLogger = logger == null ? new DefaultTranslatorLogger() : logger;
 
@@ -110,10 +109,6 @@ public class TranslatorImpl implements TranslatorContext {
       throw new IllegalStateException(
           "There is not any class in formed class path: " + this.workingClassPath);
     }
-
-    this.classContext.init();
-    this.methodsToProcess =
-        unmodifiableList(this.methodContext.findMethodsForProcessingInClassPath());
   }
 
   private static List<ParsedAsmLine> asParsedLines(final List<String> list) {
@@ -180,6 +175,9 @@ public class TranslatorImpl implements TranslatorContext {
                                 final int stackTop, final String[] patternsExcludeBinResources,
                                 final ClassLoader bootstrapClassLoader)
       throws IOException {
+    this.classContext.init();
+    final List<MethodID> methodsToProcess =
+        unmodifiableList(this.methodContext.findMethodsForProcessingInClassPath());
 
     this.reset();
 
@@ -207,12 +205,10 @@ public class TranslatorImpl implements TranslatorContext {
 
     this.getLogger().logDebug("Methods to process");
     this.getLogger().logDebug("-----------------------");
-    this.methodsToProcess.forEach(x -> {
-      this.getLogger().logDebug(x.toString());
-    });
+    methodsToProcess.forEach(x -> this.getLogger().logDebug(x.toString()));
     this.getLogger().logDebug("-----------------------");
 
-    for (final MethodID methodToProcess : this.methodsToProcess) {
+    for (final MethodID methodToProcess : methodsToProcess) {
       if (!mainMethodID.equals(methodToProcess)) {
         this.translateMethod(methodToProcess, bootstrapClassLoader);
       }
@@ -499,7 +495,7 @@ public class TranslatorImpl implements TranslatorContext {
         this.asmForMethods.put(method, resultAsm);
       }
     } catch (Exception ex) {
-      getLogger().logError("Exception during " + methodId.toString() + " [" + ex + ']');
+      getLogger().logError("Exception during " + methodId + " [" + ex + ']');
       throw new IOException("Can't translate " + methodId, ex);
     }
     return resultAsm;
