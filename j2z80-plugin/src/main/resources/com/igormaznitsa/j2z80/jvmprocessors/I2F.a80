@@ -1,0 +1,4 @@
+; 134 I2F
+    POP BC
+    CALL ___FLOAT_I2F
+    PUSH BC

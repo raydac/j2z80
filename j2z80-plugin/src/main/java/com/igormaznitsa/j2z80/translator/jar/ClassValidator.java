@@ -20,7 +20,6 @@ import com.igormaznitsa.j2z80.utils.Utils;
 import org.apache.bcel.Const;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantDouble;
-import org.apache.bcel.classfile.ConstantFloat;
 import org.apache.bcel.classfile.ConstantInteger;
 import org.apache.bcel.classfile.ConstantLong;
 import org.apache.bcel.classfile.ConstantUtf8;
@@ -92,10 +91,6 @@ public enum ClassValidator {
         final double value = ((ConstantDouble) curconst).getBytes();
         result.set("Double values are not allowed [" + value + ']');
         break;
-      } else if (curconst instanceof ConstantFloat) {
-        final float value = ((ConstantFloat) curconst).getBytes();
-        result.set("Float values are not allowed [" + value + ']');
-        break;
       } else if (curconst instanceof ConstantLong) {
         final long value = ((ConstantLong) curconst).getBytes();
         result.set("Long values are not allowed [" + Utils.longToString(value) + ']');
@@ -127,11 +122,6 @@ public enum ClassValidator {
           immediateBreak = true;
         }
         break;
-        case Const.T_FLOAT: {
-          result.set("Detected disallowed 'float' field [" + fieldName + ']');
-          immediateBreak = true;
-        }
-        break;
       }
     }
 
@@ -160,11 +150,6 @@ public enum ClassValidator {
           immediateBreak = true;
         }
         break;
-        case Const.T_FLOAT: {
-          result.set("Method returs disallowed 'float' field [" + methodName + ']');
-          immediateBreak = true;
-        }
-        break;
       }
 
       // check args
@@ -179,11 +164,6 @@ public enum ClassValidator {
             break;
             case Const.T_DOUBLE: {
               result.set("Method needs disallowed 'double' argument [" + methodName + ']');
-              immediateBreak = true;
-            }
-            break;
-            case Const.T_FLOAT: {
-              result.set("Method needs disallowed 'float' argument [" + methodName + ']');
               immediateBreak = true;
             }
             break;

@@ -1,4 +1,5 @@
 ## 1. Implementation Progress
+- Added float support. Each Java float is one 16-bit slot holding IEEE 754 binary16. Opcodes: fconst, fload/fstore, faload/fastore, fadd/fsub/fmul/fdiv/frem/fneg, i2f/f2i, fcmpl/fcmpg, freturn, ldc/ldc_w of ConstantFloat, newarray float.
 - Fixed translated runtime defects in jvmprocessors *.a80: if_icmpgt equality, jsr/jsr_w return address ($+7), if_icmpne uses JP, baload sign-extends, checkcast null succeeds, idiv/irem by zero pops both saved registers, byte-array type is 1, array size uses RL, free memory is caller SP minus heap top, allocations are zeroed, multi-array skips a zero dimension.
 - Fixed stack frame allocation for INVOKESTATIC / INVOKESPECIAL: frame size now uses method maxLocals (bytes = maxLocals * 2), not only argument slots.
 - Fixed LabelAndFrameUtils.calculateFrameSizeForMethod: no longer double-counts `this` for instance methods (maxLocals already includes it).
@@ -8,6 +9,8 @@
 - Frame size floors at argument slots so native methods (maxLocals=0, no Code attribute) still get a valid frame — unblocks main-jar verify.
 
 ## 2. Architecture & Technical Discoveries
+- Float runtime is FLOAT_ARITHMETIC_MANAGER.a80, pulled in by NeedsFloatArithmeticManager. Arithmetic is software binary16 (round-to-nearest-even, subnormals, signed zero, inf, NaN). IY points at a 16-byte workspace and is saved/restored. IX is not used.
+- f2i clamps to signed 16-bit. Float divide by zero yields infinity and does not throw. frem follows IEEEremainder; a half-precision quotient that overflows becomes NaN.
 - Locals live at (IX - index*2); IX is frame top (local 0 / first arg).
 - ___BEFORE_INVOKE: A = arg area bytes, BC = full frame bytes; lowers SP and sets IX.
 - ___AFTER_INVOKE restores previous IX and discards the frame.
@@ -21,20 +24,22 @@
 - WithLocals invoke tests historically did not set maxLocals on MethodGen (fixed in registerMockMethod).
 
 ## 4. Current Work In Progress
-- None (stack-frame fix verified via main-jar AcceptanceITCase).
+- None. Float opcodes are covered by HalfFloatTest, TestFloatArithmetic, and TestFloatSlots.
 
 ## 5. Known Issues & Limitations
+- long and double stay unsupported, including f2l, f2d, l2f, and d2f. float is half precision, not Java float32.
 - IX displacement limits locals to index 0..64 (assertLocalVariablesNumber uses 64).
 - Only documented Z80 instructions in the embedded assembler.
 - 16-bit int model: mul/div wrap in 16 bits; shifts are 16-bit (IUSHR does not match a 32-bit Java >>>). No array bounds or null checks on field/array access.
 - char is stored as an 8-bit element.
 
 ## 6. Open Questions & Pending Decisions
-- None for this frame-size fix.
+- None.
 
 ## 7. Useful References
 - docs/jni.txt — IX frame layout for JNI
 - j2z80-plugin/.../MEMORY_MANAGER.a80 — ___BEFORE_INVOKE / ___AFTER_INVOKE
+- j2z80-plugin/.../FLOAT_ARITHMETIC_MANAGER.a80 — binary16 add/sub/mul/div/rem, i2f, f2i, cmp
 - mvn22 -pl j2z80-tests/main-jar -am verify
 
 ## 8. User Advice and Recommendations

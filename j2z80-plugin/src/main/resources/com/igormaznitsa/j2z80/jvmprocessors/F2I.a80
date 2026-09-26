@@ -1,0 +1,4 @@
+; 139 F2I
+    POP BC
+    CALL ___FLOAT_F2I
+    PUSH BC

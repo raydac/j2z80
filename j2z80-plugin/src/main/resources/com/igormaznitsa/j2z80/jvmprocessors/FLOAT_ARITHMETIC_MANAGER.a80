@@ -1,0 +1,1064 @@
+; binary16 float ops. BC = value1, DE = value2, result in BC.
+; sign bit 15, exponent bits 14-10 bias 15, fraction bits 9-0.
+; Working significand keeps the hidden 1 at bit 13.
+
+___FLOAT_SHL3:
+    SLA E
+    RL D
+    SLA E
+    RL D
+    SLA E
+    RL D
+    RET
+
+___FLOAT_SHR3:
+    SRL D
+    RR E
+    SRL D
+    RR E
+    SRL D
+    RR E
+    RET
+
+___FLOAT_SHR_GS:
+    CLRLOC
+    PUSH HL
+    XOR A
+    LD C,A
+    LD L,A
+@LP:
+    LD A,C
+    OR L
+    LD C,A
+    XOR A
+    SRL D
+    RR E
+    JP NC,@NC
+    LD A,1
+@NC:
+    LD L,A
+    DJNZ @LP
+    LD A,L
+    POP HL
+    RET
+
+___FLOAT_ST_A:
+    LD (IY+0),L
+    LD (IY+1),H
+    LD (IY+2),E
+    LD (IY+3),D
+    RET
+
+___FLOAT_ST_B:
+    LD (IY+4),L
+    LD (IY+5),H
+    LD (IY+6),E
+    LD (IY+7),D
+    RET
+
+___FLOAT_UNPACK:
+    CLRLOC
+    LD A,B
+    RLCA
+    AND 1
+    LD L,A
+    LD A,B
+    AND #7C
+    RRCA
+    RRCA
+    LD H,A
+    LD A,B
+    AND 3
+    LD D,A
+    LD E,C
+    LD A,H
+    OR A
+    JP Z,@EXP0
+    CP 31
+    JP Z,@EXP31
+    LD A,D
+    OR #04
+    LD D,A
+    CALL ___FLOAT_SHL3
+    LD A,1
+    RET
+@EXP0:
+    LD A,D
+    OR E
+    JP Z,@ZERO
+    CALL ___FLOAT_SHL3
+    LD H,1
+@NORM:
+    BIT 5,D
+    JP NZ,@FINITE
+    SLA E
+    RL D
+    DEC H
+    JP @NORM
+@FINITE:
+    LD A,1
+    RET
+@ZERO:
+    LD DE,0
+    LD H,0
+    XOR A
+    RET
+@EXP31:
+    LD A,D
+    OR E
+    JP Z,@INF
+    LD A,3
+    RET
+@INF:
+    LD A,2
+    RET
+
+___FLOAT_PACK:
+    CLRLOC
+    LD A,D
+    OR E
+    JP Z,@ZERO
+@RSH:
+    BIT 7,D
+    JP NZ,@RSH1
+    BIT 6,D
+    JP Z,@LSH
+@RSH1:
+    SRL D
+    RR E
+    JP NC,@RSHC
+    SET 0,E
+@RSHC:
+    INC H
+    JP @RSH
+@LSH:
+    BIT 5,D
+    JP NZ,@ROUND
+    SLA E
+    RL D
+    DEC H
+    LD A,D
+    OR E
+    JP NZ,@LSH
+    JP @ZERO
+@ROUND:
+    BIT 2,E
+    JP Z,@EXPCHK
+    LD A,E
+    AND 3
+    JP NZ,@ROUNDUP
+    BIT 3,E
+    JP Z,@EXPCHK
+@ROUNDUP:
+    LD A,E
+    ADD A,8
+    LD E,A
+    JP NC,@RENORM
+    INC D
+@RENORM:
+    BIT 7,D
+    JP NZ,@REN1
+    BIT 6,D
+    JP Z,@EXPCHK
+@REN1:
+    SRL D
+    RR E
+    INC H
+    JP @RENORM
+@EXPCHK:
+    LD A,H
+    OR A
+    JP M,@SUB
+    JP Z,@SUB
+    CP 31
+    JP NC,@INF
+    SRL D
+    RR E
+    SRL D
+    RR E
+    SRL D
+    RR E
+    LD A,D
+    AND 3
+    LD B,A
+    LD C,E
+    LD A,H
+    ADD A,A
+    ADD A,A
+    AND #7C
+    OR B
+    LD B,A
+    JP @SIGN
+@SUB:
+    LD A,4
+    SUB H
+    CP 32
+    JP C,@SUBSH
+    LD BC,0
+    JP @SIGN
+@SUBSH:
+    LD B,A
+    CALL ___FLOAT_SHR_GS
+    OR A
+    JP Z,@SUBNR
+    LD A,C
+    OR A
+    JP NZ,@SUBRU
+    BIT 0,E
+    JP Z,@SUBNR
+@SUBRU:
+    INC DE
+@SUBNR:
+    LD A,D
+    AND #FC
+    JP NZ,@MINN
+    BIT 2,D
+    JP Z,@SUBENC
+@MINN:
+    LD BC,#0400
+    JP @SIGN
+@SUBENC:
+    LD C,E
+    LD A,D
+    AND 3
+    LD B,A
+    JP @SIGN
+@INF:
+    LD BC,#7C00
+    JP @SIGN
+@ZERO:
+    LD BC,0
+@SIGN:
+    LD A,L
+    OR A
+    RET Z
+    SET 7,B
+    RET
+
+___FLOAT_ALIGN:
+    CLRLOC
+    LD A,(IY+1)
+    SUB (IY+5)
+    JP M,@SWAP
+    JP @DIFF
+@SWAP:
+    LD A,(IY+0)
+    LD B,(IY+4)
+    LD (IY+4),A
+    LD (IY+0),B
+    LD A,(IY+1)
+    LD B,(IY+5)
+    LD (IY+5),A
+    LD (IY+1),B
+    LD A,(IY+2)
+    LD B,(IY+6)
+    LD (IY+6),A
+    LD (IY+2),B
+    LD A,(IY+3)
+    LD B,(IY+7)
+    LD (IY+7),A
+    LD (IY+3),B
+    LD A,(IY+1)
+    SUB (IY+5)
+@DIFF:
+    OR A
+    RET Z
+    CP 32
+    JP C,@SHIFT
+    LD A,(IY+6)
+    OR (IY+7)
+    LD E,0
+    LD D,0
+    JP Z,@STB
+    LD E,1
+@STB:
+    LD (IY+6),E
+    LD (IY+7),D
+    LD A,(IY+1)
+    LD (IY+5),A
+    RET
+@SHIFT:
+    LD B,A
+    LD E,(IY+6)
+    LD D,(IY+7)
+@SH:
+    SRL D
+    RR E
+    JP NC,@SHC
+    SET 0,E
+@SHC:
+    DJNZ @SH
+    LD (IY+6),E
+    LD (IY+7),D
+    LD A,(IY+1)
+    LD (IY+5),A
+    RET
+
+___FLOAT_ADD_FINITE:
+    CLRLOC
+    CALL ___FLOAT_ALIGN
+    LD A,(IY+0)
+    XOR (IY+4)
+    JP NZ,@DIF
+    LD L,(IY+2)
+    LD H,(IY+3)
+    LD E,(IY+6)
+    LD D,(IY+7)
+    ADD HL,DE
+    EX DE,HL
+    LD L,(IY+0)
+    LD H,(IY+1)
+    CALL ___FLOAT_PACK
+    RET
+@DIF:
+    LD L,(IY+2)
+    LD H,(IY+3)
+    LD E,(IY+6)
+    LD D,(IY+7)
+    OR A
+    SBC HL,DE
+    JP NC,@POS
+    LD A,H
+    CPL
+    LD H,A
+    LD A,L
+    CPL
+    LD L,A
+    INC HL
+    LD A,(IY+4)
+    LD (IY+0),A
+@POS:
+    LD A,H
+    OR L
+    JP NZ,@NZ
+    LD (IY+0),0
+@NZ:
+    LD D,H
+    LD E,L
+    LD L,(IY+0)
+    LD H,(IY+1)
+    CALL ___FLOAT_PACK
+    RET
+
+___FLOAT_UMUL:
+    CLRLOC
+    LD (IY+12),E
+    LD (IY+13),D
+    LD (IY+14),0
+    LD (IY+15),0
+    XOR A
+    LD (IY+8),A
+    LD (IY+9),A
+    LD (IY+10),A
+    LD (IY+11),A
+    LD A,16
+@UM:
+    SRL B
+    RR C
+    JP NC,@NOADD
+    PUSH AF
+    LD A,(IY+8)
+    ADD A,(IY+12)
+    LD (IY+8),A
+    LD A,(IY+9)
+    ADC A,(IY+13)
+    LD (IY+9),A
+    LD A,(IY+10)
+    ADC A,(IY+14)
+    LD (IY+10),A
+    LD A,(IY+11)
+    ADC A,(IY+15)
+    LD (IY+11),A
+    POP AF
+@NOADD:
+    SLA (IY+12)
+    RL (IY+13)
+    RL (IY+14)
+    RL (IY+15)
+    DEC A
+    JP NZ,@UM
+    RET
+
+___FLOAT_DIV_SIGS:
+    CLRLOC
+    LD (IY+6),C
+    LD (IY+7),B
+    LD D,0
+    LD E,0
+    LD B,13
+@SL:
+    ADD HL,HL
+    RL E
+    RL D
+    DJNZ @SL
+    LD BC,0
+    LD A,16
+@DV:
+    PUSH AF
+    ADD HL,HL
+    RL E
+    RL D
+    SLA C
+    RL B
+    LD A,D
+    CP (IY+7)
+    JP NZ,@CMP
+    LD A,E
+    CP (IY+6)
+@CMP:
+    JP C,@NOSUB
+    LD A,E
+    SUB (IY+6)
+    LD E,A
+    LD A,D
+    SBC A,(IY+7)
+    LD D,A
+    INC C
+@NOSUB:
+    POP AF
+    DEC A
+    JP NZ,@DV
+    LD A,D
+    OR E
+    OR H
+    OR L
+    JP Z,@QOK
+    SET 0,C
+@QOK:
+    LD D,B
+    LD E,C
+    RET
+
+___FLOAT_LOAD_PAIR:
+    CLRLOC
+    LD (IY+12),C
+    LD (IY+13),B
+    LD (IY+14),E
+    LD (IY+15),D
+    CALL ___FLOAT_UNPACK
+    LD (IY+8),A
+    CALL ___FLOAT_ST_A
+    LD C,(IY+14)
+    LD B,(IY+15)
+    CALL ___FLOAT_UNPACK
+    LD (IY+9),A
+    CALL ___FLOAT_ST_B
+    RET
+
+___FLOAT_SIGN_XOR:
+    LD A,(IY+0)
+    XOR (IY+4)
+    LD L,A
+    RET
+
+___FLOAT_LEAVE:
+    POP IY
+    POP HL
+    POP AF
+    RET
+
+___FLOAT_NAN:
+    LD BC,#7E00
+    JP ___FLOAT_LEAVE
+
+___FLOAT_SIGNED_INF:
+    CALL ___FLOAT_SIGN_XOR
+    LD BC,#7C00
+    LD A,L
+    OR A
+    JP Z,___FLOAT_LEAVE
+    SET 7,B
+    JP ___FLOAT_LEAVE
+
+___FLOAT_SIGNED_ZERO:
+    CALL ___FLOAT_SIGN_XOR
+    LD BC,0
+    LD A,L
+    OR A
+    JP Z,___FLOAT_LEAVE
+    LD B,#80
+    JP ___FLOAT_LEAVE
+
+___FLOAT_ADD:
+    PUSH AF
+    PUSH HL
+    PUSH IY
+    LD IY,___FLOAT_WS
+    CALL ___FLOAT_LOAD_PAIR
+    LD A,(IY+8)
+    CP 3
+    JP Z,___FLOAT_NAN
+    LD A,(IY+9)
+    CP 3
+    JP Z,___FLOAT_NAN
+    LD A,(IY+8)
+    CP 2
+    JP Z,@A_INF
+    LD A,(IY+9)
+    CP 2
+    JP Z,@RET_B
+    LD A,(IY+8)
+    OR A
+    JP Z,@A_ZERO
+    LD A,(IY+9)
+    OR A
+    JP Z,@RET_A
+    CALL ___FLOAT_ADD_FINITE
+    JP ___FLOAT_LEAVE
+@A_INF:
+    LD A,(IY+9)
+    CP 2
+    JP NZ,@RET_A
+    LD A,(IY+0)
+    XOR (IY+4)
+    JP NZ,___FLOAT_NAN
+    JP @RET_A
+@A_ZERO:
+    LD A,(IY+9)
+    OR A
+    JP NZ,@RET_B
+    LD A,(IY+13)
+    AND (IY+15)
+    AND #80
+    LD B,A
+    LD C,0
+    JP ___FLOAT_LEAVE
+@RET_A:
+    LD C,(IY+12)
+    LD B,(IY+13)
+    JP ___FLOAT_LEAVE
+@RET_B:
+    LD C,(IY+14)
+    LD B,(IY+15)
+    JP ___FLOAT_LEAVE
+
+___FLOAT_SUB:
+    LD A,D
+    XOR #80
+    LD D,A
+    JP ___FLOAT_ADD
+
+___FLOAT_MUL:
+    CLRLOC
+    PUSH AF
+    PUSH HL
+    PUSH IY
+    LD IY,___FLOAT_WS
+    CALL ___FLOAT_LOAD_PAIR
+    LD A,(IY+8)
+    CP 3
+    JP Z,___FLOAT_NAN
+    LD A,(IY+9)
+    CP 3
+    JP Z,___FLOAT_NAN
+    LD A,(IY+8)
+    CP 2
+    JP Z,@INF1
+    LD A,(IY+9)
+    CP 2
+    JP Z,@INF2
+    LD A,(IY+8)
+    OR A
+    JP Z,___FLOAT_SIGNED_ZERO
+    LD A,(IY+9)
+    OR A
+    JP Z,___FLOAT_SIGNED_ZERO
+    JP @FINITE
+@INF1:
+    LD A,(IY+9)
+    OR A
+    JP Z,___FLOAT_NAN
+    JP ___FLOAT_SIGNED_INF
+@INF2:
+    LD A,(IY+8)
+    OR A
+    JP Z,___FLOAT_NAN
+    JP ___FLOAT_SIGNED_INF
+@FINITE:
+    CALL ___FLOAT_SIGN_XOR
+    PUSH HL
+    LD A,(IY+1)
+    ADD A,(IY+5)
+    SUB 15
+    PUSH AF
+    LD E,(IY+2)
+    LD D,(IY+3)
+    CALL ___FLOAT_SHR3
+    PUSH DE
+    LD E,(IY+6)
+    LD D,(IY+7)
+    CALL ___FLOAT_SHR3
+    POP BC
+    CALL ___FLOAT_UMUL
+    LD A,(IY+8)
+    AND #7F
+    LD C,A
+    LD B,7
+@R7:
+    SRL (IY+11)
+    RR (IY+10)
+    RR (IY+9)
+    RR (IY+8)
+    DJNZ @R7
+    LD E,(IY+8)
+    LD D,(IY+9)
+    LD A,C
+    OR A
+    JP Z,@NOST
+    SET 0,E
+@NOST:
+    POP AF
+    LD B,A
+    POP HL
+    LD H,B
+    CALL ___FLOAT_PACK
+    JP ___FLOAT_LEAVE
+
+___FLOAT_DIV:
+    CLRLOC
+    PUSH AF
+    PUSH HL
+    PUSH IY
+    LD IY,___FLOAT_WS
+    CALL ___FLOAT_LOAD_PAIR
+    LD A,(IY+8)
+    CP 3
+    JP Z,___FLOAT_NAN
+    LD A,(IY+9)
+    CP 3
+    JP Z,___FLOAT_NAN
+    LD A,(IY+8)
+    CP 2
+    JP NZ,@NINF1
+    LD A,(IY+9)
+    CP 2
+    JP Z,___FLOAT_NAN
+@NINF1:
+    LD A,(IY+8)
+    OR A
+    JP NZ,@NZERO
+    LD A,(IY+9)
+    OR A
+    JP Z,___FLOAT_NAN
+@NZERO:
+    LD A,(IY+9)
+    OR A
+    JP Z,___FLOAT_SIGNED_INF
+    LD A,(IY+8)
+    CP 2
+    JP Z,___FLOAT_SIGNED_INF
+    LD A,(IY+9)
+    CP 2
+    JP Z,___FLOAT_SIGNED_ZERO
+    LD A,(IY+8)
+    OR A
+    JP Z,___FLOAT_SIGNED_ZERO
+    LD E,(IY+2)
+    LD D,(IY+3)
+    CALL ___FLOAT_SHR3
+    PUSH DE
+    LD E,(IY+6)
+    LD D,(IY+7)
+    CALL ___FLOAT_SHR3
+    LD B,D
+    LD C,E
+    POP HL
+    CALL ___FLOAT_DIV_SIGS
+    CALL ___FLOAT_SIGN_XOR
+    LD A,(IY+1)
+    SUB (IY+5)
+    ADD A,15
+    LD H,A
+    CALL ___FLOAT_PACK
+    JP ___FLOAT_LEAVE
+
+___FLOAT_REM:
+    CLRLOC
+    PUSH AF
+    PUSH HL
+    PUSH IY
+    LD IY,___FLOAT_WS
+    PUSH BC
+    PUSH DE
+    CALL ___FLOAT_UNPACK
+    LD L,A
+    POP BC
+    PUSH BC
+    PUSH HL
+    CALL ___FLOAT_UNPACK
+    POP HL
+    LD H,A
+    LD A,H
+    CP 3
+    JP Z,@NAN
+    LD A,L
+    CP 3
+    JP Z,@NAN
+    CP 2
+    JP Z,@NAN
+    LD A,H
+    OR A
+    JP Z,@NAN
+    CP 2
+    JP Z,@V1
+    LD A,L
+    OR A
+    JP Z,@V1
+    POP DE
+    POP BC
+    PUSH BC
+    PUSH DE
+    CALL ___FLOAT_DIV
+    CALL ___FLOAT_RINT
+    POP HL
+    PUSH BC
+    POP DE
+    LD B,H
+    LD C,L
+    CALL ___FLOAT_MUL
+    POP DE
+    PUSH BC
+    POP HL
+    LD B,D
+    LD C,E
+    LD D,H
+    LD E,L
+    CALL ___FLOAT_SUB
+    JP ___FLOAT_LEAVE
+@NAN:
+    POP HL
+    POP HL
+    LD BC,#7E00
+    JP ___FLOAT_LEAVE
+@V1:
+    POP HL
+    POP BC
+    JP ___FLOAT_LEAVE
+
+___FLOAT_RINT:
+    CLRLOC
+    PUSH AF
+    PUSH HL
+    PUSH IY
+    LD IY,___FLOAT_WS
+    CALL ___FLOAT_UNPACK
+    LD (IY+0),L
+    CP 3
+    JP Z,@NAN
+    CP 2
+    JP Z,@ORIG
+    OR A
+    JP Z,@ZERO
+    LD A,H
+    SUB 15
+    JP M,@LT1
+    CP 10
+    JP NC,@ORIG
+    LD B,A
+    LD A,10
+    SUB B
+    LD B,A
+    CALL ___FLOAT_SHR3
+    XOR A
+    LD C,A
+    LD L,A
+@RS:
+    LD A,C
+    OR L
+    LD C,A
+    XOR A
+    SRL D
+    RR E
+    JP NC,@RS0
+    LD A,1
+@RS0:
+    LD L,A
+    DJNZ @RS
+    LD A,L
+    OR A
+    JP Z,@ROK
+    LD A,C
+    OR A
+    JP NZ,@RUP
+    BIT 0,E
+    JP Z,@ROK
+@RUP:
+    INC DE
+@ROK:
+    LD B,D
+    LD C,E
+    LD A,(IY+0)
+    OR A
+    JP Z,@ASINT
+    LD A,B
+    CPL
+    LD B,A
+    LD A,C
+    CPL
+    LD C,A
+    INC BC
+@ASINT:
+    CALL ___FLOAT_I2F
+    JP ___FLOAT_LEAVE
+@LT1:
+    LD A,H
+    CP 14
+    JP C,@ZERO
+    JP NZ,@ONE
+    LD A,D
+    CP #20
+    JP NZ,@ONE
+    LD A,E
+    OR A
+    JP NZ,@ONE
+@ZERO:
+    LD A,(IY+0)
+    LD B,0
+    OR A
+    JP Z,@Z0
+    LD B,#80
+@Z0:
+    LD C,0
+    JP ___FLOAT_LEAVE
+@ONE:
+    LD A,(IY+0)
+    LD BC,#3C00
+    OR A
+    JP Z,___FLOAT_LEAVE
+    LD B,#BC
+    JP ___FLOAT_LEAVE
+@NAN:
+    LD BC,#7E00
+    JP ___FLOAT_LEAVE
+@ORIG:
+    JP ___FLOAT_LEAVE
+
+___FLOAT_I2F:
+    CLRLOC
+    PUSH AF
+    PUSH HL
+    PUSH IY
+    LD IY,___FLOAT_WS
+    LD A,B
+    OR C
+    JP Z,@ZERO
+    XOR A
+    LD (IY+0),A
+    BIT 7,B
+    JP Z,@POS
+    LD A,B
+    CP -128
+    JP NZ,@NEG
+    LD A,C
+    OR A
+    JP NZ,@NEG
+    LD BC,#F800
+    JP ___FLOAT_LEAVE
+@NEG:
+    LD (IY+0),1
+    LD A,B
+    CPL
+    LD B,A
+    LD A,C
+    CPL
+    LD C,A
+    INC BC
+@POS:
+    LD D,0
+@FIND:
+    BIT 7,B
+    JP NZ,@FOUND
+    SLA C
+    RL B
+    INC D
+    JP @FIND
+@FOUND:
+    LD A,30
+    SUB D
+    LD H,A
+    BIT 4,C
+    JP Z,@NOR
+    LD A,C
+    AND #0F
+    JP NZ,@RU
+    BIT 5,C
+    JP Z,@NOR
+@RU:
+    LD A,C
+    ADD A,#20
+    LD C,A
+    JP NC,@NOR
+    INC B
+    LD A,B
+    OR A
+    JP NZ,@NOR
+    LD B,#80
+    INC H
+@NOR:
+    SRL B
+    RR C
+    SRL B
+    RR C
+    SRL B
+    RR C
+    SRL B
+    RR C
+    SRL B
+    RR C
+    LD D,B
+    LD E,C
+    LD L,(IY+0)
+    CALL ___FLOAT_SHL3
+    CALL ___FLOAT_PACK
+    JP ___FLOAT_LEAVE
+@ZERO:
+    LD BC,0
+    JP ___FLOAT_LEAVE
+
+___FLOAT_F2I:
+    CLRLOC
+    PUSH AF
+    PUSH HL
+    PUSH IY
+    LD IY,___FLOAT_WS
+    CALL ___FLOAT_UNPACK
+    LD (IY+0),L
+    CP 3
+    JP Z,@ZERO
+    CP 2
+    JP Z,@SAT
+    OR A
+    JP Z,@ZERO
+    LD A,H
+    SUB 15
+    JP M,@ZERO
+    CP 15
+    JP NC,@SAT
+    LD B,A
+    CALL ___FLOAT_SHR3
+    LD A,B
+    CP 11
+    JP NC,@LEFT
+    LD B,A
+    LD A,10
+    SUB B
+    LD B,A
+    JP Z,@DONE
+@RR:
+    SRL D
+    RR E
+    DJNZ @RR
+    JP @DONE
+@LEFT:
+    SUB 10
+    LD B,A
+@LL:
+    SLA E
+    RL D
+    DJNZ @LL
+@DONE:
+    LD B,D
+    LD C,E
+    LD A,(IY+0)
+    OR A
+    JP Z,@POSCHK
+    LD A,B
+    CPL
+    LD B,A
+    LD A,C
+    CPL
+    LD C,A
+    INC BC
+    JP ___FLOAT_LEAVE
+@POSCHK:
+    BIT 7,B
+    JP Z,___FLOAT_LEAVE
+@SAT:
+    LD A,(IY+0)
+    OR A
+    JP Z,@PMAX
+    LD BC,#8000
+    JP ___FLOAT_LEAVE
+@PMAX:
+    LD BC,#7FFF
+    JP ___FLOAT_LEAVE
+@ZERO:
+    LD BC,0
+    JP ___FLOAT_LEAVE
+
+___FLOAT_CMP:
+    CLRLOC
+    PUSH AF
+    PUSH HL
+    PUSH IY
+    LD IY,___FLOAT_WS
+    LD (IY+8),A
+    LD (IY+12),C
+    LD (IY+13),B
+    LD (IY+14),E
+    LD (IY+15),D
+    CALL ___FLOAT_UNPACK
+    LD (IY+9),A
+    LD C,(IY+14)
+    LD B,(IY+15)
+    CALL ___FLOAT_UNPACK
+    LD (IY+10),A
+    LD A,(IY+9)
+    CP 3
+    JP Z,@NAN
+    LD A,(IY+10)
+    CP 3
+    JP Z,@NAN
+    LD A,(IY+9)
+    OR A
+    JP NZ,@CMPV
+    LD A,(IY+10)
+    OR A
+    JP Z,@EQ
+@CMPV:
+    LD C,(IY+12)
+    LD B,(IY+13)
+    LD E,(IY+14)
+    LD D,(IY+15)
+    LD A,B
+    XOR D
+    AND #80
+    JP NZ,@DIFF
+    LD A,B
+    AND #7F
+    LD H,A
+    LD L,C
+    LD A,D
+    AND #7F
+    LD D,A
+    OR A
+    SBC HL,DE
+    JP Z,@EQ
+    JP C,@SMALL
+    BIT 7,B
+    JP Z,@GT
+    JP @LT
+@SMALL:
+    BIT 7,B
+    JP Z,@LT
+    JP @GT
+@DIFF:
+    BIT 7,B
+    JP Z,@GT
+@LT:
+    LD BC,#FFFF
+    JP ___FLOAT_LEAVE
+@GT:
+    LD BC,1
+    JP ___FLOAT_LEAVE
+@EQ:
+    LD BC,0
+    JP ___FLOAT_LEAVE
+@NAN:
+    LD A,(IY+8)
+    OR A
+    JP Z,@LT
+    JP @GT
+
+___FLOAT_WS:
+    DEFS 16

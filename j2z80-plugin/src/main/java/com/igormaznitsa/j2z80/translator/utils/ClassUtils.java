@@ -176,7 +176,6 @@ public enum ClassUtils {
 
       switch (fld.getType().getType()) {
         case Const.T_DOUBLE:
-        case Const.T_FLOAT:
         case Const.T_LONG:
           throw new IllegalStateException(
               "Class " + classGen.getClassName() + " contains inappropriate field [" +

@@ -1,0 +1,5 @@
+; FADD
+    POP DE
+    POP BC
+    CALL ___FLOAT_ADD
+    PUSH BC

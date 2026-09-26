@@ -1,0 +1,5 @@
+; FREM
+    POP DE
+    POP BC
+    CALL ___FLOAT_REM
+    PUSH BC

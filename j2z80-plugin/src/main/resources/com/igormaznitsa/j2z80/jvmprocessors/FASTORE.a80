@@ -1,0 +1,10 @@
+; 81 FASTORE
+    POP DE
+    POP BC
+    POP HL
+    SLA C
+    RL B
+    ADD HL,BC
+    LD (HL),E
+    INC HL
+    LD (HL),D

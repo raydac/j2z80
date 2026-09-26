@@ -1,0 +1,4 @@
+; 56 FSTORE
+    POP BC
+    LD (IX-%index%),C
+    LD (IX-%index%+1),B

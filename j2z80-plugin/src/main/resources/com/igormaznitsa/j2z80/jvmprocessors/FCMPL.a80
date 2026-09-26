@@ -1,0 +1,6 @@
+; 149 FCMPL
+    POP DE
+    POP BC
+    XOR A
+    CALL ___FLOAT_CMP
+    PUSH BC

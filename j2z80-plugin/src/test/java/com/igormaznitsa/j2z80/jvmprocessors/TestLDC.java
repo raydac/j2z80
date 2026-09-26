@@ -21,6 +21,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.igormaznitsa.j2z80.translator.utils.HalfFloat;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import java.io.StringWriter;
 import org.apache.bcel.generic.InstructionHandle;
@@ -94,13 +95,16 @@ public class TestLDC extends AbstractJvmCommandProcessorTest {
         writer);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testFloat() throws Exception {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(LDC.class);
     final StringWriter writer = new StringWriter();
     processor.process(CLASS_PROCESSOR_MOCK, new LDC(CONSTANT_FLOAT), mock(InstructionHandle.class),
         this.getClass().getClassLoader(),
         writer);
+    assertLinearExecutionToEnd(writer.toString());
+    assertEquals(HalfFloat.toBits(ETALON_CONSTANT_FLOAT), pop() & 0xFFFF);
+    assertStackEmpty();
   }
 
   @Test(expected = IllegalArgumentException.class)

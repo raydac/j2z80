@@ -1,0 +1,6 @@
+; 150 FCMPG
+    POP DE
+    POP BC
+    LD A,1
+    CALL ___FLOAT_CMP
+    PUSH BC

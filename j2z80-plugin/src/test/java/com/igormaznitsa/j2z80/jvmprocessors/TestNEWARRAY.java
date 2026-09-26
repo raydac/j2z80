@@ -128,9 +128,11 @@ public class TestNEWARRAY extends AbstractTestBasedOnMemoryManager {
     assertStackEmpty();
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(timeout = 3000L)
   public void testArrayCreation_FloatArray() throws Exception {
     push(1000);
     assertAllocateCommand(new Instruction[] {new NEWARRAY(BasicType.FLOAT)}, 2003);
+    assertEquals(getInitialMemoryAddress() + 3, pop());
+    assertStackEmpty();
   }
 }

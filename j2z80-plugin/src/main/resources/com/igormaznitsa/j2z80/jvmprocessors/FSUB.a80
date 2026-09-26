@@ -1,0 +1,5 @@
+; FSUB
+    POP DE
+    POP BC
+    CALL ___FLOAT_SUB
+    PUSH BC

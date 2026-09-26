@@ -55,6 +55,7 @@ public class Processor_NEWARRAY extends AbstractJvmCommandProcessor implements N
         sub = SUB_ALLOCATE_BYTEARRAY;
       }
       break;
+      case 6: // float, stored as binary16
       case 9: // short
       case 10: // int
       {

@@ -1,0 +1,5 @@
+; FMUL
+    POP DE
+    POP BC
+    CALL ___FLOAT_MUL
+    PUSH BC

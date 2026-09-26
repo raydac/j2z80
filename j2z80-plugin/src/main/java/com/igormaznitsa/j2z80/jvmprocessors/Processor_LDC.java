@@ -16,9 +16,11 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
+import com.igormaznitsa.j2z80.translator.utils.HalfFloat;
 import java.io.IOException;
 import java.io.Writer;
 import org.apache.bcel.classfile.Constant;
+import org.apache.bcel.classfile.ConstantFloat;
 import org.apache.bcel.classfile.ConstantInteger;
 import org.apache.bcel.classfile.ConstantString;
 import org.apache.bcel.classfile.ConstantUtf8;
@@ -54,6 +56,8 @@ public class Processor_LDC extends AbstractJvmCommandProcessor {
       final ConstantInteger constInt = (ConstantInteger) cpConstant;
       final int value = constInt.getBytes();
       stringValue = Integer.toString(value);
+    } else if (cpConstant instanceof ConstantFloat) {
+      stringValue = HalfFloat.toAsmImmediate(((ConstantFloat) cpConstant).getBytes());
     } else if (cpConstant instanceof ConstantUtf8 || cpConstant instanceof ConstantString) {
       stringValue = methodTranslator.registerUsedConstantPoolItem(index);
     } else {

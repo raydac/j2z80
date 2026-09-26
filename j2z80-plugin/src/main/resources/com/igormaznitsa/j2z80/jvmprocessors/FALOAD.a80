@@ -1,0 +1,12 @@
+; 48 FALOAD
+    POP BC
+    POP HL
+    SLA C
+    RL B
+    ADD HL,BC
+    LD A,(HL)
+    LD C,A
+    INC HL
+    LD A,(HL)
+    LD B,A
+    PUSH BC

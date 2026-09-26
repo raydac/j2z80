@@ -1,0 +1,6 @@
+; 118 FNEG
+    POP BC
+    LD A,B
+    XOR #80
+    LD B,A
+    PUSH BC
