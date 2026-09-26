@@ -31,10 +31,21 @@ public class AsmCommandDEFM extends AbstractAsmCommand {
     return str.substring(1, str.length() - 1);
   }
 
+  private static byte[] toByteValues(final String text) {
+    final byte[] bytes = new byte[text.length()];
+    for (int index = 0; index < text.length(); index++) {
+      final char chr = text.charAt(index);
+      if (chr > 0xFF) {
+        throw new IllegalArgumentException("DEFM character does not fit in a byte [" + text + ']');
+      }
+      bytes[index] = (byte) chr;
+    }
+    return bytes;
+  }
+
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    final String str = unescape(asm.getArgs()[0]);
-    return str.getBytes();
+    return toByteValues(unescape(asm.getArgs()[0]));
   }
 
   @Override

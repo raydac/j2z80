@@ -1,4 +1,5 @@
 - 2.0.0 (SNAPSHOT)
+    - fixed Z80 assembler index offsets, 8-bit immediates, indirect registers, and forward EQU
     - added float values as 16-bit IEEE binary16, including arithmetic, loads, stores, conversions, and float arrays
     - added long values as signed 32-bit integers in two slots, including arithmetic, shifts, loads, stores, and long arrays
     - added double values as 32-bit IEEE floats in two slots, including arithmetic, comparisons, conversions, and double arrays

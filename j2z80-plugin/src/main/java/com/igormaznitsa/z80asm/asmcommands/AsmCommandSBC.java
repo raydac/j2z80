@@ -50,12 +50,12 @@ public class AsmCommandSBC extends AbstractAsmCommand {
           int number;
           if (isIndexRegisterReference(argRight)) {
             number = new LightExpression(context, this, asm, extractCalculatedPart(argRight)).calculate();
-            AsmAssertions.assertUnsignedByte(number);
+            AsmAssertions.assertSignedByte(number);
             return argRight.startsWith("(IX") ? new byte[] {(byte) 0xDD, (byte) 0x9E, (byte) number}
                 : new byte[] {(byte) 0xFD, (byte) 0x9E, (byte) number};
           } else {
             number = new LightExpression(context, this, asm, asm.getArgs()[1]).calculate();
-            AsmAssertions.assertUnsignedByte(number);
+            AsmAssertions.assertEncodableByte(number);
             return new byte[] {(byte) 0xDE, (byte) number};
           }
         }

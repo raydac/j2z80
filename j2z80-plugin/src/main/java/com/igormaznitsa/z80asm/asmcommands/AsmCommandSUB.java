@@ -48,7 +48,7 @@ public class AsmCommandSUB extends AbstractAsmCommand {
               new byte[] {(byte) 0xFD, (byte) 0x96, (byte) number};
         } else {
           number = new LightExpression(context, this, asm, arg).calculate();
-          AsmAssertions.assertSignedByte(number);
+          AsmAssertions.assertEncodableByte(number);
           return new byte[] {(byte) 0xD6, (byte) number};
         }
       }

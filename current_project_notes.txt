@@ -1,4 +1,5 @@
 ## 1. Implementation Progress
+- Fixed the embedded Z80 assembler: signed IX/IY displacements, byte immediates in -128..255 (so CP -128 assembles), rejection of LD (SP),n, case-insensitive (BC)/(DE)/(IX)/(IY), forward EQU chains, and DEFM as raw bytes.
 - Project version is 2.0.0-SNAPSHOT.
 - Added double support. Each Java double is two 16-bit slots holding IEEE binary32. Arithmetic, compare, i2d/l2d/f2d/d2i/d2l/d2f, fields, and double[] are implemented. drem is truncating remainder. multianewarray of double is rejected.
 - Added long support. Each Java long is two 16-bit slots holding a signed 32-bit value (low word in the first slot). Arithmetic, shifts, compare, i2l/l2i/l2f/f2l, ldc2_w, fields, and long[] are implemented. multianewarray of long is rejected.
@@ -22,6 +23,7 @@
 - INVOKEVIRTUAL / INVOKEINTERFACE take frame size from VT/IT tables (LabelAndFrameUtils), so they were less affected than static/special.
 - Nested loops allocate extra local slots beyond args; undersized frames overwrite caller stack / return addresses.
 - Native JNI methods have no Code attribute → BCEL getMaxLocals() is 0; callers must still size the frame from argument count.
+- Embedded assembler (z80asm): IX/IY displacement is signed (-128..127). 8-bit immediates accept -128..255 so both CP -128 and CP 255 assemble. EQU is solved by repeating until stable; a cycle throws. DEFM writes one byte per Java char (0..255). Pattern opcodes are copied so callers cannot mutate the table.
 
 ## 3. Technical Debt & Refactoring
 - Processor_ISTORE uses raw `index << 1` instead of prepareLocalVariableIndex (missing bounds check).

@@ -162,7 +162,7 @@ public class LightExpression {
         // string
         Assertions.assertTrue("String must be closed [" + str + ']', str.endsWith("\""));
         final String work = str.substring(1, str.length() - 1);
-        Assertions.assertTrue("String length must be greater than 2 chars [" + str + ']', str.length() > 2);
+        Assertions.assertTrue("String operand must not be empty [" + str + ']', str.length() > 2);
         int result = 0;
         for (final char chr : work.toCharArray()) {
           result = (result << 8) | (chr & 0xFF);

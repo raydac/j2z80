@@ -32,10 +32,20 @@ public class PositioningByteBuffer {
     insideArray = new byte[capacity];
   }
 
-  private void increaseCapacity() {
-    final byte[] newArray = new byte[insideArray.length << 1];
-    System.arraycopy(insideArray, 0, newArray, 0, insideArray.length);
-    insideArray = newArray;
+  private void ensureIndexFits(final int index) {
+    if (index < this.insideArray.length) {
+      return;
+    }
+
+    int newLength = Math.max(this.insideArray.length, 1);
+    while (newLength <= index) {
+      if (newLength > (Integer.MAX_VALUE >> 1)) {
+        newLength = index + 1;
+        break;
+      }
+      newLength <<= 1;
+    }
+    this.insideArray = Arrays.copyOf(this.insideArray, newLength);
   }
 
   public byte[] toByteArray() {
@@ -50,21 +60,16 @@ public class PositioningByteBuffer {
   }
 
   private void setAddress(final int address) {
-    if (offset < 0) {
-      offset = address;
-    } else {
-      if (address < offset) {
-        final int delta = offset - address;
-        final byte[] newArray = new byte[insideArray.length + delta];
-        System.arraycopy(insideArray, 0, newArray, delta, insideArray.length);
-        offset = address;
-        insideArray = newArray;
-      } else {
-        if ((address - offset) >= insideArray.length) {
-          increaseCapacity();
-        }
-      }
+    if (this.offset < 0) {
+      this.offset = address;
+    } else if (address < this.offset) {
+      final int delta = this.offset - address;
+      final byte[] newArray = new byte[this.insideArray.length + delta];
+      System.arraycopy(this.insideArray, 0, newArray, delta, this.insideArray.length);
+      this.offset = address;
+      this.insideArray = newArray;
     }
+    this.ensureIndexFits(address - this.offset);
   }
 
   private void writeByteAtPos(final int address, final byte data) {

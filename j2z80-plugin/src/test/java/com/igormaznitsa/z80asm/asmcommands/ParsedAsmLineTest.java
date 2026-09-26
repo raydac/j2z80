@@ -15,11 +15,13 @@
  */
 package com.igormaznitsa.z80asm.asmcommands;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class ParsedAsmLineTest {
 
@@ -134,6 +136,18 @@ public class ParsedAsmLineTest {
   @Test
   public void testHash() {
     assertEquals(new ParsedAsmLine("lAbEl: lD    (  hl  ),   a   ").hashCode(), new ParsedAsmLine("  lAbEl  ", "   ld   ", "  (hL)", "  a ").hashCode());
+  }
+
+  @Test
+  public void testIndirectRegistersIgnoreCase() {
+    final ParsedAsmLine parsed = new ParsedAsmLine("ld a,(bc),(de),(ix),(iy)");
+    assertTrue(Arrays.equals(new String[] {"A", "(BC)", "(DE)", "(IX)", "(IY)"}, parsed.getArgs()));
+  }
+
+  @Test
+  public void testIndexDisplacementKeepsExpressionCase() {
+    final ParsedAsmLine parsed = new ParsedAsmLine("ld a,(ix+Label),(iy-Name)");
+    assertTrue(Arrays.equals(new String[] {"A", "(IX+Label)", "(IY-Name)"}, parsed.getArgs()));
   }
 
   @Test

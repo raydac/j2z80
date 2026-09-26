@@ -44,6 +44,6 @@ public class AsmCommandRET extends AbstractAsmCommand {
 
   @Override
   public Arguments getAllowedArgumentsNumber() {
-    return Arguments.ZERO_ONE_OR_TWO;
+    return Arguments.NONE_OR_ONE;
   }
 }

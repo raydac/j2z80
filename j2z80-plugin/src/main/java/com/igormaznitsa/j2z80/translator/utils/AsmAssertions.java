@@ -26,6 +26,18 @@ public enum AsmAssertions {
   }
 
   /**
+   * Check that an integer fits in one machine byte, written as a signed or unsigned value.
+   *
+   * @param value an integer value to be checked
+   */
+  public static void assertEncodableByte(final int value) {
+    if (value < Byte.MIN_VALUE || value > 0xFF) {
+      throw new IllegalArgumentException(
+          "Byte operand must be in " + Byte.MIN_VALUE + "..255 [" + value + ']');
+    }
+  }
+
+  /**
    * Check that an integer in signed short bounds
    *
    * @param value an integer to be checked

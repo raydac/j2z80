@@ -43,12 +43,12 @@ public class AsmCommandXOR extends AbstractAsmCommand {
         int number;
         if (isIndexRegisterReference(arg)) {
           number = new LightExpression(context, this, asm, extractCalculatedPart(arg)).calculate();
-          AsmAssertions.assertUnsignedByte(number);
+          AsmAssertions.assertSignedByte(number);
           return arg.startsWith("(IX") ? new byte[] {(byte) 0xDD, (byte) 0xAE, (byte) number} :
               new byte[] {(byte) 0xFD, (byte) 0xAE, (byte) number};
         } else {
           number = new LightExpression(context, this, asm, arg).calculate();
-          AsmAssertions.assertUnsignedByte(number);
+          AsmAssertions.assertEncodableByte(number);
           return new byte[] {(byte) 0xEE, (byte) number};
         }
       }

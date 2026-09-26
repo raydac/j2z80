@@ -26,7 +26,7 @@ public class AsmCommandDEFB extends AbstractAsmCommand {
     final byte[] result = new byte[asm.getArgs().length];
     int index = 0;
     for (final String arg : asm.getArgs()) {
-      final int value = new LightExpression(context, this, asm, asm.getArgs()[index]).calculate();
+      final int value = new LightExpression(context, this, asm, arg).calculate();
       AsmAssertions.assertUnsignedByte(value);
       result[index++] = (byte) value;
     }

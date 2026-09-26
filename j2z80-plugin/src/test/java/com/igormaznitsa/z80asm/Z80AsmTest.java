@@ -15,12 +15,12 @@
  */
 package com.igormaznitsa.z80asm;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.util.List;
 import java.util.Locale;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class Z80AsmTest {
 
@@ -80,6 +80,30 @@ public class Z80AsmTest {
     assertEquals(0x4000, asm.findLabelAddress("label4#").intValue());
     assertEquals(0x1234, asm.findLabelAddress("label2#").intValue());
     assertEquals(0x1235, asm.getPC());
+  }
+
+  @Test
+  public void testForwardEquChain() {
+    final Z80Asm asm = new Z80Asm(List.of(
+        "labelA: equ labelB+1",
+        "labelB: equ labelC",
+        "labelC: equ #10",
+        "end"
+    ));
+    asm.process();
+
+    assertEquals(0x11, asm.findLabelAddress("labelA").intValue());
+    assertEquals(0x10, asm.findLabelAddress("labelB").intValue());
+    assertEquals(0x10, asm.findLabelAddress("labelC").intValue());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testCircularEqu() {
+    new Z80Asm(List.of(
+        "labelA: equ labelB+1",
+        "labelB: equ labelA+1",
+        "end"
+    )).process();
   }
 
   @Test

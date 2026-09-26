@@ -75,19 +75,33 @@ public class Z80Asm implements AsmTranslator {
   }
 
   private void processEquCommands() {
-    final boolean prevPassFlagState = firstPassFlag;
-    firstPassFlag = false;
+    final boolean previousPassFlag = this.firstPassFlag;
+    this.firstPassFlag = false;
+    this.globalLabelMap.setReplaceAllowed(true);
 
-    globalLabelMap.setReplaceAllowed(true);
-    final AbstractAsmCommand equCmnd = AbstractAsmCommand.findCommandForName("EQU");
-    for (final EquDirectiveContainer.EquDirectiveRecord record : equContainer.getValuesAsList()) {
-      setPC(record.getPC());
-      record.getParsedAsmLine().setLabel(record.getAssociatedLabel());
-      equCmnd.makeMachineCode(this, record.getParsedAsmLine());
+    final AbstractAsmCommand equCommand = AbstractAsmCommand.findCommandForName("EQU");
+    final List<EquDirectiveContainer.EquDirectiveRecord> records =
+        this.equContainer.getValuesAsList();
+    boolean changed = true;
+    for (int pass = 0; changed && pass <= records.size(); pass++) {
+      changed = false;
+      for (final EquDirectiveContainer.EquDirectiveRecord record : records) {
+        this.setPC(record.getPC());
+        record.getParsedAsmLine().setLabel(record.getAssociatedLabel());
+        final int addressBefore = this.globalLabelMap.getLabelAddress(record.getAssociatedLabel());
+        equCommand.makeMachineCode(this, record.getParsedAsmLine());
+        if (this.globalLabelMap.getLabelAddress(record.getAssociatedLabel()) != addressBefore) {
+          changed = true;
+        }
+      }
     }
-    equContainer.clear();
-    globalLabelMap.setReplaceAllowed(false);
-    firstPassFlag = prevPassFlagState;
+    if (changed) {
+      throw new IllegalStateException("Circular EQU dependency");
+    }
+
+    this.equContainer.clear();
+    this.globalLabelMap.setReplaceAllowed(false);
+    this.firstPassFlag = previousPassFlag;
   }
 
   public byte[] process() {
@@ -179,7 +193,6 @@ public class Z80Asm implements AsmTranslator {
         } else {
           registerNonAssignedLabels();
 
-          final int currentPC = getPC();
           final byte[] machineCode = command.makeMachineCode(this, parsed);
 
           writeCode(machineCode);
@@ -217,7 +230,7 @@ public class Z80Asm implements AsmTranslator {
     }
     nonAssignedLabels.clear();
 
-    return result == null ? new String[0] : result.toArray(new String[nonAssignedLabels.size()]);
+    return result == null ? new String[0] : result.toArray(new String[0]);
   }
 
   private boolean processSpecialDirective(final AbstractAsmCommand asmCommand, final String rawString, final int strIndex, final ParsedAsmLine parsed) {
@@ -235,7 +248,6 @@ public class Z80Asm implements AsmTranslator {
       } else {
         registerNonAssignedLabels();
         final byte[] compiled = asmCommand.makeMachineCode(this, parsed);
-        final int address = getPC();
         writeCode(compiled);
       }
     }

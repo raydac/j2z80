@@ -247,11 +247,10 @@ public class AsmCommandLD extends AbstractAsmCommand {
         result = new byte[] {(byte) 0x2E, valueByte};
       } else if ("A".equals(leftPart)) {
         result = new byte[] {(byte) 0x3E, valueByte};
-      } else if ("(SP)".equals(leftPart)) {
-        result = new byte[] {(byte) 0x36, valueByte};
       }
 
-      Assertions.assertNotNull("The left part must be A,(HL),B,C,D,E,H,L or (SP) [" + leftPart + ']', result);
+      Assertions.assertNotNull("The left part must be A,(HL),B,C,D,E,H or L [" + leftPart + ']',
+          result);
     }
     return result;
   }

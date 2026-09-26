@@ -15,12 +15,11 @@
  */
 package com.igormaznitsa.z80asm;
 
-import org.junit.Test;
-
-import java.util.Arrays;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import org.junit.Test;
 
 public class PositioningByteBufferTest {
 
@@ -40,6 +39,20 @@ public class PositioningByteBufferTest {
     buffer.write(0, new byte[] {(byte) 0xFF});
     buffer.write(3, array);
     assertTrue(Arrays.equals(new byte[] {(byte) 0xFF, 0, 0, 1, 2}, buffer.toByteArray()));
+    assertEquals(0, buffer.getDataStartOffset());
+  }
+
+  @Test
+  public void testWriteFarBeyondCapacity() {
+    final PositioningByteBuffer buffer = new PositioningByteBuffer(8);
+    buffer.write(0, new byte[] {1});
+    buffer.write(100, new byte[] {2, 3});
+
+    final byte[] data = buffer.toByteArray();
+    assertEquals(102, data.length);
+    assertEquals(1, data[0]);
+    assertEquals(2, data[100]);
+    assertEquals(3, data[101]);
     assertEquals(0, buffer.getDataStartOffset());
   }
 

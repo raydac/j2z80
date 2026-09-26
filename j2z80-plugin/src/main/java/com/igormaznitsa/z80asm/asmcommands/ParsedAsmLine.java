@@ -30,17 +30,16 @@ import java.util.Set;
 public class ParsedAsmLine {
 
   private static final String[] SPEC_ARGS = new String[] {
-      "A", "B", "C", "D", "E", "H", "L",
+      "A", "B", "C", "D", "E", "H", "L", "I", "R",
       "AF", "AF'", "BC", "DE", "HL",
       "NZ", "Z", "NC", "C", "PO", "PE", "M", "P",
-      "SP", "(SP)", "IX", "IY", "(C)", "(HL)"
+      "SP", "(SP)", "IX", "IY", "(BC)", "(DE)", "(C)", "(HL)", "(IX)", "(IY)"
   };
   private static final Set<String> SPECIAL_ARG_SET = new HashSet<>(Arrays.asList(SPEC_ARGS));
   private static final String[] EMPTY_ARRAY = new String[0];
   private final String command;
   private final String[] arguments;
   private final String signature;
-  private final int hashCode;
   private String label;
 
   public ParsedAsmLine(final String label, final String command, final String... args) {
@@ -60,13 +59,11 @@ public class ParsedAsmLine {
       }
     }
     this.signature = makeSignatureFromNormalizedArgs(this.arguments);
-    this.hashCode = this.command.hashCode() * 31 + signature.hashCode();
   }
 
   public ParsedAsmLine(final String asmString) {
     final String trimmed = asmString.trim();
     if (trimmed.isEmpty() || trimmed.charAt(0) == ';') {
-      hashCode = 0;
       command = "";
       label = null;
       arguments = EMPTY_ARRAY;
@@ -91,8 +88,6 @@ public class ParsedAsmLine {
     }
 
     signature = makeSignatureFromNormalizedArgs(arguments);
-
-    hashCode = command.hashCode() * 31 + signature.hashCode();
   }
 
   private static int findLabelPosition(final String line) {
@@ -247,8 +242,7 @@ public class ParsedAsmLine {
     for (int i = 0; i < resultList.size(); i++) {
       final String original = resultList.get(i);
       final String upperCased = original.toUpperCase(Locale.ENGLISH);
-      if (upperCased.startsWith("(IX") || upperCased.startsWith("(IY") && (upperCased.length() > 3 && (upperCased.charAt(3) == '-' || upperCased.charAt(3) == '+'))) {
-        // replace the first part
+      if (isIndexDisplacement(upperCased)) {
         resultList.set(i, upperCased.substring(0, 3) + original.substring(3));
       } else if (SPECIAL_ARG_SET.contains(upperCased)) {
         resultList.set(i, upperCased);
@@ -256,6 +250,12 @@ public class ParsedAsmLine {
     }
 
     return resultList.toArray(new String[0]);
+  }
+
+  private static boolean isIndexDisplacement(final String upperCased) {
+    return (upperCased.startsWith("(IX") || upperCased.startsWith("(IY"))
+        && upperCased.length() > 3
+        && (upperCased.charAt(3) == '+' || upperCased.charAt(3) == '-');
   }
 
   private static String makeSignatureFromNormalizedArgs(final String[] arguments) {
@@ -398,7 +398,10 @@ public class ParsedAsmLine {
 
   @Override
   public int hashCode() {
-    return hashCode;
+    int result = this.label == null ? 0 : this.label.hashCode();
+    result = 31 * result + this.command.hashCode();
+    result = 31 * result + Arrays.hashCode(this.arguments);
+    return result;
   }
 
   @Override

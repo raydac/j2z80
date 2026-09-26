@@ -216,7 +216,7 @@ public abstract class AbstractAsmCommand {
   protected byte[] getPatternCase(final String pattern) {
     final byte[] result = PATTERN_CASES.get(pattern);
     Assertions.assertNotNull("A Case must be declared [" + pattern + ']', result);
-    return result;
+    return result.clone();
   }
 
   protected int getRegisterOrder(final String register) {

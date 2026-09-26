@@ -55,12 +55,12 @@ public class AsmCommandADD extends AbstractAsmCommand {
         if (!isRegisterName(arg1)) {
           if (isIndexRegisterReference(arg1)) {
             number = new LightExpression(context, this, asm, extractCalculatedPart(arg1)).calculate();
-            AsmAssertions.assertUnsignedByte(number);
+            AsmAssertions.assertSignedByte(number);
             return arg1.startsWith("(IX") ? new byte[] {(byte) 0xDD, (byte) 0x86, (byte) number} :
                 new byte[] {(byte) 0xFD, (byte) 0x86, (byte) number};
           } else {
             number = new LightExpression(context, this, asm, arg1).calculate();
-            AsmAssertions.assertUnsignedByte(number);
+            AsmAssertions.assertEncodableByte(number);
             return new byte[] {(byte) 0xC6, (byte) number};
           }
         }
