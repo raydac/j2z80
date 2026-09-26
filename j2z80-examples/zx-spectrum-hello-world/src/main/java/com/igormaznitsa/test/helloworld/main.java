@@ -20,17 +20,13 @@ public class main {
   }
 
   private static void greet() {
-    Screen.paper(Screen.WHITE);
-    Screen.ink(Screen.BLACK);
-    Screen.bright(0);
-    Screen.flash(0);
+    Screen.colors(Screen.YELLOW, Screen.BLUE, 0, 0);
     Screen.clear();
+    Screen.clearPixels();
     Screen.border(Screen.GREEN);
-    Screen.at(10, 8);
-    System.out.println("Hello world 2026");
-    Screen.lowerColors(Screen.YELLOW, Screen.BLUE, 1, 0);
-    Screen.clearLower();
-    System.err.println("SPACE draws the set");
+    Portrait.draw();
+    Screen.border(Screen.GREEN);
+    caption("Portrait   SPACE");
     Sound.tone(80, 400);
   }
 

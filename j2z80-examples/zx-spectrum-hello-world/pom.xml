@@ -11,7 +11,8 @@
     <artifactId>zx-spectrum-hello-world</artifactId>
     <packaging>jar</packaging>
 
-    <description>ZX Spectrum 48 demo: greeting, then a fixed-point Mandelbrot drawn through the spectrum library
+    <description>ZX Spectrum 48 demo: line-art portrait, then a fixed-point Mandelbrot drawn through the spectrum
+        library
     </description>
     <inceptionYear>2012</inceptionYear>
 
