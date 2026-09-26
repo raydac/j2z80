@@ -1,0 +1,5 @@
+; GETSTATIC long
+    LD BC,(%address%+2)
+    PUSH BC
+    LD BC,(%address%)
+    PUSH BC

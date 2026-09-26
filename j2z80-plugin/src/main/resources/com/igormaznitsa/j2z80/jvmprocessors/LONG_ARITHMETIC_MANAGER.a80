@@ -1,0 +1,615 @@
+; 32-bit signed long. Low word is the first slot and the top of the stack.
+; High word is the next slot, pushed first.
+
+___LONG_IS_NEG:
+    INC HL
+    INC HL
+    INC HL
+    LD A,(HL)
+    AND #80
+    RET
+
+___LONG_IS_MIN:
+    CLRLOC
+    LD A,(HL)
+    INC HL
+    OR (HL)
+    INC HL
+    OR (HL)
+    INC HL
+    JP NZ,@NOT
+    LD A,(HL)
+    CP -128
+    RET
+@NOT:
+    RET
+
+___LONG_NEG_AT:
+    CLRLOC
+    PUSH HL
+    LD E,(HL)
+    INC HL
+    LD D,(HL)
+    INC HL
+    LD C,(HL)
+    INC HL
+    LD B,(HL)
+    LD A,E
+    CPL
+    LD E,A
+    LD A,D
+    CPL
+    LD D,A
+    LD A,C
+    CPL
+    LD C,A
+    LD A,B
+    CPL
+    LD B,A
+    INC DE
+    LD A,D
+    OR E
+    JP NZ,@STORE
+    INC BC
+@STORE:
+    POP HL
+    LD (HL),E
+    INC HL
+    LD (HL),D
+    INC HL
+    LD (HL),C
+    INC HL
+    LD (HL),B
+    RET
+
+___LONG_UMUL16:
+    CLRLOC
+    LD (___LONG_M),BC
+    LD HL,0
+    LD (___LONG_M+2),HL
+    LD (___LONG_T),HL
+    LD (___LONG_T+2),HL
+    LD A,16
+@LP:
+    BIT 0,E
+    JP Z,@SKIP
+    PUSH AF
+    LD HL,(___LONG_T)
+    LD BC,(___LONG_M)
+    ADD HL,BC
+    LD (___LONG_T),HL
+    LD HL,(___LONG_T+2)
+    LD BC,(___LONG_M+2)
+    ADC HL,BC
+    LD (___LONG_T+2),HL
+    POP AF
+    LD BC,(___LONG_M)
+@SKIP:
+    LD HL,(___LONG_M)
+    ADD HL,HL
+    LD (___LONG_M),HL
+    LD HL,(___LONG_M+2)
+    ADC HL,HL
+    LD (___LONG_M+2),HL
+    SRL D
+    RR E
+    DEC A
+    JP NZ,@LP
+    RET
+
+___LONG_UDIV:
+    CLRLOC
+    LD HL,0
+    LD (___LONG_T),HL
+    LD (___LONG_T+2),HL
+    LD (___LONG_R),HL
+    LD (___LONG_R+2),HL
+    LD C,32
+@BIT:
+    LD HL,(___LONG_A)
+    ADD HL,HL
+    LD (___LONG_A),HL
+    LD HL,(___LONG_A+2)
+    ADC HL,HL
+    LD (___LONG_A+2),HL
+    LD HL,(___LONG_T)
+    ADC HL,HL
+    LD (___LONG_T),HL
+    LD HL,(___LONG_T+2)
+    ADC HL,HL
+    LD (___LONG_T+2),HL
+    LD HL,(___LONG_R)
+    ADD HL,HL
+    LD (___LONG_R),HL
+    LD HL,(___LONG_R+2)
+    ADC HL,HL
+    LD (___LONG_R+2),HL
+    LD HL,(___LONG_T+2)
+    LD DE,(___LONG_B+2)
+    OR A
+    SBC HL,DE
+    JP C,@NEXT
+    JP NZ,@YES
+    LD HL,(___LONG_T)
+    LD DE,(___LONG_B)
+    OR A
+    SBC HL,DE
+    JP C,@NEXT
+@YES:
+    LD HL,(___LONG_T)
+    LD DE,(___LONG_B)
+    OR A
+    SBC HL,DE
+    LD (___LONG_T),HL
+    LD HL,(___LONG_T+2)
+    LD DE,(___LONG_B+2)
+    SBC HL,DE
+    LD (___LONG_T+2),HL
+    LD HL,(___LONG_R)
+    LD A,L
+    OR 1
+    LD L,A
+    LD (___LONG_R),HL
+@NEXT:
+    DEC C
+    JP NZ,@BIT
+    RET
+
+___LONG_ENTER_EPILOGUE:
+    PUSH AF
+    LD HL,(___LONG_TMP)
+    PUSH HL
+    LD HL,(___LONG_RET)
+    PUSH HL
+    RET
+
+___LONG_ENTER_BIN:
+    LD (___LONG_TMP),HL
+    POP HL
+    LD (___LONG_RET),HL
+    POP HL
+    LD (___LONG_STUB),HL
+    POP HL
+    LD (___LONG_B),HL
+    POP HL
+    LD (___LONG_B+2),HL
+    POP HL
+    LD (___LONG_A),HL
+    POP HL
+    LD (___LONG_A+2),HL
+    JP ___LONG_ENTER_EPILOGUE
+
+___LONG_ENTER_UNARY:
+    LD (___LONG_TMP),HL
+    POP HL
+    LD (___LONG_RET),HL
+    POP HL
+    LD (___LONG_STUB),HL
+    POP HL
+    LD (___LONG_A),HL
+    POP HL
+    LD (___LONG_A+2),HL
+    JP ___LONG_ENTER_EPILOGUE
+
+___LONG_ENTER_SHIFT:
+    LD (___LONG_TMP),HL
+    POP HL
+    LD (___LONG_RET),HL
+    POP HL
+    LD (___LONG_STUB),HL
+    POP HL
+    LD A,L
+    AND 63
+    LD (___LONG_N),A
+    POP HL
+    LD (___LONG_A),HL
+    POP HL
+    LD (___LONG_A+2),HL
+    JP ___LONG_ENTER_EPILOGUE
+
+___LONG_LEAVE:
+    POP HL
+    POP AF
+    LD BC,(___LONG_R+2)
+    PUSH BC
+    LD BC,(___LONG_R)
+    PUSH BC
+    LD HL,(___LONG_STUB)
+    PUSH HL
+    RET
+
+___LONG_LEAVE_INT:
+    POP HL
+    POP AF
+    PUSH BC
+    LD HL,(___LONG_STUB)
+    PUSH HL
+    RET
+
+___LONG_THROW:
+    POP HL
+    POP AF
+    LD HL,(___LONG_STUB)
+    PUSH HL
+    LD HL,(___ATHROW_PROCESSING_CODE_ADDRESS)
+    JP (HL)
+
+___LONG_COPY_A_TO_R:
+    LD HL,(___LONG_A)
+    LD (___LONG_R),HL
+    LD HL,(___LONG_A+2)
+    LD (___LONG_R+2),HL
+    RET
+
+___LONG_ADD:
+    CALL ___LONG_ENTER_BIN
+    LD HL,(___LONG_A)
+    LD BC,(___LONG_B)
+    ADD HL,BC
+    LD (___LONG_R),HL
+    LD HL,(___LONG_A+2)
+    LD BC,(___LONG_B+2)
+    ADC HL,BC
+    LD (___LONG_R+2),HL
+    JP ___LONG_LEAVE
+
+___LONG_SUB:
+    CALL ___LONG_ENTER_BIN
+    LD HL,(___LONG_A)
+    LD BC,(___LONG_B)
+    OR A
+    SBC HL,BC
+    LD (___LONG_R),HL
+    LD HL,(___LONG_A+2)
+    LD BC,(___LONG_B+2)
+    SBC HL,BC
+    LD (___LONG_R+2),HL
+    JP ___LONG_LEAVE
+
+___LONG_MUL:
+    CALL ___LONG_ENTER_BIN
+    LD BC,(___LONG_A)
+    LD DE,(___LONG_B)
+    CALL ___LONG_UMUL16
+    LD HL,(___LONG_T)
+    LD (___LONG_R),HL
+    LD HL,(___LONG_T+2)
+    LD (___LONG_R+2),HL
+    LD BC,(___LONG_A)
+    LD DE,(___LONG_B+2)
+    CALL ___LONG_UMUL16
+    LD HL,(___LONG_R+2)
+    LD DE,(___LONG_T)
+    ADD HL,DE
+    LD (___LONG_R+2),HL
+    LD BC,(___LONG_A+2)
+    LD DE,(___LONG_B)
+    CALL ___LONG_UMUL16
+    LD HL,(___LONG_R+2)
+    LD DE,(___LONG_T)
+    ADD HL,DE
+    LD (___LONG_R+2),HL
+    JP ___LONG_LEAVE
+
+___LONG_DIVMAG:
+    CLRLOC
+    LD HL,(___LONG_B)
+    LD A,H
+    OR L
+    LD HL,(___LONG_B+2)
+    OR H
+    OR L
+    JP Z,@THROW
+    LD HL,___LONG_B
+    CALL ___LONG_IS_MIN
+    JP NZ,@MAG
+    LD HL,___LONG_A
+    CALL ___LONG_IS_MIN
+    JP NZ,@QZERO
+    LD HL,1
+    LD (___LONG_R),HL
+    LD HL,0
+    LD (___LONG_R+2),HL
+    LD (___LONG_T),HL
+    LD (___LONG_T+2),HL
+    RET
+@QZERO:
+    LD HL,(___LONG_A)
+    LD (___LONG_T),HL
+    LD HL,(___LONG_A+2)
+    LD (___LONG_T+2),HL
+    LD HL,0
+    LD (___LONG_R),HL
+    LD (___LONG_R+2),HL
+    RET
+@MAG:
+    XOR A
+    LD (___LONG_SIGNQ),A
+    LD (___LONG_SIGNR),A
+    LD HL,___LONG_A
+    CALL ___LONG_IS_NEG
+    JP Z,@ADONE
+    LD A,1
+    LD (___LONG_SIGNQ),A
+    LD (___LONG_SIGNR),A
+    LD HL,___LONG_A
+    CALL ___LONG_IS_MIN
+    JP Z,@ADONE
+    LD HL,___LONG_A
+    CALL ___LONG_NEG_AT
+@ADONE:
+    LD HL,___LONG_B
+    CALL ___LONG_IS_NEG
+    JP Z,@BDONE
+    LD A,(___LONG_SIGNQ)
+    XOR 1
+    LD (___LONG_SIGNQ),A
+    LD HL,___LONG_B
+    CALL ___LONG_NEG_AT
+@BDONE:
+    CALL ___LONG_UDIV
+    LD A,(___LONG_SIGNQ)
+    OR A
+    JP Z,@QSIGN
+    LD HL,___LONG_R
+    CALL ___LONG_NEG_AT
+@QSIGN:
+    LD A,(___LONG_SIGNR)
+    OR A
+    RET Z
+    LD HL,(___LONG_T)
+    LD A,H
+    OR L
+    LD HL,(___LONG_T+2)
+    OR H
+    OR L
+    RET Z
+    LD HL,___LONG_T
+    CALL ___LONG_NEG_AT
+    RET
+@THROW:
+    POP HL
+    JP ___LONG_THROW
+
+___LONG_DIV:
+    CALL ___LONG_ENTER_BIN
+    CALL ___LONG_DIVMAG
+    JP ___LONG_LEAVE
+
+___LONG_REM:
+    CALL ___LONG_ENTER_BIN
+    CALL ___LONG_DIVMAG
+    LD HL,(___LONG_T)
+    LD (___LONG_R),HL
+    LD HL,(___LONG_T+2)
+    LD (___LONG_R+2),HL
+    JP ___LONG_LEAVE
+
+___LONG_NEG:
+    CALL ___LONG_ENTER_UNARY
+    LD HL,___LONG_A
+    CALL ___LONG_NEG_AT
+    CALL ___LONG_COPY_A_TO_R
+    JP ___LONG_LEAVE
+
+___LONG_AND:
+    CALL ___LONG_ENTER_BIN
+    LD HL,(___LONG_A)
+    LD DE,(___LONG_B)
+    LD A,H
+    AND D
+    LD H,A
+    LD A,L
+    AND E
+    LD L,A
+    LD (___LONG_R),HL
+    LD HL,(___LONG_A+2)
+    LD DE,(___LONG_B+2)
+    LD A,H
+    AND D
+    LD H,A
+    LD A,L
+    AND E
+    LD L,A
+    LD (___LONG_R+2),HL
+    JP ___LONG_LEAVE
+
+___LONG_OR:
+    CALL ___LONG_ENTER_BIN
+    LD HL,(___LONG_A)
+    LD DE,(___LONG_B)
+    LD A,H
+    OR D
+    LD H,A
+    LD A,L
+    OR E
+    LD L,A
+    LD (___LONG_R),HL
+    LD HL,(___LONG_A+2)
+    LD DE,(___LONG_B+2)
+    LD A,H
+    OR D
+    LD H,A
+    LD A,L
+    OR E
+    LD L,A
+    LD (___LONG_R+2),HL
+    JP ___LONG_LEAVE
+
+___LONG_XOR:
+    CALL ___LONG_ENTER_BIN
+    LD HL,(___LONG_A)
+    LD DE,(___LONG_B)
+    LD A,H
+    XOR D
+    LD H,A
+    LD A,L
+    XOR E
+    LD L,A
+    LD (___LONG_R),HL
+    LD HL,(___LONG_A+2)
+    LD DE,(___LONG_B+2)
+    LD A,H
+    XOR D
+    LD H,A
+    LD A,L
+    XOR E
+    LD L,A
+    LD (___LONG_R+2),HL
+    JP ___LONG_LEAVE
+
+___LONG_SHL:
+    CLRLOC
+    CALL ___LONG_ENTER_SHIFT
+    LD A,(___LONG_N)
+    OR A
+    JP Z,@COPY
+    CP 32
+    JP NC,@ZERO
+    LD B,A
+    LD HL,(___LONG_A)
+    LD DE,(___LONG_A+2)
+@LP:
+    SLA L
+    RL H
+    RL E
+    RL D
+    DJNZ @LP
+    LD (___LONG_R),HL
+    LD (___LONG_R+2),DE
+    JP ___LONG_LEAVE
+@COPY:
+    CALL ___LONG_COPY_A_TO_R
+    JP ___LONG_LEAVE
+@ZERO:
+    LD HL,0
+    LD (___LONG_R),HL
+    LD (___LONG_R+2),HL
+    JP ___LONG_LEAVE
+
+___LONG_SHR:
+    CLRLOC
+    CALL ___LONG_ENTER_SHIFT
+    LD A,(___LONG_N)
+    OR A
+    JP Z,@COPY
+    CP 32
+    JP NC,@FILL
+    LD B,A
+    LD HL,(___LONG_A)
+    LD DE,(___LONG_A+2)
+@LP:
+    SRA D
+    RR E
+    RR H
+    RR L
+    DJNZ @LP
+    LD (___LONG_R),HL
+    LD (___LONG_R+2),DE
+    JP ___LONG_LEAVE
+@COPY:
+    CALL ___LONG_COPY_A_TO_R
+    JP ___LONG_LEAVE
+@FILL:
+    LD HL,(___LONG_A+2)
+    BIT 7,H
+    LD HL,0
+    JP Z,@STORE
+    DEC HL
+@STORE:
+    LD (___LONG_R),HL
+    LD (___LONG_R+2),HL
+    JP ___LONG_LEAVE
+
+___LONG_USHR:
+    CLRLOC
+    CALL ___LONG_ENTER_SHIFT
+    LD A,(___LONG_N)
+    OR A
+    JP Z,@COPY
+    CP 32
+    JP NC,@ZERO
+    LD B,A
+    LD HL,(___LONG_A)
+    LD DE,(___LONG_A+2)
+@LP:
+    SRL D
+    RR E
+    RR H
+    RR L
+    DJNZ @LP
+    LD (___LONG_R),HL
+    LD (___LONG_R+2),DE
+    JP ___LONG_LEAVE
+@COPY:
+    CALL ___LONG_COPY_A_TO_R
+    JP ___LONG_LEAVE
+@ZERO:
+    LD HL,0
+    LD (___LONG_R),HL
+    LD (___LONG_R+2),HL
+    JP ___LONG_LEAVE
+
+___LONG_CMP:
+    CLRLOC
+    CALL ___LONG_ENTER_BIN
+    LD HL,___LONG_A
+    CALL ___LONG_IS_NEG
+    LD C,A
+    LD HL,___LONG_B
+    CALL ___LONG_IS_NEG
+    XOR C
+    AND #80
+    JP NZ,@DIFF
+    LD HL,(___LONG_A+2)
+    LD DE,(___LONG_B+2)
+    OR A
+    SBC HL,DE
+    JP C,@LT
+    JP NZ,@GT
+    LD HL,(___LONG_A)
+    LD DE,(___LONG_B)
+    OR A
+    SBC HL,DE
+    JP C,@LT
+    JP NZ,@GT
+    LD BC,0
+    JP ___LONG_LEAVE_INT
+@DIFF:
+    LD A,C
+    AND #80
+    JP NZ,@LT
+@GT:
+    LD BC,1
+    JP ___LONG_LEAVE_INT
+@LT:
+    LD BC,#FFFF
+    JP ___LONG_LEAVE_INT
+
+___LONG_TMP:
+    DEFW 0
+___LONG_RET:
+    DEFW 0
+___LONG_STUB:
+    DEFW 0
+___LONG_N:
+    DEFB 0
+___LONG_SIGNQ:
+    DEFB 0
+___LONG_SIGNR:
+    DEFB 0
+___LONG_A:
+    DEFW 0
+    DEFW 0
+___LONG_B:
+    DEFW 0
+    DEFW 0
+___LONG_R:
+    DEFW 0
+    DEFW 0
+___LONG_T:
+    DEFW 0
+    DEFW 0
+___LONG_M:
+    DEFW 0
+    DEFW 0

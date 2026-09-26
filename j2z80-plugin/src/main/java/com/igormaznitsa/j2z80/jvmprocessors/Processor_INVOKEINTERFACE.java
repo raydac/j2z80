@@ -27,8 +27,6 @@ import org.apache.bcel.generic.INVOKEINTERFACE;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
-import org.apache.bcel.generic.Type;
-
 // class to process INVOKEINTERFACE with code 185
 public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor implements NeedsATHROWManager, NeedsINVOKEINTERFACEManager {
 
@@ -66,9 +64,7 @@ public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor implement
 
       String postfix = "";
 
-      if (invokedMethod.getReturnType().getType() != Type.VOID.getType()) {
-        postfix += "PUSH BC\n";
-      }
+      postfix += pushReturnedValue(invokedMethod.getReturnType());
 
       final String res = template.replace(MACROS_OBJREFOFFSET, "#" + Integer.toHexString(offsetOnStackToTheObjectRef & 0xFFFF).toUpperCase(Locale.ENGLISH)).replace(MACROS_VALUE, Integer.toString(argumentsBlockSize)).replace(MACROS_ID, interfaceMethdodId).replace(MACROS_POSTFIX, postfix);
 

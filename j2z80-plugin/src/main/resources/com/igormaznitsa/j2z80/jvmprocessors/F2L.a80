@@ -1,0 +1,5 @@
+; F2L
+    POP BC
+    CALL ___FLOAT_HALF_TO_I32
+    PUSH DE
+    PUSH BC

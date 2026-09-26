@@ -1,0 +1,15 @@
+; PUTFIELD long
+    POP BC
+    POP DE
+    POP HL
+    PUSH DE
+    LD DE,%address%
+    ADD HL,DE
+    POP DE
+    LD (HL),C
+    INC HL
+    LD (HL),B
+    INC HL
+    LD (HL),E
+    INC HL
+    LD (HL),D

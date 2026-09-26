@@ -1,0 +1,7 @@
+; LSTORE
+    POP BC
+    LD (IX-%index%),C
+    LD (IX-%index%+1),B
+    POP BC
+    LD (IX-%high%),C
+    LD (IX-%high%+1),B

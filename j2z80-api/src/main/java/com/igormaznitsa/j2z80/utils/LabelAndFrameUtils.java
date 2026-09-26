@@ -15,6 +15,8 @@
  */
 package com.igormaznitsa.j2z80.utils;
 
+import static java.util.Arrays.stream;
+
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.ids.MethodID;
@@ -34,6 +36,10 @@ public final class LabelAndFrameUtils {
 
   private LabelAndFrameUtils() {
 
+  }
+
+  public static int countArgumentSlots(final Type[] argumentTypes) {
+    return stream(argumentTypes).mapToInt(Type::getSize).sum();
   }
 
   /**

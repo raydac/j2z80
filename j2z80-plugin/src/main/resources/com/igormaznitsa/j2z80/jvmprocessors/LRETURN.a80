@@ -1,0 +1,4 @@
+; LRETURN
+    POP BC
+    POP DE
+    RET

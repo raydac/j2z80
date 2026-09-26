@@ -93,8 +93,10 @@ public enum ClassValidator {
         break;
       } else if (curconst instanceof ConstantLong) {
         final long value = ((ConstantLong) curconst).getBytes();
-        result.set("Long values are not allowed [" + Utils.longToString(value) + ']');
-        break;
+        if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
+          result.set("Long value does not fit in 32 bits [" + Utils.longToString(value) + ']');
+          break;
+        }
       }
     }
 
@@ -112,11 +114,6 @@ public enum ClassValidator {
       final String fieldName = field.getName();
 
       switch (type.getType()) {
-        case Const.T_LONG: {
-          result.set("Detected disallowed 'long' field [" + fieldName + ']');
-          immediateBreak = true;
-        }
-        break;
         case Const.T_DOUBLE: {
           result.set("Detected disallowed 'double' field [" + fieldName + ']');
           immediateBreak = true;
@@ -140,11 +137,6 @@ public enum ClassValidator {
       final Type returnType = method.getReturnType();
 
       switch (returnType.getType()) {
-        case Const.T_LONG: {
-          result.set("Method returns disallowed 'long' result [" + methodName + ']');
-          immediateBreak = true;
-        }
-        break;
         case Const.T_DOUBLE: {
           result.set("Method returns disallowed 'double' result [" + methodName + ']');
           immediateBreak = true;
@@ -157,11 +149,6 @@ public enum ClassValidator {
         for (final Type arg : method.getArgumentTypes()) {
 
           switch (arg.getType()) {
-            case Const.T_LONG: {
-              result.set("Method needs disallowed 'long' argument [" + methodName + ']');
-              immediateBreak = true;
-            }
-            break;
             case Const.T_DOUBLE: {
               result.set("Method needs disallowed 'double' argument [" + methodName + ']');
               immediateBreak = true;

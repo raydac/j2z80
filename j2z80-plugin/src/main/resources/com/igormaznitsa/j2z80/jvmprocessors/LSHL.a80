@@ -1,0 +1,2 @@
+; LSHL
+    CALL ___LONG_SHL

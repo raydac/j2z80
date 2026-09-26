@@ -19,6 +19,8 @@ import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.IOException;
 import java.io.Writer;
+import org.apache.bcel.Const;
+import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MULTIANEWARRAY;
@@ -37,11 +39,22 @@ public class Processor_MULTIANEWARRAY extends AbstractJvmCommandProcessor implem
     return "MULTIANEWARRAY";
   }
 
+  private static boolean isLongArray(final ConstantPoolGen pool, final int index) {
+    if (pool == null || pool.getConstantPool() == null) {
+      return false;
+    }
+    final String name = pool.getConstantPool().getConstantString(index, Const.CONSTANT_Class);
+    return name != null && name.startsWith("[") && name.endsWith("J");
+  }
+
   @Override
   public void process(final MethodTranslator methodTranslator, final Instruction instruction,
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final MULTIANEWARRAY multiarraynew = (MULTIANEWARRAY) instruction;
+    if (isLongArray(methodTranslator.getConstantPool(), multiarraynew.getIndex())) {
+      throw new IllegalArgumentException("multianewarray of long is not supported");
+    }
     out.write(template.replace(MACROS_VALUE, Integer.toString(multiarraynew.getDimensions())));
     out.write(NEXT_LINE);
   }

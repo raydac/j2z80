@@ -24,15 +24,18 @@ import org.apache.bcel.generic.GETSTATIC;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
+import org.apache.bcel.generic.Type;
 
 // class to process GETSTATIC with code 178
 public class Processor_GETSTATIC extends AbstractFieldProcessor {
 
   private final String template;
+  private final String longTemplate;
 
   public Processor_GETSTATIC() {
     super();
-    template = loadResourceFileAsString("GETSTATIC.a80");
+    this.template = loadResourceFileAsString("GETSTATIC.a80");
+    this.longTemplate = loadResourceFileAsString("GETSTATIC_LONG.a80");
   }
 
   @Override
@@ -50,8 +53,10 @@ public class Processor_GETSTATIC extends AbstractFieldProcessor {
       final ConstantPoolGen cpool = methodTranslator.getConstantPool();
       final ObjectType obj = (ObjectType) ins.getReferenceType(cpool);
       final String address = LabelAndFrameUtils.makeLabelNameForField(obj.getClassName(), ins.getFieldName(cpool), ins.getFieldType(cpool));
+      final String body = ins.getFieldType(cpool).getType() == Type.LONG.getType()
+          ? this.longTemplate : this.template;
 
-      out.write(template.replace(MACROS_ADDRESS, address));
+      out.write(body.replace(MACROS_ADDRESS, address));
       out.write(NEXT_LINE);
     }
   }

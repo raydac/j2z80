@@ -16,6 +16,7 @@
 
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.countArgumentSlots;
 import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.makeLabelNameForMethod;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
@@ -61,8 +62,18 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @return the memory block size in bytes
    */
   public static int calculateArgumentBlockSize(final MethodGen invokingMethod) {
-    return calculateArgumentBlockSize(invokingMethod.getArgumentTypes().length,
+    return calculateArgumentBlockSize(countArgumentSlots(invokingMethod.getArgumentTypes()),
         invokingMethod.isStatic());
+  }
+
+  public static String pushReturnedValue(final Type returnType) {
+    if (returnType.getType() == Type.VOID.getType()) {
+      return "";
+    }
+    if (returnType.getSize() == 2) {
+      return "PUSH DE" + NEXT_LINE + "PUSH BC" + NEXT_LINE;
+    }
+    return "PUSH BC" + NEXT_LINE;
   }
 
   /**
@@ -83,7 +94,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    */
   public static int calculateTotalFrameSizeWithLocals(final MethodGen invokingMethod) {
     return calculateTotalFrameSizeWithLocals(
-        invokingMethod.getArgumentTypes().length,
+        countArgumentSlots(invokingMethod.getArgumentTypes()),
         invokingMethod.getMaxLocals(),
         invokingMethod.isStatic());
   }
@@ -164,9 +175,10 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
     boolean result = false;
     if (processor != null) {
       final boolean isStaticCall = instruction instanceof INVOKESTATIC;
-      final int argAreaSize = calculateArgumentBlockSize(methodArgs.length, isStaticCall);
-      final int totalFrameSize = calculateTotalFrameSizeWithLocals(methodArgs.length,
-          methodArgs.length + (isStaticCall ? 0 : 1), isStaticCall);
+      final int argumentSlots = countArgumentSlots(methodArgs);
+      final int argAreaSize = calculateArgumentBlockSize(argumentSlots, isStaticCall);
+      final int totalFrameSize = calculateTotalFrameSizeWithLocals(argumentSlots,
+          argumentSlots + (isStaticCall ? 0 : 1), isStaticCall);
 
       String prefix = "";
       String postfix = "";

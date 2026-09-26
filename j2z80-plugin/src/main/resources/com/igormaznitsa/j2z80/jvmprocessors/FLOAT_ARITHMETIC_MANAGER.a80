@@ -1060,5 +1060,183 @@ ___FLOAT_CMP:
     JP Z,@LT
     JP @GT
 
+___FLOAT_I32_TO_HALF:
+    CLRLOC
+    LD A,D
+    OR E
+    JP Z,@HIGH0
+    LD A,D
+    AND E
+    CP -1
+    JP NZ,@INF
+    BIT 7,B
+    JP NZ,@I16
+    LD A,B
+    OR C
+    JP Z,@INF
+    LD A,C
+    CPL
+    LD L,A
+    LD A,B
+    CPL
+    LD H,A
+    INC HL
+    LD A,1
+    JP @U16
+@HIGH0:
+    BIT 7,B
+    JP NZ,@POSWIDE
+@I16:
+    CALL ___FLOAT_I2F
+    RET
+@POSWIDE:
+    LD L,C
+    LD H,B
+    XOR A
+@U16:
+    LD (___FLOAT_I32_SIGN),A
+    LD A,H
+    OR L
+    JP Z,@ZERO
+    LD DE,#FFF0
+    OR A
+    SBC HL,DE
+    JP NC,@INFS
+    ADD HL,DE
+    LD D,0
+    BIT 7,H
+    JP NZ,@ALIGNED
+@FIND:
+    ADD HL,HL
+    INC D
+    BIT 7,H
+    JP Z,@FIND
+@ALIGNED:
+    LD A,L
+    AND 3
+    LD C,A
+    SRL H
+    RR L
+    SRL H
+    RR L
+    LD A,C
+    OR A
+    JP Z,@NOST
+    SET 0,L
+@NOST:
+    LD A,30
+    SUB D
+    LD B,A
+    LD D,H
+    LD E,L
+    LD H,B
+    LD A,(___FLOAT_I32_SIGN)
+    LD L,A
+    CALL ___FLOAT_PACK
+    RET
+@INFS:
+    LD A,(___FLOAT_I32_SIGN)
+    LD BC,#7C00
+    OR A
+    RET Z
+    LD B,#FC
+    RET
+@INF:
+    LD BC,#7C00
+    BIT 7,D
+    RET Z
+    LD B,#FC
+    RET
+@ZERO:
+    LD BC,0
+    RET
+
+___FLOAT_HALF_TO_I32:
+    CLRLOC
+    CALL ___FLOAT_UNPACK
+    LD (___FLOAT_I32_SIGN),A
+    LD A,L
+    LD (___FLOAT_I32_SIGN+1),A
+    LD A,(___FLOAT_I32_SIGN)
+    CP 3
+    JP Z,@ZERO
+    OR A
+    JP Z,@ZERO
+    CP 2
+    JP Z,@INF
+    LD A,H
+    SUB 15
+    JP M,@ZERO
+    CP 16
+    JP NC,@INF
+    LD B,A
+    CALL ___FLOAT_SHR3
+    LD A,B
+    CP 11
+    JP NC,@LEFT
+    LD B,A
+    LD A,10
+    SUB B
+    LD B,A
+    JP Z,@MAG
+@RR:
+    SRL D
+    RR E
+    DJNZ @RR
+    JP @MAG
+@LEFT:
+    SUB 10
+    LD B,A
+@LL:
+    SLA E
+    RL D
+    DJNZ @LL
+@MAG:
+    LD C,E
+    LD B,D
+    LD DE,0
+    LD A,(___FLOAT_I32_SIGN+1)
+    OR A
+    JP Z,@DONE
+    LD A,C
+    CPL
+    LD C,A
+    LD A,B
+    CPL
+    LD B,A
+    LD A,E
+    CPL
+    LD E,A
+    LD A,D
+    CPL
+    LD D,A
+    INC BC
+    LD A,B
+    OR C
+    JP NZ,@DONE
+    INC DE
+    JP @DONE
+@INF:
+    LD A,(___FLOAT_I32_SIGN+1)
+    OR A
+    JP NZ,@NINF
+    LD BC,#FFFF
+    LD DE,#7FFF
+    RET
+@NINF:
+    LD BC,0
+    LD D,#80
+    LD E,0
+    RET
+@ZERO:
+    LD BC,0
+    LD DE,0
+    RET
+@DONE:
+    RET
+
+___FLOAT_I32_SIGN:
+    DEFW 0
+
 ___FLOAT_WS:
     DEFS 16

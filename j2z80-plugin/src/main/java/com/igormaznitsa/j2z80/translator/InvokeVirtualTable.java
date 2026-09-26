@@ -179,7 +179,9 @@ public class InvokeVirtualTable {
       final String methodLabel = LabelAndFrameUtils.makeLabelNameForMethod(classMethodInfo);
       final int classId =
           translator.getClassContext().findClassUID(new ClassID(classMethodInfo.getClassInfo()));
-      final int frameSize = LabelAndFrameUtils.calculateFrameSizeForMethod(methGen.getArgumentTypes().length, methGen.getMaxLocals(), false);
+      final int frameSize = LabelAndFrameUtils.calculateFrameSizeForMethod(
+          LabelAndFrameUtils.countArgumentSlots(methGen.getArgumentTypes()), methGen.getMaxLocals(),
+          false);
 
       return "DEFW " + classId + ','
           + methodLabel + ','

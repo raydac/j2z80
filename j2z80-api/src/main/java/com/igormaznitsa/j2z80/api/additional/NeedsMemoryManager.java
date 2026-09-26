@@ -36,6 +36,10 @@ public interface NeedsMemoryManager extends J2ZAdditionalBlock {
    */
   String SUB_ALLOCATE_WORDARRAY = "___MEMORY_ALLOCATE_WORDARRAY";
   /**
+   * The label of the subroutine to allocate a 4-byte-element array in the heap.
+   */
+  String SUB_ALLOCATE_DWORDARRAY = "___MEMORY_ALLOCATE_DWORDARRAY";
+  /**
    * The label of the subroutine to allocate a byte array in the heap
    */
   String SUB_ALLOCATE_BYTEARRAY = "___MEMORY_ALLOCATE_BYTEARRAY";

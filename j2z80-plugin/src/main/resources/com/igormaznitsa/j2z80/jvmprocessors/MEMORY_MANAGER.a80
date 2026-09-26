@@ -121,6 +121,38 @@ ___MEMORY_ALLOCATE_WORDARRAY: ; BC element number, first byte size (2), second w
     POP HL
     RET
 ;-----------------------------------------------------------
+___MEMORY_ALLOCATE_DWORDARRAY: ; BC element number, element size 4, then length word, then data, address in BC
+    PUSH HL
+    PUSH DE
+
+    LD HL,(___MEMORY_MANAGER_TOP_POINTER)
+    LD (HL),4
+    INC HL
+
+    LD (HL),C
+    INC HL
+    LD (HL),B
+    INC HL
+
+    LD E,L
+    LD D,H
+
+    SLA C
+    RL B
+    SLA C
+    RL B
+    ADD HL,BC
+
+    LD (___MEMORY_MANAGER_TOP_POINTER),HL
+
+    PUSH DE
+    CALL ___MEMORY_ZERO_PAYLOAD
+    POP BC
+
+    POP DE
+    POP HL
+    RET
+;-----------------------------------------------------------
 ___MEMORY_ALLOCATE_BYTEARRAY: ; BC element number, first byte size (1), second word is length, then data, the address in BC
     PUSH HL
     PUSH DE
@@ -278,8 +310,12 @@ ___MEMORY_GET_ARRAY_SIZE: ; BC - first array element address, size in bytes in B
     LD B,(IX-1)
     LD C,(IX-2)
     
-    LD A,1
-    CP (IX-3)
+    LD A,(IX-3)
+    CP 1
+    JP Z,___MEMORY_GET_ARRAY_SIZE_IN_BYTES_BYTEARRAY
+    SLA C
+    RL B
+    CP 2
     JP Z,___MEMORY_GET_ARRAY_SIZE_IN_BYTES_BYTEARRAY
     SLA C
     RL B

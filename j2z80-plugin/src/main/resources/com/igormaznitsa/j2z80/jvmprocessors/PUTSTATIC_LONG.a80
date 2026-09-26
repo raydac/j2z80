@@ -1,0 +1,5 @@
+; PUTSTATIC long
+    POP BC
+    POP DE
+    LD (%address%),BC
+    LD (%address%+2),DE

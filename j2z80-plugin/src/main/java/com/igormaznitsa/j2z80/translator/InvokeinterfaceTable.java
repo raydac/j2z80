@@ -20,11 +20,10 @@ import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
-import org.apache.bcel.generic.MethodGen;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.apache.bcel.generic.MethodGen;
 
 public class InvokeinterfaceTable {
   private final TranslatorContext translator;
@@ -73,7 +72,9 @@ public class InvokeinterfaceTable {
 
       for (final MethodID method : inheritedMethods) {
         final MethodGen meth = translator.getMethodContext().findMethod(method);
-        final int frameSize = LabelAndFrameUtils.calculateFrameSizeForMethod(meth.getArgumentTypes().length, meth.getMaxLocals(), false);
+        final int frameSize = LabelAndFrameUtils.calculateFrameSizeForMethod(
+            LabelAndFrameUtils.countArgumentSlots(meth.getArgumentTypes()), meth.getMaxLocals(),
+            false);
 
         result.append("DEFW ").append(LabelAndFrameUtils.makeLabelForClassID(method.getClassID())).append(',')
             .append(method.getMethodLabel()).append(',')

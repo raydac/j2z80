@@ -23,8 +23,6 @@ import org.apache.bcel.generic.INVOKESPECIAL;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
-import org.apache.bcel.generic.Type;
-
 // class to process INVOKESPECIAL with code 183
 public class Processor_INVOKESPECIAL extends AbstractInvokeProcessor implements NeedsMemoryManager {
 
@@ -60,9 +58,7 @@ public class Processor_INVOKESPECIAL extends AbstractInvokeProcessor implements 
       final String prefix = generateFramePrefix(argBlockSize, frameSize);
       String postfix = generateFramePostfix(argBlockSize, frameSize);
 
-      if (invokingMethod.getReturnType().getType() != Type.VOID.getType()) {
-        postfix += "PUSH BC\n";
-      }
+      postfix += pushReturnedValue(invokingMethod.getReturnType());
 
       final String res = template.replace(MACROS_ADDRESS, labelForMethod).replace(MACROS_PREFIX, prefix).replace(MACROS_POSTFIX, postfix);
 

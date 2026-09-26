@@ -24,15 +24,18 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUTFIELD;
+import org.apache.bcel.generic.Type;
 
 // class to process PUTFIELD with code 181
 public class Processor_PUTFIELD extends AbstractFieldProcessor {
 
   private final String template;
+  private final String longTemplate;
 
   public Processor_PUTFIELD() {
     super();
-    template = loadResourceFileAsString("PUTFIELD.a80");
+    this.template = loadResourceFileAsString("PUTFIELD.a80");
+    this.longTemplate = loadResourceFileAsString("PUTFIELD_LONG.a80");
   }
 
   @Override
@@ -51,8 +54,10 @@ public class Processor_PUTFIELD extends AbstractFieldProcessor {
       final ObjectType objType = (ObjectType) putfield.getReferenceType(const_pool);
 
       final String labelOffset = LabelAndFrameUtils.makeLabelNameForFieldOffset(objType.getClassName(), putfield.getFieldName(const_pool), putfield.getFieldType(const_pool));
+      final String body = putfield.getFieldType(const_pool).getType() == Type.LONG.getType()
+          ? this.longTemplate : this.template;
 
-      out.write(template.replace(MACROS_ADDRESS, labelOffset));
+      out.write(body.replace(MACROS_ADDRESS, labelOffset));
       out.write(NEXT_LINE);
     }
   }

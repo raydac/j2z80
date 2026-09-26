@@ -174,20 +174,14 @@ public enum ClassUtils {
         continue;
       }
 
-      switch (fld.getType().getType()) {
-        case Const.T_DOUBLE:
-        case Const.T_LONG:
-          throw new IllegalStateException(
-              "Class " + classGen.getClassName() + " contains inappropriate field [" +
-                  fld.toString() + ']');
-        default: {
-          fieldNumber++;
-        }
-        break;
+      if (fld.getType().getType() == Const.T_DOUBLE) {
+        throw new IllegalStateException(
+            "Class " + classGen.getClassName() + " contains inappropriate field [" +
+                fld.toString() + ']');
       }
 
-
-      fieldNumber++;
+      final int slots = fld.getType().getType() == Const.T_LONG ? 2 : 1;
+      fieldNumber += slots * 2;
     }
 
     if (isJ2Z80ObjectClass(superClass)) {

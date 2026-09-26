@@ -1,0 +1,17 @@
+; LALOAD
+    POP BC
+    POP HL
+    SLA C
+    RL B
+    SLA C
+    RL B
+    ADD HL,BC
+    LD C,(HL)
+    INC HL
+    LD B,(HL)
+    INC HL
+    LD E,(HL)
+    INC HL
+    LD D,(HL)
+    PUSH DE
+    PUSH BC

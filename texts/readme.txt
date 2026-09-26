@@ -13,8 +13,8 @@ Because the project needs very strong testing on the low level, I actively use i
 Features of the translator
 -----------------------------
 It supports : OOP, object creation, base arithmetic and bit operations, JNI, arrays
-It doesn't support: some data types (long, double), exceptions, synchronization, any garbage collection, both StringBuilder and StringBuffer (so it's impossible to make string operations) also all Core Java API excluded
-Specific usage: char is 8bit width and String can't contain more than 255 symbols, int is 16 bit signed type, float is 16-bit IEEE binary16. It uses small embedded Z80-assembler for translation.
+It doesn't support: double, exceptions, synchronization, any garbage collection, both StringBuilder and StringBuffer (so it's impossible to make string operations) also all Core Java API excluded
+Specific usage: char is 8bit width and String can't contain more than 255 symbols, int is 16 bit signed type, long is 32 bit signed type, float is 16-bit IEEE binary16. It uses small embedded Z80-assembler for translation.
 
 but anyway the plugin opens a good way to use the most modern technologies for Z80 developments and allow to use the Java toolchain.
 at present I have implemented obly very basic optimization in the generated code.

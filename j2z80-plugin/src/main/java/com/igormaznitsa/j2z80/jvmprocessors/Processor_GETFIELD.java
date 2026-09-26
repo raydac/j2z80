@@ -24,15 +24,18 @@ import org.apache.bcel.generic.GETFIELD;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
+import org.apache.bcel.generic.Type;
 
 // class to process GETFIELD with code 180
 public class Processor_GETFIELD extends AbstractFieldProcessor {
 
   private final String template;
+  private final String longTemplate;
 
   public Processor_GETFIELD() {
     super();
-    template = loadResourceFileAsString("GETFIELD.a80");
+    this.template = loadResourceFileAsString("GETFIELD.a80");
+    this.longTemplate = loadResourceFileAsString("GETFIELD_LONG.a80");
   }
 
   @Override
@@ -52,8 +55,10 @@ public class Processor_GETFIELD extends AbstractFieldProcessor {
       final ObjectType objType = (ObjectType) getfield.getReferenceType(const_pool);
 
       final String labelOffset = LabelAndFrameUtils.makeLabelNameForFieldOffset(objType.getClassName(), getfield.getFieldName(const_pool), getfield.getFieldType(const_pool));
+      final String body = getfield.getFieldType(const_pool).getType() == Type.LONG.getType()
+          ? this.longTemplate : this.template;
 
-      out.write(template.replace(MACROS_ADDRESS, labelOffset));
+      out.write(body.replace(MACROS_ADDRESS, labelOffset));
       out.write(NEXT_LINE);
     }
   }

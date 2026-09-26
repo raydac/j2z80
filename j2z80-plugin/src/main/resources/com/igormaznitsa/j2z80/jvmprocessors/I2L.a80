@@ -1,0 +1,11 @@
+; I2L
+    CLRLOC
+    POP BC
+    LD A,B
+    RLA
+    LD DE,0
+    JP NC,@POS
+    LD DE,#FFFF
+@POS:
+    PUSH DE
+    PUSH BC

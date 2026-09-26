@@ -1,0 +1,2 @@
+; LNEG
+    CALL ___LONG_NEG

@@ -109,9 +109,7 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
         postfix = generateFramePostfix(argumentMemorySize, totalMemorySize);
       }
 
-      if (invokedMethod.getReturnType().getType() != Type.VOID.getType()) {
-        postfix += "PUSH BC\n";
-      }
+      postfix += pushReturnedValue(invokedMethod.getReturnType());
 
       final String res = template.replace(MACROS_ADDRESS, labelForMethod).replace(MACROS_PREFIX, prefix).replace(MACROS_POSTFIX, postfix);
 

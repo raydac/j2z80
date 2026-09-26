@@ -25,8 +25,6 @@ import org.apache.bcel.generic.INVOKEVIRTUAL;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
-import org.apache.bcel.generic.Type;
-
 // class to process INVOKEVIRTUAL with code 182
 public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements NeedsINVOKEVIRTUALManager {
 
@@ -61,9 +59,7 @@ public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements 
 
       String postfix = "";
 
-      if (invokedMethod.getReturnType().getType() != Type.VOID.getType()) {
-        postfix += "PUSH BC\n";
-      }
+      postfix += pushReturnedValue(invokedMethod.getReturnType());
 
       final String res = template.replace(MACROS_OBJREFOFFSET, "#" + Integer.toHexString(offsetOnStackToTheObjectRef & 0xFFFF).toUpperCase(Locale.ENGLISH))
           .replace(MACROS_RECORDADDR, recordLabel)
