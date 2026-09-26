@@ -105,7 +105,8 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
       assertLocalVariablesNumber(invokedMethod);
 
       if (needsFrame) {
-        prefix = generateFramePrefix(argumentMemorySize, totalMemorySize);
+        prefix = orientWideArguments(invokedMethod.getArgumentTypes())
+            + generateFramePrefix(argumentMemorySize, totalMemorySize);
         postfix = generateFramePostfix(argumentMemorySize, totalMemorySize);
       }
 

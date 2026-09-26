@@ -113,6 +113,43 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
   }
 
   /**
+   * A long or double is pushed high word then low word, so the low word is on top.
+   * The callee frame addresses slot 0 at the first pushed word, so each pair is
+   * exchanged and the low word lands in the first slot.
+   */
+  public static String orientWideArguments(final Type[] argumentTypes) {
+    final StringBuilder oriented = new StringBuilder();
+    int offset = 0;
+    for (int index = argumentTypes.length - 1; index >= 0; index--) {
+      final Type argumentType = argumentTypes[index];
+      if (argumentType.getSize() == 2) {
+        oriented.append(swapStackPair(offset));
+      }
+      offset += argumentType.getSize() << 1;
+    }
+    return oriented.toString();
+  }
+
+  private static String swapStackPair(final int offset) {
+    return "LD HL," + offset + NEXT_LINE
+        + "ADD HL,SP" + NEXT_LINE
+        + "LD E,(HL)" + NEXT_LINE
+        + "INC HL" + NEXT_LINE
+        + "LD D,(HL)" + NEXT_LINE
+        + "INC HL" + NEXT_LINE
+        + "LD C,(HL)" + NEXT_LINE
+        + "INC HL" + NEXT_LINE
+        + "LD B,(HL)" + NEXT_LINE
+        + "LD (HL),D" + NEXT_LINE
+        + "DEC HL" + NEXT_LINE
+        + "LD (HL),E" + NEXT_LINE
+        + "DEC HL" + NEXT_LINE
+        + "LD (HL),B" + NEXT_LINE
+        + "DEC HL" + NEXT_LINE
+        + "LD (HL),C" + NEXT_LINE;
+  }
+
+  /**
    * Generate the postfix for a method invocation
    *
    * @param argMemorySize the memory block size for arguments of the method
@@ -185,7 +222,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
 
       if (processor.doesInvokeNeedFrame(methodTranslator.getTranslatorContext(), methodName,
           methodArgs, methodResult)) {
-        prefix = generateFramePrefix(argAreaSize, totalFrameSize);
+        prefix = orientWideArguments(methodArgs) + generateFramePrefix(argAreaSize, totalFrameSize);
         postfix = generateFramePostfix(argAreaSize, totalFrameSize);
       }
 

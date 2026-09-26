@@ -1,0 +1,30 @@
+j2z80.spectrum.Keyboard.row#[I]I:
+    PUSH DE
+    PUSH HL
+    LD A,(IX+1)
+    OR A
+    JR NZ,ZXK.NONE
+    LD A,(IX-0)
+    CP 8
+    JR NC,ZXK.NONE
+    LD E,A
+    LD D,0
+    LD HL,ZXK.PORTS
+    ADD HL,DE
+    LD B,(HL)
+    LD C,#FE
+    IN A,(C)
+    CPL
+    AND #1F
+    LD C,A
+    LD B,0
+    JR ZXK.OUT
+ZXK.NONE:
+    LD BC,0
+ZXK.OUT:
+    POP HL
+    POP DE
+    RET
+
+ZXK.PORTS:
+    DEFB #FE,#FD,#FB,#F7,#EF,#DF,#BF,#7F

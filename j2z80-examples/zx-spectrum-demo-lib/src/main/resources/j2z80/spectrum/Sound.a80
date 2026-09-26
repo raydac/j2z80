@@ -1,0 +1,19 @@
+ZX.BEEPER: EQU #03B5
+
+j2z80.spectrum.Sound.tone#[II]V:
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    LD E,(IX-0)
+    LD D,(IX+1)
+    LD L,(IX-2)
+    LD H,(IX-1)
+    CALL ZX.ROM.READY
+    PUSH IX
+    CALL ZX.BEEPER
+    DI
+    POP IX
+    POP HL
+    POP DE
+    POP BC
+    RET

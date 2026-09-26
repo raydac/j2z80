@@ -61,7 +61,9 @@ public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements 
 
       postfix += pushReturnedValue(invokedMethod.getReturnType());
 
-      final String res = template.replace(MACROS_OBJREFOFFSET, "#" + Integer.toHexString(offsetOnStackToTheObjectRef & 0xFFFF).toUpperCase(Locale.ENGLISH))
+      final String res = orientWideArguments(invokedMethod.getArgumentTypes())
+          + template.replace(MACROS_OBJREFOFFSET, "#" +
+              Integer.toHexString(offsetOnStackToTheObjectRef & 0xFFFF).toUpperCase(Locale.ENGLISH))
           .replace(MACROS_RECORDADDR, recordLabel)
           .replace(MACROS_ARGAREALEN, Integer.toString(argumentsBlockSize))
           .replace(MACROS_POSTFIX, postfix);

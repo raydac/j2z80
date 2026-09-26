@@ -30,6 +30,7 @@ public class TestINVOKESTATIC extends AbstractInvokeTest {
 
   private static final String TEST_EXPRESSION_4_LABEL = "TEST_EXPRESSION_4";
   private static final String TEST_333_LABEL = "TEST_333_LABEL";
+  private static final String WIDE_RETURN_LABEL = "WIDE_RETURN";
   private static final int TEST_LOCALS_NUMBER = 28;
 
   private final INVOKESTATIC INSTRUCTION_INSTANCE = new INVOKESTATIC(CONSTANT_MOCK_METHOD);
@@ -190,9 +191,45 @@ public class TestINVOKESTATIC extends AbstractInvokeTest {
     assertEquals((short) testExpression(arg1, arg2, arg3, arg4), (short) pop());
     assertStackEmpty();
   }
+  private int wideLow0;
 
   private int testExpression(final int a, final int b, final int c, final int d) {
     return a + b - c * d;
+  }
+  private int wideHigh0;
+  private int wideLow1;
+  private int wideHigh1;
+
+  @Test(timeout = 3000L)
+  public void testDoubleArgumentsKeepSlotOrderAndDoubleResultSurvivesTheFrame() throws Exception {
+    mockupOfInvokedMethod =
+        registerMockMethod(CONSTANT_MOCK_METHOD, TEST_INVOKED_CLASS, TEST_INVOKED_METHOD,
+            AccessFlag.STATIC, 0, new Type[] {Type.DOUBLE, Type.DOUBLE}, Type.DOUBLE);
+
+    final StringWriter writer = new StringWriter();
+    processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
+        this.getClass().getClassLoader(),
+        writer);
+    makePostfixWithBreakPoint(WIDE_RETURN_LABEL, writer);
+
+    push(0x1111);
+    push(0x0101);
+    push(0x2222);
+    push(0x0202);
+
+    registerBreakPoint(WIDE_RETURN_LABEL);
+    IX(INITIAL_IX);
+    assertLinearExecutionToEnd(writer.toString());
+
+    assertEquals(FLAG_METHOD_CALLED, peekb(FLAG_ADDRESS));
+    assertEquals(INITIAL_IX, IX);
+    assertEquals(0x0101, this.wideLow0);
+    assertEquals(0x1111, this.wideHigh0);
+    assertEquals(0x0202, this.wideLow1);
+    assertEquals(0x2222, this.wideHigh1);
+    assertEquals(0xABCD, pop());
+    assertEquals(0x1234, pop());
+    assertStackEmpty();
   }
 
   @Override
@@ -203,6 +240,14 @@ public class TestINVOKESTATIC extends AbstractInvokeTest {
       breakpointmet = true;
     } else if (TEST_333_LABEL.equals(label)) {
       BC(333);
+      breakpointmet = true;
+    } else if (WIDE_RETURN_LABEL.equals(label)) {
+      this.wideLow0 = this.readLocalFrameVariable(0);
+      this.wideHigh0 = this.readLocalFrameVariable(1);
+      this.wideLow1 = this.readLocalFrameVariable(2);
+      this.wideHigh1 = this.readLocalFrameVariable(3);
+      BC(0xABCD);
+      DE(0x1234);
       breakpointmet = true;
     }
 

@@ -1,0 +1,381 @@
+ZX.BORDCR: EQU #5C48
+ZX.ATTR.P: EQU #5C8D
+ZX.ATTR.T: EQU #5C8F
+ZX.SCREEN: EQU #4000
+ZX.ATTRS: EQU #5800
+ZX.CLS: EQU #0D6B
+ZX.CLS.LOWER: EQU #0D6E
+ZX.CHAN.OPEN: EQU #1601
+
+j2z80.spectrum.Screen.border#[I]V:
+    LD A,(IX-0)
+    AND 7
+    OUT (#FE),A
+    RLCA
+    RLCA
+    RLCA
+    BIT 5,A
+    JR NZ,ZXS.BORDER.STORE
+    XOR #07
+ZXS.BORDER.STORE:
+    LD (ZX.BORDCR),A
+    RET
+
+j2z80.spectrum.Screen.colors#[IIII]V:
+    PUSH BC
+    PUSH DE
+    LD B,(IX-0)
+    LD C,(IX-2)
+    LD D,(IX-4)
+    LD E,(IX-6)
+    CALL ZXS.PACK
+    CALL ZXS.ATTR
+    POP DE
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.ink#[I]V:
+    PUSH BC
+    LD A,(ZX.ATTR.P)
+    AND #F8
+    LD B,A
+    LD A,(IX-0)
+    AND 7
+    OR B
+    CALL ZXS.ATTR
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.paper#[I]V:
+    PUSH BC
+    LD A,(ZX.ATTR.P)
+    AND #C7
+    LD B,A
+    LD A,(IX-0)
+    AND 7
+    RLCA
+    RLCA
+    RLCA
+    OR B
+    CALL ZXS.ATTR
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.bright#[I]V:
+    PUSH BC
+    LD A,(ZX.ATTR.P)
+    AND #BF
+    LD B,A
+    LD A,(IX-0)
+    OR A
+    JR Z,ZXS.BRIGHT.STORE
+    LD A,B
+    OR #40
+    LD B,A
+ZXS.BRIGHT.STORE:
+    LD A,B
+    CALL ZXS.ATTR
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.flash#[I]V:
+    PUSH BC
+    LD A,(ZX.ATTR.P)
+    AND #7F
+    LD B,A
+    LD A,(IX-0)
+    OR A
+    JR Z,ZXS.FLASH.STORE
+    LD A,B
+    OR #80
+    LD B,A
+ZXS.FLASH.STORE:
+    LD A,B
+    CALL ZXS.ATTR
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.lowerColors#[IIII]V:
+    PUSH BC
+    PUSH DE
+    LD B,(IX-0)
+    LD C,(IX-2)
+    LD D,(IX-4)
+    LD E,(IX-6)
+    CALL ZXS.PACK
+    LD (ZX.BORDCR),A
+    POP DE
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.clear#[]V:
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    CALL ZX.ROM.READY
+    CALL ZX.CLS
+    POP HL
+    POP DE
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.clearPixels#[]V:
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    LD HL,ZX.SCREEN
+    LD DE,ZX.SCREEN
+    INC DE
+    LD BC,#17FF
+    LD (HL),0
+    LDIR
+    POP HL
+    POP DE
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.clearLower#[]V:
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    CALL ZX.ROM.READY
+    CALL ZX.CLS.LOWER
+    POP HL
+    POP DE
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.plot#[II]V:
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    CALL ZXS.COORDS
+    JR NZ,ZXS.PLOT.OUT
+    CALL ZXS.PIXEL
+    OR (HL)
+    LD (HL),A
+ZXS.PLOT.OUT:
+    POP HL
+    POP DE
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.unplot#[II]V:
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    CALL ZXS.COORDS
+    JR NZ,ZXS.UNPLOT.OUT
+    CALL ZXS.PIXEL
+    CPL
+    AND (HL)
+    LD (HL),A
+ZXS.UNPLOT.OUT:
+    POP HL
+    POP DE
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.point#[II]I:
+    PUSH DE
+    PUSH HL
+    CALL ZXS.COORDS
+    JR NZ,ZXS.POINT.CLEAR
+    CALL ZXS.PIXEL
+    AND (HL)
+    LD BC,0
+    JR Z,ZXS.POINT.OUT
+    LD BC,1
+    JR ZXS.POINT.OUT
+ZXS.POINT.CLEAR:
+    LD BC,0
+ZXS.POINT.OUT:
+    POP HL
+    POP DE
+    RET
+
+j2z80.spectrum.Screen.cell#[III]V:
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    LD A,(IX+1)
+    OR A
+    JR NZ,ZXS.CELL.OUT
+    LD A,(IX-1)
+    OR A
+    JR NZ,ZXS.CELL.OUT
+    LD A,(IX-3)
+    OR A
+    JR NZ,ZXS.CELL.OUT
+    LD A,(IX-0)
+    CP 32
+    JR NC,ZXS.CELL.OUT
+    LD A,(IX-2)
+    CP 24
+    JR NC,ZXS.CELL.OUT
+    LD L,(IX-2)
+    LD H,0
+    ADD HL,HL
+    ADD HL,HL
+    ADD HL,HL
+    ADD HL,HL
+    ADD HL,HL
+    LD E,(IX-0)
+    LD D,0
+    ADD HL,DE
+    LD DE,ZX.ATTRS
+    ADD HL,DE
+    LD A,(IX-4)
+    LD (HL),A
+ZXS.CELL.OUT:
+    POP HL
+    POP DE
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.at#[II]V:
+    LD A,(IX+1)
+    OR A
+    RET NZ
+    LD A,(IX-1)
+    OR A
+    RET NZ
+    LD A,(IX-0)
+    CP 24
+    RET NC
+    LD A,(IX-2)
+    CP 32
+    RET NC
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    LD D,(IX-0)
+    LD E,(IX-2)
+    PUSH DE
+    CALL ZX.ROM.READY
+    LD A,#02
+    CALL ZX.CHAN.OPEN
+    LD A,#16
+    RST 16
+    POP DE
+    PUSH DE
+    LD A,D
+    RST 16
+    POP DE
+    LD A,E
+    RST 16
+    POP HL
+    POP DE
+    POP BC
+    RET
+
+j2z80.spectrum.Screen.frame#[]V:
+    PUSH BC
+    LD BC,#0C00
+ZXS.FRAME.WAIT:
+    DEC BC
+    LD A,B
+    OR C
+    JR NZ,ZXS.FRAME.WAIT
+    POP BC
+    RET
+
+ZXS.COORDS:
+    LD A,(IX+1)
+    OR A
+    JR NZ,ZXS.COORDS.BAD
+    LD A,(IX-1)
+    OR A
+    JR NZ,ZXS.COORDS.BAD
+    LD A,(IX-2)
+    CP 192
+    JR NC,ZXS.COORDS.BAD
+    LD C,(IX-0)
+    LD B,(IX-2)
+    XOR A
+    RET
+ZXS.COORDS.BAD:
+    XOR A
+    INC A
+    RET
+
+ZXS.PIXEL:
+    LD A,191
+    SUB B
+    LD B,A
+    LD A,B
+    AND #C0
+    RRCA
+    RRCA
+    RRCA
+    OR #40
+    LD D,A
+    LD A,B
+    AND #07
+    OR D
+    LD H,A
+    LD A,B
+    AND #38
+    RLCA
+    RLCA
+    LD L,A
+    LD A,C
+    RRCA
+    RRCA
+    RRCA
+    AND #1F
+    OR L
+    LD L,A
+    LD A,C
+    AND #07
+    LD E,A
+    LD D,0
+    PUSH HL
+    LD HL,ZXS.MASKS
+    ADD HL,DE
+    LD A,(HL)
+    POP HL
+    RET
+
+ZXS.PACK:
+    LD A,C
+    AND 7
+    RLCA
+    RLCA
+    RLCA
+    LD C,A
+    LD A,B
+    AND 7
+    OR C
+    LD C,A
+    LD A,D
+    OR A
+    JR Z,ZXS.PACK.FLASH
+    LD A,C
+    OR #40
+    LD C,A
+ZXS.PACK.FLASH:
+    LD A,E
+    OR A
+    JR Z,ZXS.PACK.DONE
+    LD A,C
+    OR #80
+    RET
+ZXS.PACK.DONE:
+    LD A,C
+    RET
+
+ZXS.ATTR:
+    LD (ZX.ATTR.P),A
+    LD (ZX.ATTR.T),A
+    RET
+
+ZX.ROM.READY:
+    LD IY,#5C3A
+    LD A,#FF
+    LD (#5C3A),A
+    RES 5,(IY+1)
+    RET
+
+ZXS.MASKS:
+    DEFB #80,#40,#20,#10,#08,#04,#02,#01

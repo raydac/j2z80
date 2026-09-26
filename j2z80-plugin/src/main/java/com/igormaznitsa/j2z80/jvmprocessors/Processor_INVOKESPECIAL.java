@@ -55,7 +55,8 @@ public class Processor_INVOKESPECIAL extends AbstractInvokeProcessor implements 
 
       assertLocalVariablesNumber(invokingMethod);
 
-      final String prefix = generateFramePrefix(argBlockSize, frameSize);
+      final String prefix = orientWideArguments(invokingMethod.getArgumentTypes())
+          + generateFramePrefix(argBlockSize, frameSize);
       String postfix = generateFramePostfix(argBlockSize, frameSize);
 
       postfix += pushReturnedValue(invokingMethod.getReturnType());

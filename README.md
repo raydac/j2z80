@@ -6,20 +6,25 @@ It is a maven plugin developed for academical purposes, the plugin allows to tra
 ```Java
 package com.igormaznitsa.test.helloworld;
 
-import static com.igormaznitsa.test.helloworld.ZXScreen.*;
+import j2z80.spectrum.Screen;
 
 public class main {
   public static void mainz() {
-        setTextColor(COLOR_RED, COLOR_WHITE);
-        clearWholeScreen();
-        System.out.println("Hello world!");
-        setTextColor(COLOR_YELLOW, COLOR_BLUE);
-        clearServiceScreen();
-        System.err.println("Written in Java!!!");
-        setBorderColor(COLOR_RED);
+        Screen.paper(Screen.WHITE);
+        Screen.ink(Screen.BLACK);
+        Screen.clear();
+        Screen.border(Screen.GREEN);
+        Screen.at(10, 8);
+        System.out.println("Hello world 2026");
+        Screen.lowerColors(Screen.YELLOW, Screen.BLUE, 1, 0);
+        Screen.clearLower();
+        System.err.println("SPACE draws the set");
     }
 }
 ```
+
+The same example then waits for space and draws a Mandelbrot set on the attribute grid, followed by a closer view of the
+seahorse valley.
 
 As the input it uses JAR files  It takes a JAR file and translate all found classes into solid Z80 binary block which can be started on real device or under emulator. 
 

@@ -1,4 +1,5 @@
 ## 1. Implementation Progress
+- ZX Spectrum 48 library: border, ink/paper/bright/flash, lower-screen colors, clear, pixel plot/unplot/point, attribute cells, print position, frame sync, keyboard matrix, and beeper. Hello-world greets, then draws an attribute Mandelbrot and a zoomed seahorse view.
 - SpotBugs 4.10.4.1 runs on j2z80-plugin during verify (medium and higher). Endemic patterns are listed in src/main/spotbugs/exclude.xml.
 - Fixed the embedded Z80 assembler: signed IX/IY displacements, byte immediates in -128..255 (so CP -128 assembles), rejection of LD (SP),n, case-insensitive (BC)/(DE)/(IX)/(IY), forward EQU chains, and DEFM as raw bytes.
 - Project version is 2.0.0-SNAPSHOT.
@@ -12,15 +13,18 @@
 - assertLocalVariablesNumber now checks MethodGen.getMaxLocals().
 - Test helper registerMockMethod now applies the maxLocals parameter via setMaxLocals.
 - Frame size floors at argument slots so native methods (maxLocals=0, no Code attribute) still get a valid frame — unblocks main-jar verify.
+- Started Z80Processor JUnit tests in j2z80-plugin: single commands, a DJNZ loop, a two-word CALL return, and the double-argument word order.
+- JavaZ80Run compiles a Java class (entry mainz), translates it, runs it on Z80Processor, and reads static int fields. Covered: addition, a second class, for/while with break and continue, nested loops, and labeled break/continue.
 
 ## 2. Architecture & Technical Discoveries
+- ZX Spectrum 48 API is j2z80.spectrum.Screen, Keyboard, and Sound in zx-spectrum-demo-lib, with native bodies in matching .a80 resources. Pixel y=0 is the bottom scanline; attribute row 0 is the top character row. border() matches ROM BORDER: light papers keep black ink in BORDCR. frame() is a short delay with interrupts left disabled; HALT let the ROM keyboard scan treat space as a BASIC key and restart the machine. Before ROM calls, ERR-NR is set to #FF and the new-key flag is cleared. tone() calls ROM BEEPER #03B5 then DI. The hello-world Mandelbrot is 32 by 22 attribute cells in 1/64 fixed point; multiplies stay within +/-170 so the 16-bit product fits. Each cell's color is the paper color, because the bitmap is cleared. After the seahorse view, a float sine and a double Lissajous are plotted. SPACE steps greeting, overview, seahorse, curves, then repeats.
 - Double runtime is DOUBLE_ARITHMETIC_MANAGER.a80. Same two-slot stack order as long: low word on top. Values are binary32, so results match Java float, not full float64.
 - Long runtime is LONG_ARITHMETIC_MANAGER.a80. Low word is on top of the stack and in the first local slot; high word is beneath it. Argument area size counts long as two slots. A long return leaves the low word in BC and the high word in DE. Divide by zero throws. Constants outside signed 32-bit are rejected.
 - Float runtime is FLOAT_ARITHMETIC_MANAGER.a80, pulled in by NeedsFloatArithmeticManager. Arithmetic is software binary16 (round-to-nearest-even, subnormals, signed zero, inf, NaN). IY points at a 16-byte workspace and is saved/restored. IX is not used.
 - f2i clamps to signed 16-bit. Float divide by zero yields infinity and does not throw. frem follows IEEEremainder; a half-precision quotient that overflows becomes NaN.
-- Locals live at (IX - index*2); IX is frame top (local 0 / first arg).
+- tone() must preserve IX around the ROM beeper. The beeper borrows IX, and the invoke epilogue resets the stack from IX, so a borrowed IX jumps into ROM and resets the machine after the greeting.
 - ___BEFORE_INVOKE: A = arg area bytes, BC = full frame bytes; lowers SP and sets IX.
-- ___AFTER_INVOKE restores previous IX and discards the frame.
+- ___AFTER_INVOKE restores previous IX and discards the frame. It keeps BC and DE, because a long or double result returns the low word in BC and the high word in DE. Before the frame is built, each long or double argument has its words exchanged so the low word is the first slot; the arithmetic stack still keeps the low word on top.
 - INVOKEVIRTUAL / INVOKEINTERFACE take frame size from VT/IT tables (LabelAndFrameUtils), so they were less affected than static/special.
 - Nested loops allocate extra local slots beyond args; undersized frames overwrite caller stack / return addresses.
 - Native JNI methods have no Code attribute → BCEL getMaxLocals() is 0; callers must still size the frame from argument count.
@@ -32,7 +36,7 @@
 - WithLocals invoke tests historically did not set maxLocals on MethodGen (fixed in registerMockMethod).
 
 ## 4. Current Work In Progress
-- None. Double opcodes are covered by TestDoubleArithmetic.
+- None.
 
 ## 5. Known Issues & Limitations
 - float is half precision, not Java float32. double is binary32, not Java float64. long is 32-bit, not Java's 64-bit long. drem truncates toward zero. Logical long shift is a 32-bit unsigned shift. multianewarray of long or double is not supported.
@@ -50,8 +54,11 @@
 - j2z80-plugin/.../FLOAT_ARITHMETIC_MANAGER.a80 — binary16 add/sub/mul/div/rem, i2f, f2i, cmp
 - j2z80-plugin/.../LONG_ARITHMETIC_MANAGER.a80 — 32-bit long add/sub/mul/div/rem, shifts, compare
 - j2z80-plugin/.../DOUBLE_ARITHMETIC_MANAGER.a80 — binary32 add/sub/mul/div, compare, conversions
+- Z80 emulation tests live in j2z80-tests/main-jar, not in the plugin. Z80Machine runs raw assembly. JavaZ80Run compiles sources, translates them with the plugin, and checks static int fields after mainz. Dependency is com.codingrodent.microprocessor:Z80Processor:4.2.0. Version 5.0.0 needs Java 25; mvn22 runs on JDK 22, and 4.2.0 is the newest jar that JDK can load. Those tests compile with release 17; translated fixtures and the plugin stay release 11.
+- mvn22 -pl j2z80-tests/main-jar -am -Dtest=JavaZ80RunTest,Z80CommandTest,Z80WideArgumentTest test
 - mvn22 -pl j2z80-plugin -DskipTests spotbugs:check
 - mvn22 -pl j2z80-tests/main-jar -am verify
+- mvn22 -pl j2z80-examples/zx-spectrum-hello-world -am install
 
 ## 8. User Advice and Recommendations
 - Nested loops / extra locals need correct maxLocals-based frames; regenerating after this fix should restore correct stack behavior.

@@ -22,18 +22,20 @@ ___BEFORE_INVOKE: ; (in) A - arguments length in bytes, (in)BC - needed full sta
     PUSH BC ; place the return address on the stack
     RET
 ;-----------------------------------------------------------
-___AFTER_INVOKE: ; restore IX
+___AFTER_INVOKE: ; restore IX; BC and DE keep an int, float, long, or double result
+    LD (___AFTER_INVOKE_DE),DE
     POP DE ; the return address in DE
     POP HL ; the old IX in the HL
     LD SP,IX ; write in SP the first cell
-    
+
     INC SP
     INC SP
 
     PUSH HL
     POP IX ; the old IX restored
-    
+
     PUSH DE ; the return address restored
+    LD DE,(___AFTER_INVOKE_DE)
     RET
 ;-----------------------------------------------------------
 ___MEMORY_ALLOCATE_OBJECT: ; BC - size in cells, DE - class id, the address in BC
@@ -355,6 +357,9 @@ ___MEMORY_ZERO_PAYLOAD: ; DE - first byte, BC - byte count
     LDIR
     RET
 ;-----------------------------------------------------------
+___AFTER_INVOKE_DE:
+    DEFW 0
+
 ___MEMORY_MANAGER_TOP_POINTER:
     DEFW ___MEMORY_HEAP_START_AREA
 

@@ -66,7 +66,11 @@ public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor implement
 
       postfix += pushReturnedValue(invokedMethod.getReturnType());
 
-      final String res = template.replace(MACROS_OBJREFOFFSET, "#" + Integer.toHexString(offsetOnStackToTheObjectRef & 0xFFFF).toUpperCase(Locale.ENGLISH)).replace(MACROS_VALUE, Integer.toString(argumentsBlockSize)).replace(MACROS_ID, interfaceMethdodId).replace(MACROS_POSTFIX, postfix);
+      final String res = orientWideArguments(invokedMethod.getArgumentTypes())
+          + template.replace(MACROS_OBJREFOFFSET, "#" +
+              Integer.toHexString(offsetOnStackToTheObjectRef & 0xFFFF).toUpperCase(Locale.ENGLISH))
+          .replace(MACROS_VALUE, Integer.toString(argumentsBlockSize))
+          .replace(MACROS_ID, interfaceMethdodId).replace(MACROS_POSTFIX, postfix);
 
       out.write(res);
       out.write(NEXT_LINE);

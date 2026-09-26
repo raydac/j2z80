@@ -26,10 +26,34 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>j2z80-plugin</artifactId>
+          <version>${j2z80.test.version}</version>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>com.codingrodent.microprocessor</groupId>
+          <artifactId>Z80Processor</artifactId>
+          <version>4.2.0</version>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
 
   <build>
     <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>default-testCompile</id>
+                    <configuration>
+                        <release>17</release>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
       <plugin>
         <groupId>${project.groupId}</groupId>
         <artifactId>j2z80-plugin</artifactId>

@@ -1,4 +1,11 @@
 - 2.0.0 (SNAPSHOT)
+    - ZX Spectrum example drives the 48K screen, keyboard, and beeper, and draws a Mandelbrot set
+    - fixed ZX Spectrum text printing so a string is shown as text instead of BASIC keywords
+    - fixed the Spectrum greeting so the beeper no longer resets the machine
+    - Mandelbrot cells use the paper color so the picture is visible on a cleared screen
+    - Space on the last Spectrum picture starts the demo again
+    - Spectrum demo draws a float sine and a double Lissajous after the seahorse view
+    - fixed long and double method calls so both words arrive in order and the result survives the return
     - fixed Z80 assembler index offsets, 8-bit immediates, indirect registers, and forward EQU
     - added float values as 16-bit IEEE binary16, including arithmetic, loads, stores, conversions, and float arrays
     - added long values as signed 32-bit integers in two slots, including arithmetic, shifts, loads, stores, and long arrays
