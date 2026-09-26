@@ -57,5 +57,6 @@ public abstract class AbstractIntMathManagerBasedTest extends AbstractJvmCommand
 
     assertLinearExecutionToEnd(exceptionCode + asm);
     assertEquals("Exception block must be called", EXCEPTION_FLAG, peekb(EXCEPTION_FLAG_ADDRESS));
+    assertStackEmpty();
   }
 }

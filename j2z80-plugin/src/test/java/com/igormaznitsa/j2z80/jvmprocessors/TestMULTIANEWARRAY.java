@@ -15,11 +15,11 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.MULTIANEWARRAY;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class TestMULTIANEWARRAY extends AbstractTestBasedOnMemoryManager {
 
@@ -99,6 +99,17 @@ public class TestMULTIANEWARRAY extends AbstractTestBasedOnMemoryManager {
     assertAllocateCommand(new Instruction[] {new MULTIANEWARRAY(0, (short) 4)}, calculateMemorySize(dim1, dim2, dim3, dim4));
     assertEquals(getInitialMemoryAddress() + 3, pop());
     assertStackEmpty();
+  }
+
+  @Test(timeout = 3000L)
+  public void testCreateTwoDimensionsWithEmptyRoot() throws Exception {
+    push(0);
+    push(5);
+    assertAllocateCommand(new Instruction[] {new MULTIANEWARRAY(0, (short) 2)},
+        calculateMemorySize(0, 5));
+    assertEquals(getInitialMemoryAddress() + 3, pop());
+    assertStackEmpty();
+    assertEquals(0, peekw(getInitialMemoryAddress() + 1));
   }
 
   @Test

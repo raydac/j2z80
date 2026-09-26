@@ -15,14 +15,26 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.bcel.generic.BasicType;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.NEWARRAY;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class TestNEWARRAY extends AbstractTestBasedOnMemoryManager {
+
+  private boolean poisonHeap;
+
+  @Override
+  protected void beforeExec(final int heapStart) {
+    if (!this.poisonHeap) {
+      return;
+    }
+    for (int offset = 0; offset < 16; offset++) {
+      this.pokeb(heapStart + offset, 0xFF);
+    }
+  }
 
   @Test(timeout = 3000L)
   public void testArrayCreation_BooleanArray() throws Exception {
@@ -74,6 +86,46 @@ public class TestNEWARRAY extends AbstractTestBasedOnMemoryManager {
   public void testArrayCreation_DoubleArray() throws Exception {
     push(1000);
     assertAllocateCommand(new Instruction[] {new NEWARRAY(BasicType.DOUBLE)}, 2003);
+  }
+
+  @Test(timeout = 3000L)
+  public void testByteArrayPayloadIsCleared() throws Exception {
+    this.poisonHeap = true;
+    push(4);
+    assertAllocateCommand(new Instruction[] {new NEWARRAY(BasicType.BYTE)}, 7);
+    final int address = pop();
+    assertEquals(1, peekb(address - 3));
+    for (int offset = 0; offset < 4; offset++) {
+      assertEquals(0, peekb(address + offset));
+    }
+    assertStackEmpty();
+  }
+
+  @Test(timeout = 3000L)
+  public void testWordArraySizeKeepsCarryIntoHighByte() throws Exception {
+    assertLinearExecutionToEnd(
+        "LD BC,128\nCALL " + SUB_ALLOCATE_WORDARRAY + "\nCALL " + SUB_GET_ARRAY_SIZE +
+            "\nPUSH BC\n",
+        3 + 256);
+    assertEquals(256, pop());
+    assertStackEmpty();
+  }
+
+  @Test(timeout = 3000L)
+  public void testByteArraySizeIsNotDoubled() throws Exception {
+    assertLinearExecutionToEnd(
+        "LD BC,200\nCALL " + SUB_ALLOCATE_BYTEARRAY + "\nCALL " + SUB_GET_ARRAY_SIZE +
+            "\nPUSH BC\n",
+        3 + 200);
+    assertEquals(200, pop());
+    assertStackEmpty();
+  }
+
+  @Test(timeout = 3000L)
+  public void testFreeMemoryIsCallerStackMinusHeapTop() throws Exception {
+    assertLinearExecutionToEnd("CALL " + SUB_GETFREEMEMORY + "\nPUSH BC\n", 0);
+    assertEquals(INIT_SP - this.getInitialMemoryAddress(), pop());
+    assertStackEmpty();
   }
 
   @Test(expected = IllegalArgumentException.class)

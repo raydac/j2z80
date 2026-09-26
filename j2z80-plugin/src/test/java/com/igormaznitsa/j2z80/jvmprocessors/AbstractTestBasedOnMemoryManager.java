@@ -105,9 +105,13 @@ public abstract class AbstractTestBasedOnMemoryManager extends AbstractJvmComman
     memoryPointerAddress = asm.findLabelAddress(VAR_MANAGER_TOP_POINTER).intValue();
 
     endAddress = asm.findLabelAddress(END_LABEL).intValue();
+    this.beforeExec(memoryTopAddress);
     exec(Integer.MAX_VALUE);
     assertEquals("Must allocate block size", assertedMemory, getAllocatedMemorySize());
     return asm;
+  }
+
+  protected void beforeExec(final int heapStart) {
   }
 
 
@@ -138,6 +142,7 @@ public abstract class AbstractTestBasedOnMemoryManager extends AbstractJvmComman
     memoryPointerAddress = asm.findLabelAddress(VAR_MANAGER_TOP_POINTER).intValue();
 
     endAddress = asm.findLabelAddress(END_LABEL).intValue();
+    this.beforeExec(memoryTopAddress);
     exec(Integer.MAX_VALUE);
     assertEquals("Must allocate block size", assertedMemory, getAllocatedMemorySize());
   }

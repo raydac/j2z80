@@ -45,4 +45,24 @@ public class TestBALOAD extends AbstractJvmCommandProcessorTest {
     assertEquals(CELL_VALUE, pop());
     assertEquals(INIT_SP, SP);
   }
+
+  @Test
+  public void testExecutionSignExtendsNegativeByte() throws IOException {
+    final AbstractJvmCommandProcessor processor =
+        AbstractJvmCommandProcessor.findProcessor(BALOAD.class);
+    final StringWriter writer = new StringWriter();
+    final int ARRAY_ADDRESS = 0x8000;
+    final int CELL_ADDRESS = 0x302;
+    pokeb(ARRAY_ADDRESS + CELL_ADDRESS, 0xFF);
+
+    push(ARRAY_ADDRESS);
+    push(CELL_ADDRESS);
+
+    processor.process(CLASS_PROCESSOR_MOCK, new BALOAD(), mock(InstructionHandle.class),
+        this.getClass().getClassLoader(), writer);
+    assertLinearExecutionToEnd(writer.toString());
+
+    assertEquals(0xFFFF, pop());
+    assertEquals(INIT_SP, SP);
+  }
 }

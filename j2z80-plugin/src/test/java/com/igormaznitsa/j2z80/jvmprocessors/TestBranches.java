@@ -274,6 +274,27 @@ public class TestBranches extends AbstractJVMBranchTest {
   }
 
   @Test(timeout = 3000L)
+  public void testIFICMPGT_falseForEqualPositives() throws Exception {
+    push(18799);
+    push(18799);
+    assertFalseCondition(IF_ICMPGT.class);
+  }
+
+  @Test(timeout = 3000L)
+  public void testIFICMPGT_falseForEqualNegatives() throws Exception {
+    push(-18788);
+    push(-18788);
+    assertFalseCondition(IF_ICMPGT.class);
+  }
+
+  @Test(timeout = 3000L)
+  public void testIFICMPGT_falseForZero() throws Exception {
+    push(0);
+    push(0);
+    assertFalseCondition(IF_ICMPGT.class);
+  }
+
+  @Test(timeout = 3000L)
   public void testIFICMPGE_trueForZero() throws Exception {
     push(0);
     push(0);

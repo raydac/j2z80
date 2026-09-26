@@ -69,6 +69,7 @@ public class TestCHECKCAST extends AbstractTestBasedOnMemoryManager implements N
   }
 
   private String postfixText;
+  private boolean castNull;
 
   @Before
   public void prepareTest() {
@@ -150,9 +151,38 @@ public class TestCHECKCAST extends AbstractTestBasedOnMemoryManager implements N
 
   }
 
+  @Test(timeout = 3000L)
+  public void testNullReferenceSucceeds() throws IOException {
+    this.castNull = true;
+    prepareTabe(false);
+
+    final AbstractJvmCommandProcessor processor =
+        AbstractJvmCommandProcessor.findProcessor(CHECKCAST.class);
+    final StringWriter writer = new StringWriter();
+
+    processor.process(CLASS_PROCESSOR_MOCK, new CHECKCAST(CLASS_INDEX),
+        mock(InstructionHandle.class), this.getClass().getClassLoader(),
+        writer);
+    assertLinearExecutionToEnd(writer.toString(), 0);
+    assertEquals(0, pop());
+    assertStackEmpty();
+    assertEquals(0, peekb(EXCEPTION_FLAG_ADDRESS));
+  }
+
 
   @Override
   public String getAsmPrefix() {
+    if (this.castNull) {
+      return "LD BC,EXSTART\n"
+          + "LD (___ATHROW_PROCESSING_CODE_ADDRESS),BC\n"
+          + "LD BC,0\n"
+          + "PUSH BC\n"
+          + "JP STRT\n"
+          + "EXSTART: LD A," + EXCEPTION_FLAG + "\n"
+          + "LD (" + EXCEPTION_FLAG_ADDRESS + "),A\n"
+          + "JP " + END_LABEL + "\n"
+          + "STRT:\n";
+    }
     return "LD BC,EXSTART\n"
         + "LD (___ATHROW_PROCESSING_CODE_ADDRESS),BC\n"
         + "LD BC, " + CLASS_FIELD_NUMBER + "\n"

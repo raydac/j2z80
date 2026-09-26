@@ -3,4 +3,4 @@
     POP HL
     OR A
     SBC HL,BC
-    JR NZ,%address%
+    JP NZ,%address%

@@ -4,6 +4,7 @@
     POP HL
     OR A
     SBC HL,BC
+    JR Z,@IF_ICMPGT_END
     JP M,@IF_ICMPGT_S
     JP PO,%address%
     JR @IF_ICMPGT_END

@@ -1,8 +1,13 @@
 ; 51 BALOAD arrayref,index -> value
+    CLRLOC
     POP BC ; index
     POP HL ; array pointer
     ADD HL,BC ; make the cell address
     LD A,(HL); data
     LD C,A
     LD B,0
-    PUSH BC; place the data on stack
+    BIT 7,C
+    JR Z,@BALOAD_POSITIVE
+    LD B,#FF
+@BALOAD_POSITIVE:
+    PUSH BC; place the sign-extended data on stack

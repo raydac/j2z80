@@ -111,8 +111,8 @@ ___INT_MATH_DIV: ;BC - divident, DE - divisor
     JP @DIV_END
 
 @DIVISOR_IS_ZERO:
-    ; arithmetic exception
-    POP AF ; clear stack
+    POP HL
+    POP AF
     LD HL,(___ATHROW_PROCESSING_CODE_ADDRESS)
     JP (HL)
 
@@ -168,8 +168,8 @@ ___INT_MATH_REM:
     JP @REM_END
 
 @DIVISOR_IS_ZERO:
-    ; arithmetic exception
-    POP AF ; clear stack
+    POP HL
+    POP AF
     LD HL,(___ATHROW_PROCESSING_CODE_ADDRESS)
     JP (HL)
 

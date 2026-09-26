@@ -1,4 +1,8 @@
 - 1.1.0 (SNAPSHOT)
+    - fixed signed greater-than so equal values do not take the branch
+    - fixed jsr and jsr_w so ret continues after the call
+    - fixed far not-equal branches, negative byte loads, checkcast of null, and divide-by-zero
+    - fixed array sizing, free memory, cleared new objects and arrays, and empty multi-array dimensions
     - fixed stack frame size for method calls so local variables (e.g. nested loops) are reserved
     - added SNA as a target format
     - adaptation for JDK 11 and Maven 3.8+

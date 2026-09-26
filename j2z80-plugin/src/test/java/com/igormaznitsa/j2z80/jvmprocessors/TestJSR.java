@@ -35,7 +35,7 @@ public class TestJSR extends AbstractJvmCommandProcessorTest {
   public void testJSR() throws Exception {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(JSR.class);
     final StringWriter writer = new StringWriter();
-    final int VALUE = START_ADDRESS + 3;
+    final int VALUE = START_ADDRESS + 7;
 
     final JSR instruction = new JSR(null);
 

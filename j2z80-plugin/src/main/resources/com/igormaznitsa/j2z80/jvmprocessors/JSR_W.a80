@@ -1,4 +1,4 @@
 ; 201 JSR_W
-   LD BC,$+3
+   LD BC,$+7
    PUSH BC
    JP %address%

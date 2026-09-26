@@ -1,6 +1,9 @@
    CLRLOC
 ___CHECKCAST:  ; check that object in BC can be cast to the class whose id in DE, if it is impossible then an exception will be thrown
     CLRLOC
+    LD A,B
+    OR C
+    RET Z
     PUSH BC
     CALL ___INSTANCE_OF
     LD A,C

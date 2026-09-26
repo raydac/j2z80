@@ -59,8 +59,9 @@ ___MEMORY_ALLOCATE_OBJECT: ; BC - size in cells, DE - class id, the address in B
     ADD HL,BC
     LD (___MEMORY_MANAGER_TOP_POINTER),HL ; save the new memory top address into the system variable
 
-    LD B,D ; save the first cell address into BC
-    LD C,E
+    PUSH DE
+    CALL ___MEMORY_ZERO_PAYLOAD
+    POP BC
 
     POP DE
     POP HL
@@ -112,8 +113,9 @@ ___MEMORY_ALLOCATE_WORDARRAY: ; BC element number, first byte size (2), second w
 
     LD (___MEMORY_MANAGER_TOP_POINTER),HL
 
-    LD C,E
-    LD B,D
+    PUSH DE
+    CALL ___MEMORY_ZERO_PAYLOAD
+    POP BC
 
     POP DE
     POP HL
@@ -124,7 +126,7 @@ ___MEMORY_ALLOCATE_BYTEARRAY: ; BC element number, first byte size (1), second w
     PUSH DE
 
     LD HL,(___MEMORY_MANAGER_TOP_POINTER)
-    LD (HL),2
+    LD (HL),1
     INC HL
 
     LD (HL),C
@@ -139,8 +141,9 @@ ___MEMORY_ALLOCATE_BYTEARRAY: ; BC element number, first byte size (1), second w
 
     LD (___MEMORY_MANAGER_TOP_POINTER),HL
 
-    LD C,E
-    LD B,D
+    PUSH DE
+    CALL ___MEMORY_ZERO_PAYLOAD
+    POP BC
 
     POP DE
     POP HL
@@ -220,7 +223,15 @@ ___RECURSIVE_MAKEARRAYS: ; HL dimensions pointer, B number of dimensions, (out)B
     PUSH BC ; place the array size on the stack
     POP DE  ; load the array size into DE, the array address on the stack
 
-@MAKE_LOOP: ; A contains the current dimension index
+@MAKE_LOOP: ; A contains the current dimension index, DE the remaining cell count
+    INC D
+    DEC D
+    JR NZ,@MAKE_ONE
+    INC E
+    DEC E
+    JR Z,@MAKE_DONE
+
+@MAKE_ONE:
     LD B,A ; restore the dimension index into B, HL already contains the cell address
     CALL ___RECURSIVE_MAKEARRAYS ; create a child array, the result address in BC
     
@@ -234,14 +245,9 @@ ___RECURSIVE_MAKEARRAYS: ; HL dimensions pointer, B number of dimensions, (out)B
     EX (SP),HL ; the address saved on the stack top, the dimension address in the HL again
 
     DEC DE ; decrease number of cells to be filled by new arrays
-    
-    INC D
-    DEC D
-    JR NZ,@MAKE_LOOP
-    INC E
-    DEC E
-    JR NZ,@MAKE_LOOP
-    
+    JR @MAKE_LOOP
+
+@MAKE_DONE:
     POP BC ; remove the end array address from the stack
     POP BC ; get the array address into BC
 
@@ -276,7 +282,7 @@ ___MEMORY_GET_ARRAY_SIZE: ; BC - first array element address, size in bytes in B
     CP (IX-3)
     JP Z,___MEMORY_GET_ARRAY_SIZE_IN_BYTES_BYTEARRAY
     SLA C
-    SLA B
+    RL B
 ___MEMORY_GET_ARRAY_SIZE_IN_BYTES_BYTEARRAY:
 
     POP AF
@@ -286,15 +292,31 @@ ___MEMORY_GET_ARRAY_SIZE_IN_BYTES_BYTEARRAY:
 ___MEMORY_GET_FREE_MEMORY: ; get the free memory size in bytes, the result in BC
     PUSH HL
     PUSH DE
-    LD HL,0
+    LD HL,6
     ADD HL,SP
-    LD DE,(___MEMORY_HEAP_START_AREA)
+    LD DE,(___MEMORY_MANAGER_TOP_POINTER)
     AND A
     SBC HL,DE
     LD C,L
     LD B,H
     POP DE
     POP HL
+    RET
+
+___MEMORY_ZERO_PAYLOAD: ; DE - first byte, BC - byte count
+    LD A,B
+    OR C
+    RET Z
+    XOR A
+    LD (DE),A
+    DEC BC
+    LD A,B
+    OR C
+    RET Z
+    LD H,D
+    LD L,E
+    INC DE
+    LDIR
     RET
 ;-----------------------------------------------------------
 ___MEMORY_MANAGER_TOP_POINTER:
