@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantString;
 import org.apache.bcel.classfile.ConstantUtf8;
+import org.apache.bcel.generic.CodeExceptionGen;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
@@ -73,10 +74,15 @@ public class MethodTranslator {
     result.add(LabelAndFrameUtils.makeLabelNameForMethod(this.method) + ':');
 
     final MethodGen methodG = this.method.getMethodGen();
+    CheckedExceptionSupport.validateMethodExceptions(this.translatorContext, methodG);
+    if (CheckedExceptionSupport.declaresCheckedExceptions(methodG)) {
+      result.add(CheckedExceptionSupport.clearPendingException());
+    }
 
     final InstructionList list = methodG.getInstructionList();
     list.setPositions();
     final InstructionHandle[] handles = list.getInstructionHandles();
+    final CodeExceptionGen[] exceptionHandlers = methodG.getExceptionHandlers();
 
     for (final InstructionHandle handler : handles) {
       final Instruction instruction = handler.getInstruction();
@@ -97,7 +103,7 @@ public class MethodTranslator {
         throw ex;
       }
 
-      if (checkHandleForInstructionTargeters(handler)) {
+      if (this.isLabeled(handler, exceptionHandlers)) {
         // the instruction is a jump target so we label it
         final String methodJumpLabel =
             LabelAndFrameUtils.makeClassMethodJumpLabel(this.method.getClassInfo(),
@@ -111,7 +117,8 @@ public class MethodTranslator {
     return result;
   }
 
-  private boolean checkHandleForInstructionTargeters(final InstructionHandle handle) {
+  private boolean isLabeled(final InstructionHandle handle,
+                            final CodeExceptionGen[] exceptionHandlers) {
     if (handle.hasTargeters()) {
       for (final InstructionTargeter targeter : handle.getTargeters()) {
         if (targeter instanceof Instruction) {
@@ -119,7 +126,19 @@ public class MethodTranslator {
         }
       }
     }
+    for (final CodeExceptionGen exceptionHandler : exceptionHandlers) {
+      if (handle == exceptionHandler.getStartPC()
+          || handle == exceptionHandler.getHandlerPC()
+          || handle == this.exclusiveEnd(exceptionHandler)) {
+        return true;
+      }
+    }
     return false;
+  }
+
+  private InstructionHandle exclusiveEnd(final CodeExceptionGen exceptionHandler) {
+    final InstructionHandle end = exceptionHandler.getEndPC();
+    return end == null ? null : end.getNext();
   }
 
   public ConstantPoolGen getConstantPool() {

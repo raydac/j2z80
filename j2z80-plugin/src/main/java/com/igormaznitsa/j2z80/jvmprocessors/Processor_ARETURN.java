@@ -15,6 +15,7 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import com.igormaznitsa.j2z80.translator.CheckedExceptionSupport;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.IOException;
 import java.io.Writer;
@@ -41,6 +42,8 @@ public class Processor_ARETURN extends AbstractJvmCommandProcessor {
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final ARETURN areturn = (ARETURN) instruction;
+    out.write(
+        CheckedExceptionSupport.clearPendingOnReturn(classProcessor.getMethod().getMethodGen()));
     out.write(template);
     out.write(NEXT_LINE);
   }

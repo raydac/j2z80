@@ -14,7 +14,8 @@
 - Test helper registerMockMethod now applies the maxLocals parameter via setMaxLocals.
 - Frame size floors at argument slots so native methods (maxLocals=0, no Code attribute) still get a valid frame — unblocks main-jar verify.
 - Started Z80Processor JUnit tests in j2z80-plugin: single commands, a DJNZ loop, a two-word CALL return, and the double-argument word order.
-- JavaZ80Run compiles a Java class (entry mainz), translates it, runs it on Z80Processor, and reads static int fields. Covered: addition, a second class, for/while with break and continue, nested loops, labeled break/continue, and a class hierarchy that uses invokestatic, invokespecial, invokevirtual, and invokeinterface.
+- JavaZ80Run compiles a Java class (entry mainz), translates it, runs it on Z80Processor, and reads static int fields. Covered: addition, loops, invokes, tableswitch and lookupswitch, and try/catch/finally (nested, subclass catch, throw from a callee, finally on break).
+- Exceptions are checked-only. Unchecked types (RuntimeException/Error and subclasses) are rejected at translate time. A method that declares throws clears/sets ___PENDING_EXCEPTION; call sites check that cell and jump to a covering catch or RET to propagate. Local athrow uses the same compile-time handler match (no global unwind table). Arithmetic/checkcast still JP via ___ATHROW_PROCESSING_CODE_ADDRESS (default 0).
 
 ## 2. Architecture & Technical Discoveries
 - ZX Spectrum 48 API is j2z80.spectrum.Screen, Keyboard, and Sound in zx-spectrum-demo-lib, with native bodies in matching .a80 resources. Pixel y=0 is the bottom scanline; attribute row 0 is the top character row. border() matches ROM BORDER: light papers keep black ink in BORDCR. frame() is a short delay with interrupts left disabled; HALT let the ROM keyboard scan treat space as a BASIC key and restart the machine. Before ROM calls, ERR-NR is set to #FF and the new-key flag is cleared. tone() calls ROM BEEPER #03B5 then DI. The hello-world Mandelbrot is 32 by 22 attribute cells in 1/64 fixed point; multiplies stay within +/-170 so the 16-bit product fits. Each cell's color is the paper color, because the bitmap is cleared. After the seahorse view, a float sine and a double Lissajous are plotted. SPACE steps greeting, overview, seahorse, curves, then repeats.
@@ -44,6 +45,7 @@
 - Only documented Z80 instructions in the embedded assembler.
 - 16-bit int model: mul/div wrap in 16 bits; shifts are 16-bit (IUSHR does not match a 32-bit Java >>>). No array bounds or null checks on field/array access.
 - char is stored as an 8-bit element.
+- Only checked exceptions are supported. Unchecked exceptions (RuntimeException, Error, subclasses) cannot be declared, thrown, caught, or subclassed. Runtime faults (e.g. divide by zero) still reset via ATHROW processing address.
 
 ## 6. Open Questions & Pending Decisions
 - None.

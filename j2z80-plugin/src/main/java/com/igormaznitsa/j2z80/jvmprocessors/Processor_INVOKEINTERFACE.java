@@ -64,7 +64,7 @@ public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor implement
 
       String postfix = "";
 
-      postfix += pushReturnedValue(invokedMethod.getReturnType());
+      postfix += pushReturnedValueAndCheckException(methodTranslator, handle, invokedMethod);
 
       final String res = orientWideArguments(invokedMethod.getArgumentTypes())
           + template.replace(MACROS_OBJREFOFFSET, "#" +

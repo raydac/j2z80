@@ -6,6 +6,7 @@
     - Space on the last Spectrum picture starts the demo again
     - Spectrum demo draws a float sine and a double Lissajous after the seahorse view
     - fixed long and double method calls so both words arrive in order and the result survives the return
+    - try/catch/finally for checked exceptions only: methods with throws return a hidden pending-exception cell; unchecked exceptions are rejected at translate time
     - fixed Z80 assembler index offsets, 8-bit immediates, indirect registers, and forward EQU
     - added float values as 16-bit IEEE binary16, including arithmetic, loads, stores, conversions, and float arrays
     - added long values as signed 32-bit integers in two slots, including arithmetic, shifts, loads, stores, and long arrays

@@ -59,7 +59,7 @@ public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements 
 
       String postfix = "";
 
-      postfix += pushReturnedValue(invokedMethod.getReturnType());
+      postfix += pushReturnedValueAndCheckException(methodTranslator, handle, invokedMethod);
 
       final String res = orientWideArguments(invokedMethod.getArgumentTypes())
           + template.replace(MACROS_OBJREFOFFSET, "#" +

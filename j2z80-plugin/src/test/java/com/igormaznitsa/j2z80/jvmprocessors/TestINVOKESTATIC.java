@@ -47,12 +47,14 @@ public class TestINVOKESTATIC extends AbstractInvokeTest {
     processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
         this.getClass().getClassLoader(),
         writer);
-    makePostfixWithBreakPoint(null, writer);
+    makePostfixWithBreakPoint("NOLABEL", writer);
 
+    IX(INITIAL_IX);
     assertLinearExecutionToEnd(writer.toString());
 
     assertEquals(FLAG_METHOD_CALLED, peekb(FLAG_ADDRESS));
-    assertElementsOnStack(1);
+    assertEquals(INITIAL_IX, IX);
+    assertStackEmpty();
   }
 
   @Test(timeout = 3000L)

@@ -181,6 +181,8 @@ public class TranslatorImpl implements TranslatorContext {
 
     this.reset();
 
+    CheckedExceptionSupport.validateClasspath(this);
+
     assertAddress(startAddress);
     assertAddress(stackTop);
 

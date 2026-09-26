@@ -26,4 +26,9 @@ public interface NeedsATHROWManager extends J2ZAdditionalBlock {
    * The label name of the memory cells (two cells) where the exception processing procedure address should be placed
    */
   String ATHROW_PROCESSING_ADDRESS = "___ATHROW_PROCESSING_CODE_ADDRESS";
+
+  /**
+   * Hidden result cell for methods that declare checked exceptions (0 = none).
+   */
+  String PENDING_EXCEPTION = "___PENDING_EXCEPTION";
 }

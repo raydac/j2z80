@@ -15,13 +15,11 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager.PENDING_EXCEPTION;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
-import com.igormaznitsa.j2z80.utils.Utils;
-import com.igormaznitsa.z80asm.Z80Asm;
 import java.io.IOException;
 import java.io.StringWriter;
 import org.apache.bcel.generic.ATHROW;
@@ -31,38 +29,20 @@ import org.junit.Test;
 public class TestATHROW extends AbstractJvmCommandProcessorTest {
 
   @Test
-  public void testExecution() throws IOException {
+  public void uncaughtAthrowResetsWhenMethodDoesNotDeclareThrows() throws IOException {
     final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(ATHROW.class);
     final StringWriter writer = new StringWriter();
-    final int VALUE = 0xCAFE;
-
-    push(VALUE);
 
     processor.process(CLASS_PROCESSOR_MOCK, new ATHROW(), mock(InstructionHandle.class),
         this.getClass().getClassLoader(), writer);
-    final Z80Asm asm = assertLinearExecutionToEnd(writer.toString());
 
-    assertEquals(asm.findLabelAddress(END_LABEL).intValue(), HL());
-    assertEquals(asm.findLabelAddress("SSSS").intValue(), pop());
-    assertEquals(VALUE, pop());
-
-    assertStackEmpty();
+    final String asm = writer.toString();
+    assertTrue(asm.contains("POP BC"));
+    assertTrue(asm.contains("JP 0"));
   }
 
-  @Override
-  public String getAsmPrefix() {
-    return "LD HL," + END_LABEL + "\n" + "LD (" + NeedsATHROWManager.ATHROW_PROCESSING_ADDRESS + "),HL\n SSSS:\n";
+  @Test
+  public void pendingExceptionCellIsDefinedInManager() {
+    assertEquals("___PENDING_EXCEPTION", PENDING_EXCEPTION);
   }
-
-  @Override
-  public String getAsmPostfix() {
-    try {
-      final String str = Utils.readTextResource(AbstractJvmCommandProcessor.class, "ATHROW_MANAGER.a80");
-      return "FOREVER: JR FOREVER\n" + str;
-    } catch (IOException ex) {
-      fail("IOException, can't read text resource");
-      return null;
-    }
-  }
-
 }

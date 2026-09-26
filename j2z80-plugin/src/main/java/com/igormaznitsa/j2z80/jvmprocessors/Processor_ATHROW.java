@@ -16,21 +16,17 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
+import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
+import com.igormaznitsa.j2z80.translator.CheckedExceptionSupport;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.IOException;
 import java.io.Writer;
-import org.apache.bcel.generic.ATHROW;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 
 // class to process ATHROW with code 191
-public class Processor_ATHROW extends AbstractJvmCommandProcessor implements NeedsATHROWManager {
-  private final String template;
-
-  public Processor_ATHROW() {
-    super();
-    template = loadResourceFileAsString("ATHROW.a80").replace(MACROS_ADDRESS, ATHROW_PROCESSING_ADDRESS);
-  }
+public class Processor_ATHROW extends AbstractJvmCommandProcessor
+    implements NeedsATHROWManager, NeedsInstanceofManager {
 
   @Override
   public String getName() {
@@ -40,10 +36,8 @@ public class Processor_ATHROW extends AbstractJvmCommandProcessor implements Nee
   @Override
   public void process(final MethodTranslator methodTranslator, final Instruction instruction,
                       final InstructionHandle handle,
-                      ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
-    methodTranslator.getTranslatorContext().getLogger().logWarning("ATHROW in usage, don't forget define its processing");
-    final ATHROW athrow = (ATHROW) instruction;
-    out.write(template);
+                      final ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
+    out.write(CheckedExceptionSupport.translateAthrow(methodTranslator, handle));
     out.write(NEXT_LINE);
   }
 }

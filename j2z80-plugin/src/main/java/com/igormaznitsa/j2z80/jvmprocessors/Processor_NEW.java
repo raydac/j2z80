@@ -18,6 +18,7 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.ids.ClassID;
+import com.igormaznitsa.j2z80.translator.CheckedExceptionSupport;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.meta.common.utils.Assertions;
@@ -49,6 +50,9 @@ public class Processor_NEW extends AbstractJvmCommandProcessor implements NeedsM
     final NEW newins = (NEW) instruction;
     final ObjectType type = newins.getLoadClassType(methodTranslator.getConstantPool());
     final String className = type.getClassName();
+
+    CheckedExceptionSupport.rejectUncheckedType(
+        methodTranslator.getTranslatorContext(), className, "NEW");
 
     final Integer classID = methodTranslator.getTranslatorContext().getClassContext().findClassUID(new ClassID(className));
 

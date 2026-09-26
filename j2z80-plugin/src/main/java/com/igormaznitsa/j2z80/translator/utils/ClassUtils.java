@@ -79,12 +79,19 @@ public enum ClassUtils {
   }
 
   public static boolean isJ2Z80ObjectClass(final String className) {
-    if (className.equals("java.lang.Object")) {
+    if (className.equals("java.lang.Object")
+        || className.equals("java.lang.Throwable")
+        || className.equals("java.lang.Exception")
+        || className.equals("java.lang.RuntimeException")
+        || className.equals("java.lang.Error")) {
       return true;
     }
-    return (J2Z80_BOOTSTRAP_PACKAGE_PREFIX + '.' +
-        "java.lang.Object").equals(
-        className);
+    final String bootstrapName = J2Z80_BOOTSTRAP_PACKAGE_PREFIX + '.';
+    return (bootstrapName + "java.lang.Object").equals(className)
+        || (bootstrapName + "java.lang.Throwable").equals(className)
+        || (bootstrapName + "java.lang.Exception").equals(className)
+        || (bootstrapName + "java.lang.RuntimeException").equals(className)
+        || (bootstrapName + "java.lang.Error").equals(className);
   }
 
   public static List<Field> findAllFields(final ZClassPath archive, final ClassGen classGen) {
@@ -131,16 +138,17 @@ public enum ClassUtils {
 
   private static void _findAllAdditionalBlocksInClass(final Class<?> processor,
                                                       final Set<Class<? extends J2ZAdditionalBlock>> result) {
+    if (processor == null || processor == Object.class) {
+      return;
+    }
+
     for (final Class<?> type : processor.getInterfaces()) {
-      if (J2ZAdditionalBlock.class.isAssignableFrom(type)) {
+      if (type != J2ZAdditionalBlock.class && J2ZAdditionalBlock.class.isAssignableFrom(type)) {
         result.add(type.asSubclass(J2ZAdditionalBlock.class));
       }
     }
 
-    final Class<?> superclass = processor.getSuperclass();
-    if (superclass != Object.class) {
-      _findAllAdditionalBlocksInClass(superclass, result);
-    }
+    _findAllAdditionalBlocksInClass(processor.getSuperclass(), result);
   }
 
   public static Set<ClassID> findAllImplementedInterfaces(final ClassContext classContext,

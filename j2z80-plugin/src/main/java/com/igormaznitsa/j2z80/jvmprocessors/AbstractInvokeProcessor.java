@@ -22,11 +22,13 @@ import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.makeLabelNameForMe
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootstrapClass;
 import com.igormaznitsa.j2z80.ids.MethodID;
+import com.igormaznitsa.j2z80.translator.CheckedExceptionSupport;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.IOException;
 import java.io.Writer;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.INVOKESTATIC;
+import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.InvokeInstruction;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
@@ -74,6 +76,15 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
       return "PUSH DE" + NEXT_LINE + "PUSH BC" + NEXT_LINE;
     }
     return "PUSH BC" + NEXT_LINE;
+  }
+
+  public static String pushReturnedValueAndCheckException(
+      final MethodTranslator methodTranslator,
+      final InstructionHandle handle,
+      final MethodGen invokedMethod
+  ) {
+    return pushReturnedValue(invokedMethod.getReturnType())
+        + CheckedExceptionSupport.afterInvokeCheck(methodTranslator, handle, invokedMethod);
   }
 
   /**

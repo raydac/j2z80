@@ -39,12 +39,19 @@ public final class Z80Machine implements IMemory, IBaseDevice {
     this.cpu.reset();
     this.cpu.setProgramCounter(origin);
     final int stop = stopAddress & 0xFFFF;
+    final int[] recent = new int[24];
     int executed = 0;
     while (this.cpu.getProgramCounter() != stop) {
       if (executed == instructionLimit) {
-        throw new IllegalStateException("stop address was not reached after " + instructionLimit
-            + " instructions, pc=" + this.cpu.getProgramCounter());
+        final StringBuilder trace = new StringBuilder();
+        final int start = Math.max(0, executed - recent.length);
+        for (int index = start; index < executed; index++) {
+          trace.append(Integer.toHexString(recent[index % recent.length])).append(' ');
+        }
+        throw new IllegalStateException("stop address " + Integer.toHexString(stop)
+            + " was not reached after " + instructionLimit + " instructions, trace=" + trace);
       }
+      recent[executed % recent.length] = this.cpu.getProgramCounter();
       this.cpu.executeOneInstruction();
       executed++;
     }

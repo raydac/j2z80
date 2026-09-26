@@ -59,7 +59,7 @@ public class Processor_INVOKESPECIAL extends AbstractInvokeProcessor implements 
           + generateFramePrefix(argBlockSize, frameSize);
       String postfix = generateFramePostfix(argBlockSize, frameSize);
 
-      postfix += pushReturnedValue(invokingMethod.getReturnType());
+      postfix += pushReturnedValueAndCheckException(methodTranslator, handle, invokingMethod);
 
       final String res = template.replace(MACROS_ADDRESS, labelForMethod).replace(MACROS_PREFIX, prefix).replace(MACROS_POSTFIX, postfix);
 
