@@ -1,0 +1,3 @@
+; DCMPL
+    XOR A
+    CALL ___DBL_CMP

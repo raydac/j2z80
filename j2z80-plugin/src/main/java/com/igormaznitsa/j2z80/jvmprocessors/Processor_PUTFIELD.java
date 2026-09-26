@@ -24,8 +24,6 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUTFIELD;
-import org.apache.bcel.generic.Type;
-
 // class to process PUTFIELD with code 181
 public class Processor_PUTFIELD extends AbstractFieldProcessor {
 
@@ -54,7 +52,7 @@ public class Processor_PUTFIELD extends AbstractFieldProcessor {
       final ObjectType objType = (ObjectType) putfield.getReferenceType(const_pool);
 
       final String labelOffset = LabelAndFrameUtils.makeLabelNameForFieldOffset(objType.getClassName(), putfield.getFieldName(const_pool), putfield.getFieldType(const_pool));
-      final String body = putfield.getFieldType(const_pool).getType() == Type.LONG.getType()
+      final String body = putfield.getFieldType(const_pool).getSize() == 2
           ? this.longTemplate : this.template;
 
       out.write(body.replace(MACROS_ADDRESS, labelOffset));

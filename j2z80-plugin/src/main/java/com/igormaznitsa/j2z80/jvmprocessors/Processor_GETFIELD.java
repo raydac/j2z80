@@ -24,8 +24,6 @@ import org.apache.bcel.generic.GETFIELD;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
-import org.apache.bcel.generic.Type;
-
 // class to process GETFIELD with code 180
 public class Processor_GETFIELD extends AbstractFieldProcessor {
 
@@ -55,7 +53,7 @@ public class Processor_GETFIELD extends AbstractFieldProcessor {
       final ObjectType objType = (ObjectType) getfield.getReferenceType(const_pool);
 
       final String labelOffset = LabelAndFrameUtils.makeLabelNameForFieldOffset(objType.getClassName(), getfield.getFieldName(const_pool), getfield.getFieldType(const_pool));
-      final String body = getfield.getFieldType(const_pool).getType() == Type.LONG.getType()
+      final String body = getfield.getFieldType(const_pool).getSize() == 2
           ? this.longTemplate : this.template;
 
       out.write(body.replace(MACROS_ADDRESS, labelOffset));

@@ -24,8 +24,6 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUTSTATIC;
-import org.apache.bcel.generic.Type;
-
 // class to process PUTSTATIC with code 179
 public class Processor_PUTSTATIC extends AbstractFieldProcessor {
 
@@ -52,7 +50,7 @@ public class Processor_PUTSTATIC extends AbstractFieldProcessor {
       final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
       final ObjectType objType = (ObjectType) putstatic.getReferenceType(constantPool);
       final String label = LabelAndFrameUtils.makeLabelNameForField(objType.getClassName(), putstatic.getFieldName(constantPool), putstatic.getFieldType(constantPool));
-      final String body = putstatic.getFieldType(constantPool).getType() == Type.LONG.getType()
+      final String body = putstatic.getFieldType(constantPool).getSize() == 2
           ? this.longTemplate : this.template;
 
       out.write(body.replace(MACROS_ADDRESS, label));

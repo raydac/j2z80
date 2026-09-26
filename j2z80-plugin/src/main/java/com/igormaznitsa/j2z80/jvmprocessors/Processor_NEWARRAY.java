@@ -62,6 +62,7 @@ public class Processor_NEWARRAY extends AbstractJvmCommandProcessor implements N
         sub = SUB_ALLOCATE_WORDARRAY;
       }
       break;
+      case 7: // double, stored as binary32
       case 11: // long, stored as two words
       {
         sub = SUB_ALLOCATE_DWORDARRAY;

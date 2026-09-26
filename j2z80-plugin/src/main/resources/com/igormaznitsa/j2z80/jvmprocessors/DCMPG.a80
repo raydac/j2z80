@@ -1,0 +1,3 @@
+; DCMPG
+    LD A,1
+    CALL ___DBL_CMP

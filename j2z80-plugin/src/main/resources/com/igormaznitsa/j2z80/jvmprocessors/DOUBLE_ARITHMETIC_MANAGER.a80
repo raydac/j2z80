@@ -1,0 +1,1704 @@
+; binary32 double in two slots. Low word is on top of the stack.
+; Working significand keeps the hidden 1 at bit 26.
+
+___DBL_SHL_AT:
+    CLRLOC
+@LP:
+    PUSH HL
+    PUSH BC
+    SLA (HL)
+    INC HL
+    RL (HL)
+    INC HL
+    RL (HL)
+    INC HL
+    RL (HL)
+    POP BC
+    POP HL
+    DJNZ @LP
+    RET
+
+___DBL_SHR_AT:
+    CLRLOC
+@LP:
+    PUSH HL
+    PUSH BC
+    INC HL
+    INC HL
+    INC HL
+    SRL (HL)
+    DEC HL
+    RR (HL)
+    DEC HL
+    RR (HL)
+    DEC HL
+    RR (HL)
+    JP NC,@NC
+    SET 0,(HL)
+@NC:
+    POP BC
+    POP HL
+    DJNZ @LP
+    RET
+
+___DBL_SHR_CLEAN:
+    CLRLOC
+@LP:
+    PUSH HL
+    PUSH BC
+    INC HL
+    INC HL
+    INC HL
+    SRL (HL)
+    DEC HL
+    RR (HL)
+    DEC HL
+    RR (HL)
+    DEC HL
+    RR (HL)
+    POP BC
+    POP HL
+    DJNZ @LP
+    RET
+
+___DBL_UMUL16:
+    CLRLOC
+    LD (___DBL_M),BC
+    LD HL,0
+    LD (___DBL_M+2),HL
+    LD (___DBL_T),HL
+    LD (___DBL_T+2),HL
+    LD A,16
+@LP:
+    BIT 0,E
+    JP Z,@SKIP
+    PUSH AF
+    LD HL,(___DBL_T)
+    LD BC,(___DBL_M)
+    ADD HL,BC
+    LD (___DBL_T),HL
+    LD HL,(___DBL_T+2)
+    LD BC,(___DBL_M+2)
+    ADC HL,BC
+    LD (___DBL_T+2),HL
+    POP AF
+@SKIP:
+    LD HL,(___DBL_M)
+    ADD HL,HL
+    LD (___DBL_M),HL
+    LD HL,(___DBL_M+2)
+    ADC HL,HL
+    LD (___DBL_M+2),HL
+    SRL D
+    RR E
+    DEC A
+    JP NZ,@LP
+    RET
+
+___DBL_SIG_ZERO:
+    PUSH HL
+    LD A,(HL)
+    INC HL
+    OR (HL)
+    INC HL
+    OR (HL)
+    INC HL
+    OR (HL)
+    POP HL
+    RET
+
+___DBL_COPY_U_TO_A:
+    LD A,(___DBL_US)
+    LD (___DBL_AS),A
+    LD A,(___DBL_UC)
+    LD (___DBL_AC),A
+    LD HL,(___DBL_UE)
+    LD (___DBL_AE),HL
+    LD HL,(___DBL_UM)
+    LD (___DBL_AM),HL
+    LD HL,(___DBL_UM+2)
+    LD (___DBL_AM+2),HL
+    RET
+
+___DBL_COPY_U_TO_B:
+    LD A,(___DBL_US)
+    LD (___DBL_BS),A
+    LD A,(___DBL_UC)
+    LD (___DBL_BC),A
+    LD HL,(___DBL_UE)
+    LD (___DBL_BE),HL
+    LD HL,(___DBL_UM)
+    LD (___DBL_BM),HL
+    LD HL,(___DBL_UM+2)
+    LD (___DBL_BM+2),HL
+    RET
+
+___DBL_UNPACK:
+    CLRLOC
+    LD E,(HL)
+    INC HL
+    LD D,(HL)
+    INC HL
+    LD C,(HL)
+    INC HL
+    LD B,(HL)
+    XOR A
+    BIT 7,B
+    JP Z,@NOS
+    LD A,1
+@NOS:
+    LD (___DBL_US),A
+    LD A,B
+    AND #7F
+    ADD A,A
+    LD B,A
+    LD A,C
+    RLCA
+    AND 1
+    OR B
+    LD L,A
+    LD H,0
+    LD (___DBL_UE),HL
+    LD A,L
+    OR A
+    JP Z,@EXP0
+    CP -1
+    JP Z,@EXP255
+    LD A,C
+    AND #7F
+    OR #80
+    LD (___DBL_UM+2),A
+    XOR A
+    LD (___DBL_UM+3),A
+    LD (___DBL_UM),DE
+    LD HL,___DBL_UM
+    LD B,3
+    CALL ___DBL_SHL_AT
+    LD A,1
+    LD (___DBL_UC),A
+    RET
+@EXP255:
+    LD A,C
+    AND #7F
+    OR D
+    OR E
+    JP Z,@INF
+    LD A,3
+    LD (___DBL_UC),A
+    RET
+@INF:
+    LD A,2
+    LD (___DBL_UC),A
+    RET
+@EXP0:
+    LD A,C
+    AND #7F
+    LD B,A
+    OR D
+    OR E
+    JP Z,@ZERO
+    LD A,B
+    LD (___DBL_UM+2),A
+    XOR A
+    LD (___DBL_UM+3),A
+    LD (___DBL_UM),DE
+    LD HL,1
+    LD (___DBL_UE),HL
+@NORM:
+    LD A,(___DBL_UM+2)
+    BIT 7,A
+    JP NZ,@NORMED
+    LD HL,___DBL_UM
+    LD B,1
+    CALL ___DBL_SHL_AT
+    LD HL,(___DBL_UE)
+    DEC HL
+    LD (___DBL_UE),HL
+    JP @NORM
+@NORMED:
+    LD HL,___DBL_UM
+    LD B,3
+    CALL ___DBL_SHL_AT
+    LD A,1
+    LD (___DBL_UC),A
+    RET
+@ZERO:
+    LD HL,0
+    LD (___DBL_UM),HL
+    LD (___DBL_UM+2),HL
+    LD (___DBL_UE),HL
+    XOR A
+    LD (___DBL_UC),A
+    RET
+
+___DBL_PACK:
+    CLRLOC
+    CALL ___DBL_SIG_ZERO_UM
+    JP Z,@ZERO
+@HI:
+    LD A,(___DBL_UM+3)
+    BIT 3,A
+    JP Z,@LO
+    LD HL,___DBL_UM
+    LD B,1
+    CALL ___DBL_SHR_AT
+    LD HL,(___DBL_UE)
+    INC HL
+    LD (___DBL_UE),HL
+    JP @HI
+@LO:
+    LD A,(___DBL_UM+3)
+    BIT 2,A
+    JP NZ,@ROUND
+    CALL ___DBL_SIG_ZERO_UM
+    JP Z,@ZERO
+    LD HL,___DBL_UM
+    LD B,1
+    CALL ___DBL_SHL_AT
+    LD HL,(___DBL_UE)
+    DEC HL
+    LD (___DBL_UE),HL
+    JP @LO
+@ROUND:
+    LD A,(___DBL_UM)
+    BIT 2,A
+    JP Z,@EXP
+    AND 3
+    JP NZ,@UP
+    LD A,(___DBL_UM)
+    BIT 3,A
+    JP Z,@EXP
+@UP:
+    LD HL,(___DBL_UM)
+    LD DE,8
+    ADD HL,DE
+    LD (___DBL_UM),HL
+    JP NC,@REN
+    LD HL,(___DBL_UM+2)
+    INC HL
+    LD (___DBL_UM+2),HL
+@REN:
+    LD A,(___DBL_UM+3)
+    BIT 3,A
+    JP Z,@EXP
+    LD HL,___DBL_UM
+    LD B,1
+    CALL ___DBL_SHR_AT
+    LD HL,(___DBL_UE)
+    INC HL
+    LD (___DBL_UE),HL
+@EXP:
+    LD HL,(___DBL_UE)
+    BIT 7,H
+    JP NZ,@SUB
+    LD A,H
+    OR A
+    JP NZ,@INF
+    LD A,L
+    OR A
+    JP Z,@SUB
+    CP -1
+    JP Z,@INF
+    LD HL,___DBL_UM
+    LD B,3
+    CALL ___DBL_SHR_CLEAN
+    LD A,(___DBL_UM+2)
+    AND #7F
+    LD B,A
+    LD A,(___DBL_UE)
+    AND 1
+    JP Z,@NEXP
+    LD A,B
+    OR #80
+    LD B,A
+@NEXP:
+    LD A,(___DBL_UE)
+    SRL A
+    LD C,A
+    LD A,(___DBL_US)
+    OR A
+    JP Z,@NSGN
+    LD A,C
+    OR #80
+    LD C,A
+@NSGN:
+    LD H,C
+    LD L,B
+    LD (___DBL_R+2),HL
+    LD HL,(___DBL_UM)
+    LD (___DBL_R),HL
+    RET
+@SUB:
+    LD HL,4
+    LD DE,(___DBL_UE)
+    OR A
+    SBC HL,DE
+    LD A,H
+    OR A
+    JP NZ,@ZERO
+    LD A,L
+    CP 32
+    JP NC,@ZERO
+    OR A
+    JP Z,@SENC
+    LD B,A
+    LD HL,___DBL_UM
+    CALL ___DBL_SHR_AT
+@SENC:
+    LD A,(___DBL_UM+2)
+    BIT 7,A
+    JP NZ,@MINN
+    AND #7F
+    LD B,A
+    LD H,0
+    LD L,B
+    LD (___DBL_R+2),HL
+    LD HL,(___DBL_UM)
+    LD (___DBL_R),HL
+    JP @SIGN
+@MINN:
+    LD HL,#0080
+    LD (___DBL_R+2),HL
+    LD HL,0
+    LD (___DBL_R),HL
+    JP @SIGN
+@INF:
+    LD HL,#7F80
+    LD (___DBL_R+2),HL
+    LD HL,0
+    LD (___DBL_R),HL
+    JP @SIGN
+@ZERO:
+    LD HL,0
+    LD (___DBL_R),HL
+    LD (___DBL_R+2),HL
+@SIGN:
+    LD A,(___DBL_US)
+    OR A
+    RET Z
+    LD A,(___DBL_R+3)
+    OR #80
+    LD (___DBL_R+3),A
+    RET
+
+___DBL_SIG_ZERO_UM:
+    LD HL,___DBL_UM
+    JP ___DBL_SIG_ZERO
+
+___DBL_NAN:
+    LD HL,#7FC0
+    LD (___DBL_R+2),HL
+    LD HL,0
+    LD (___DBL_R),HL
+    RET
+
+___DBL_ENTER_EPILOGUE:
+    PUSH AF
+    LD HL,(___DBL_TMP)
+    PUSH HL
+    LD HL,(___DBL_RET)
+    PUSH HL
+    RET
+
+___DBL_ENTER_BIN:
+    LD (___DBL_TMP),HL
+    POP HL
+    LD (___DBL_RET),HL
+    POP HL
+    LD (___DBL_STUB),HL
+    POP HL
+    LD (___DBL_B),HL
+    POP HL
+    LD (___DBL_B+2),HL
+    POP HL
+    LD (___DBL_A),HL
+    POP HL
+    LD (___DBL_A+2),HL
+    JP ___DBL_ENTER_EPILOGUE
+
+___DBL_ENTER_UNARY:
+    LD (___DBL_TMP),HL
+    POP HL
+    LD (___DBL_RET),HL
+    POP HL
+    LD (___DBL_STUB),HL
+    POP HL
+    LD (___DBL_A),HL
+    POP HL
+    LD (___DBL_A+2),HL
+    JP ___DBL_ENTER_EPILOGUE
+
+___DBL_ENTER_WORD:
+    LD (___DBL_TMP),HL
+    POP HL
+    LD (___DBL_RET),HL
+    POP HL
+    LD (___DBL_STUB),HL
+    POP HL
+    LD (___DBL_A),HL
+    LD HL,0
+    LD (___DBL_A+2),HL
+    JP ___DBL_ENTER_EPILOGUE
+
+___DBL_LEAVE:
+    POP HL
+    POP AF
+    LD BC,(___DBL_R+2)
+    PUSH BC
+    LD BC,(___DBL_R)
+    PUSH BC
+    LD HL,(___DBL_STUB)
+    PUSH HL
+    RET
+
+___DBL_LEAVE_INT:
+    POP HL
+    POP AF
+    PUSH BC
+    LD HL,(___DBL_STUB)
+    PUSH HL
+    RET
+
+___DBL_LOAD_PAIR:
+    LD HL,___DBL_A
+    CALL ___DBL_UNPACK
+    CALL ___DBL_COPY_U_TO_A
+    LD HL,___DBL_B
+    CALL ___DBL_UNPACK
+    CALL ___DBL_COPY_U_TO_B
+    RET
+
+___DBL_ADD:
+    CALL ___DBL_ENTER_BIN
+___DBL_ADD_RAW:
+    CLRLOC
+    CALL ___DBL_LOAD_PAIR
+    LD A,(___DBL_AC)
+    CP 3
+    JP Z,___DBL_NAN_LEAVE
+    LD A,(___DBL_BC)
+    CP 3
+    JP Z,___DBL_NAN_LEAVE
+    LD A,(___DBL_AC)
+    CP 2
+    JP Z,@AINF
+    LD A,(___DBL_BC)
+    CP 2
+    JP Z,@BINF
+    LD A,(___DBL_AC)
+    OR A
+    JP Z,@AZ
+    LD A,(___DBL_BC)
+    OR A
+    JP Z,@ARET
+    CALL ___DBL_ADD_FINITE
+    JP ___DBL_PACK_LEAVE
+@AINF:
+    LD A,(___DBL_BC)
+    CP 2
+    JP NZ,@ARET
+    LD A,(___DBL_BS)
+    LD B,A
+    LD A,(___DBL_AS)
+    XOR B
+    JP NZ,___DBL_NAN_LEAVE
+@ARET:
+    LD HL,(___DBL_A)
+    LD (___DBL_R),HL
+    LD HL,(___DBL_A+2)
+    LD (___DBL_R+2),HL
+    JP ___DBL_LEAVE
+@BINF:
+    LD HL,(___DBL_B)
+    LD (___DBL_R),HL
+    LD HL,(___DBL_B+2)
+    LD (___DBL_R+2),HL
+    JP ___DBL_LEAVE
+@AZ:
+    LD A,(___DBL_BC)
+    OR A
+    JP NZ,@BINF
+    LD A,(___DBL_B+3)
+    LD B,A
+    LD A,(___DBL_A+3)
+    AND B
+    AND #80
+    LD H,A
+    LD L,0
+    LD (___DBL_R+2),HL
+    LD HL,0
+    LD (___DBL_R),HL
+    JP ___DBL_LEAVE
+
+___DBL_NAN_LEAVE:
+    CALL ___DBL_NAN
+    JP ___DBL_LEAVE
+
+___DBL_PACK_LEAVE:
+    CALL ___DBL_PACK
+    JP ___DBL_LEAVE
+
+___DBL_ADD_FINITE:
+    CLRLOC
+    LD HL,(___DBL_AE)
+    LD DE,(___DBL_BE)
+    OR A
+    SBC HL,DE
+    JP NC,@NOSW
+    LD A,(___DBL_AS)
+    LD B,A
+    LD A,(___DBL_BS)
+    LD (___DBL_AS),A
+    LD A,B
+    LD (___DBL_BS),A
+    LD HL,(___DBL_AE)
+    LD DE,(___DBL_BE)
+    LD (___DBL_AE),DE
+    LD (___DBL_BE),HL
+    LD HL,(___DBL_AM)
+    LD DE,(___DBL_BM)
+    LD (___DBL_AM),DE
+    LD (___DBL_BM),HL
+    LD HL,(___DBL_AM+2)
+    LD DE,(___DBL_BM+2)
+    LD (___DBL_AM+2),DE
+    LD (___DBL_BM+2),HL
+    LD HL,(___DBL_AE)
+    LD DE,(___DBL_BE)
+    OR A
+    SBC HL,DE
+@NOSW:
+    LD A,H
+    OR A
+    JP NZ,@DROP
+    LD A,L
+    CP 32
+    JP NC,@DROP
+    OR A
+    JP Z,@SAME
+    LD B,A
+    LD HL,___DBL_BM
+    CALL ___DBL_SHR_AT
+    JP @SAME
+@DROP:
+    LD HL,(___DBL_BM)
+    LD A,H
+    OR L
+    LD HL,(___DBL_BM+2)
+    OR H
+    OR L
+    LD HL,0
+    LD (___DBL_BM),HL
+    LD (___DBL_BM+2),HL
+    JP Z,@SAME
+    LD HL,1
+    LD (___DBL_BM),HL
+@SAME:
+    LD A,(___DBL_BS)
+    LD B,A
+    LD A,(___DBL_AS)
+    XOR B
+    JP NZ,@DIF
+    LD HL,(___DBL_AM)
+    LD DE,(___DBL_BM)
+    ADD HL,DE
+    LD (___DBL_UM),HL
+    LD HL,(___DBL_AM+2)
+    LD DE,(___DBL_BM+2)
+    ADC HL,DE
+    LD (___DBL_UM+2),HL
+    LD HL,(___DBL_AE)
+    LD (___DBL_UE),HL
+    LD A,(___DBL_AS)
+    LD (___DBL_US),A
+    RET
+@DIF:
+    LD HL,(___DBL_AM)
+    LD DE,(___DBL_BM)
+    OR A
+    SBC HL,DE
+    LD (___DBL_UM),HL
+    LD HL,(___DBL_AM+2)
+    LD DE,(___DBL_BM+2)
+    SBC HL,DE
+    LD (___DBL_UM+2),HL
+    JP NC,@POS
+    LD HL,(___DBL_UM)
+    LD A,L
+    CPL
+    LD L,A
+    LD A,H
+    CPL
+    LD H,A
+    LD (___DBL_UM),HL
+    LD HL,(___DBL_UM+2)
+    LD A,L
+    CPL
+    LD L,A
+    LD A,H
+    CPL
+    LD H,A
+    LD (___DBL_UM+2),HL
+    LD HL,(___DBL_UM)
+    INC HL
+    LD (___DBL_UM),HL
+    LD A,H
+    OR L
+    JP NZ,@NEGOK
+    LD HL,(___DBL_UM+2)
+    INC HL
+    LD (___DBL_UM+2),HL
+@NEGOK:
+    LD A,(___DBL_BS)
+    LD (___DBL_AS),A
+@POS:
+    LD HL,(___DBL_UM)
+    LD A,H
+    OR L
+    LD HL,(___DBL_UM+2)
+    OR H
+    OR L
+    JP NZ,@NZ
+    XOR A
+    LD (___DBL_AS),A
+@NZ:
+    LD HL,(___DBL_AE)
+    LD (___DBL_UE),HL
+    LD A,(___DBL_AS)
+    LD (___DBL_US),A
+    RET
+
+___DBL_SUB:
+    CALL ___DBL_ENTER_BIN
+    LD A,(___DBL_B+3)
+    XOR #80
+    LD (___DBL_B+3),A
+    JP ___DBL_ADD_RAW
+
+___DBL_MUL:
+    CALL ___DBL_ENTER_BIN
+___DBL_MUL_RAW:
+    CLRLOC
+    CALL ___DBL_LOAD_PAIR
+    LD A,(___DBL_AC)
+    CP 3
+    JP Z,___DBL_NAN_LEAVE
+    LD A,(___DBL_BC)
+    CP 3
+    JP Z,___DBL_NAN_LEAVE
+    LD A,(___DBL_BS)
+    LD B,A
+    LD A,(___DBL_AS)
+    XOR B
+    LD (___DBL_US),A
+    LD A,(___DBL_AC)
+    CP 2
+    JP Z,@INF1
+    LD A,(___DBL_BC)
+    CP 2
+    JP Z,@INF2
+    LD A,(___DBL_AC)
+    OR A
+    JP Z,@ZERO
+    LD A,(___DBL_BC)
+    OR A
+    JP Z,@ZERO
+    LD HL,(___DBL_AE)
+    LD DE,(___DBL_BE)
+    ADD HL,DE
+    LD DE,127
+    OR A
+    SBC HL,DE
+    LD (___DBL_UE),HL
+    LD HL,___DBL_AM
+    LD B,3
+    CALL ___DBL_SHR_CLEAN
+    LD HL,___DBL_BM
+    LD B,3
+    CALL ___DBL_SHR_CLEAN
+    LD HL,0
+    LD (___DBL_P),HL
+    LD (___DBL_P+2),HL
+    LD (___DBL_P+4),HL
+    LD (___DBL_P+6),HL
+    LD BC,(___DBL_AM)
+    LD DE,(___DBL_BM)
+    CALL ___DBL_UMUL16
+    LD HL,(___DBL_T)
+    LD (___DBL_P),HL
+    LD HL,(___DBL_T+2)
+    LD (___DBL_P+2),HL
+    LD BC,(___DBL_AM)
+    LD A,(___DBL_BM+2)
+    LD E,A
+    LD D,0
+    CALL ___DBL_UMUL16
+    CALL ___DBL_ADD_SHIFT16
+    LD A,(___DBL_AM+2)
+    LD C,A
+    LD B,0
+    LD DE,(___DBL_BM)
+    CALL ___DBL_UMUL16
+    CALL ___DBL_ADD_SHIFT16
+    LD A,(___DBL_AM+2)
+    LD C,A
+    LD B,0
+    LD A,(___DBL_BM+2)
+    LD E,A
+    LD D,0
+    CALL ___DBL_UMUL16
+    LD HL,(___DBL_P+4)
+    LD DE,(___DBL_T)
+    ADD HL,DE
+    LD (___DBL_P+4),HL
+    LD HL,(___DBL_P+6)
+    LD DE,(___DBL_T+2)
+    ADC HL,DE
+    LD (___DBL_P+6),HL
+    LD HL,(___DBL_P)
+    LD A,H
+    OR L
+    LD (___DBL_STK),A
+    LD HL,(___DBL_P+2)
+    LD (___DBL_P),HL
+    LD HL,(___DBL_P+4)
+    LD (___DBL_P+2),HL
+    LD HL,(___DBL_P+6)
+    LD (___DBL_P+4),HL
+    LD HL,0
+    LD (___DBL_P+6),HL
+    LD HL,___DBL_P
+    LD B,4
+    CALL ___DBL_SHR_AT
+    LD A,(___DBL_STK)
+    OR A
+    JP Z,@NOST
+    LD A,(___DBL_P)
+    OR 1
+    LD (___DBL_P),A
+@NOST:
+    LD HL,(___DBL_P)
+    LD (___DBL_UM),HL
+    LD HL,(___DBL_P+2)
+    LD (___DBL_UM+2),HL
+    JP ___DBL_PACK_LEAVE
+@INF1:
+    LD A,(___DBL_BC)
+    OR A
+    JP Z,___DBL_NAN_LEAVE
+    JP @SINF
+@INF2:
+    LD A,(___DBL_AC)
+    OR A
+    JP Z,___DBL_NAN_LEAVE
+@SINF:
+    LD HL,#7F80
+    LD (___DBL_R+2),HL
+    LD HL,0
+    LD (___DBL_R),HL
+    LD A,(___DBL_US)
+    OR A
+    JP Z,___DBL_LEAVE
+    LD A,#FF
+    LD (___DBL_R+3),A
+    JP ___DBL_LEAVE
+@ZERO:
+    LD HL,0
+    LD (___DBL_R),HL
+    LD (___DBL_R+2),HL
+    LD A,(___DBL_US)
+    OR A
+    JP Z,___DBL_LEAVE
+    LD A,#80
+    LD (___DBL_R+3),A
+    JP ___DBL_LEAVE
+
+___DBL_ADD_SHIFT16:
+    LD HL,(___DBL_P+2)
+    LD DE,(___DBL_T)
+    ADD HL,DE
+    LD (___DBL_P+2),HL
+    LD HL,(___DBL_P+4)
+    LD DE,(___DBL_T+2)
+    ADC HL,DE
+    LD (___DBL_P+4),HL
+    RET NC
+    LD HL,(___DBL_P+6)
+    INC HL
+    LD (___DBL_P+6),HL
+    RET
+
+___DBL_DIV:
+    CALL ___DBL_ENTER_BIN
+___DBL_DIV_RAW:
+    CLRLOC
+    CALL ___DBL_LOAD_PAIR
+    LD A,(___DBL_AC)
+    CP 3
+    JP Z,___DBL_NAN_LEAVE
+    LD A,(___DBL_BC)
+    CP 3
+    JP Z,___DBL_NAN_LEAVE
+    LD A,(___DBL_BS)
+    LD B,A
+    LD A,(___DBL_AS)
+    XOR B
+    LD (___DBL_US),A
+    LD A,(___DBL_AC)
+    CP 2
+    JP NZ,@NINF1
+    LD A,(___DBL_BC)
+    CP 2
+    JP Z,___DBL_NAN_LEAVE
+@NINF1:
+    LD A,(___DBL_AC)
+    OR A
+    JP NZ,@NZ1
+    LD A,(___DBL_BC)
+    OR A
+    JP Z,___DBL_NAN_LEAVE
+@NZ1:
+    LD A,(___DBL_BC)
+    OR A
+    JP Z,@INF
+    LD A,(___DBL_AC)
+    CP 2
+    JP Z,@INF
+    LD A,(___DBL_BC)
+    CP 2
+    JP Z,@ZERO
+    LD A,(___DBL_AC)
+    OR A
+    JP Z,@ZERO
+    LD HL,(___DBL_AE)
+    LD DE,(___DBL_BE)
+    OR A
+    SBC HL,DE
+    LD DE,127
+    ADD HL,DE
+    LD (___DBL_UE),HL
+    LD HL,___DBL_AM
+    LD B,3
+    CALL ___DBL_SHR_CLEAN
+    LD HL,___DBL_BM
+    LD B,3
+    CALL ___DBL_SHR_CLEAN
+    LD HL,___DBL_AM
+    LD B,8
+    CALL ___DBL_SHL_AT
+    LD HL,0
+    LD (___DBL_RD),HL
+    LD (___DBL_RD+2),HL
+    LD (___DBL_Q),HL
+    LD (___DBL_Q+2),HL
+    LD A,50
+    LD (___DBL_N),A
+@BIT:
+    LD HL,___DBL_AM
+    LD B,1
+    CALL ___DBL_SHL_AT
+    LD HL,___DBL_RD
+    LD B,1
+    CALL ___DBL_SHL_CARRY
+    LD HL,___DBL_Q
+    LD B,1
+    CALL ___DBL_SHL_AT
+    CALL ___DBL_REM_GE
+    JP C,@NO
+    CALL ___DBL_REM_SUB
+    LD A,(___DBL_Q)
+    OR 1
+    LD (___DBL_Q),A
+@NO:
+    LD A,(___DBL_N)
+    DEC A
+    LD (___DBL_N),A
+    JP NZ,@BIT
+    LD HL,(___DBL_RD)
+    LD A,H
+    OR L
+    LD HL,(___DBL_RD+2)
+    OR H
+    OR L
+    JP Z,@QOK
+    LD A,(___DBL_Q)
+    OR 1
+    LD (___DBL_Q),A
+@QOK:
+    LD HL,(___DBL_Q)
+    LD (___DBL_UM),HL
+    LD HL,(___DBL_Q+2)
+    LD (___DBL_UM+2),HL
+    JP ___DBL_PACK_LEAVE
+@INF:
+    LD HL,#7F80
+    LD (___DBL_R+2),HL
+    LD HL,0
+    LD (___DBL_R),HL
+    LD A,(___DBL_US)
+    OR A
+    JP Z,___DBL_LEAVE
+    LD A,#FF
+    LD (___DBL_R+3),A
+    JP ___DBL_LEAVE
+@ZERO:
+    LD HL,0
+    LD (___DBL_R),HL
+    LD (___DBL_R+2),HL
+    LD A,(___DBL_US)
+    OR A
+    JP Z,___DBL_LEAVE
+    LD A,#80
+    LD (___DBL_R+3),A
+    JP ___DBL_LEAVE
+
+___DBL_SHL_CARRY:
+    PUSH HL
+    PUSH BC
+    RL (HL)
+    INC HL
+    RL (HL)
+    INC HL
+    RL (HL)
+    INC HL
+    RL (HL)
+    POP BC
+    POP HL
+    RET
+
+___DBL_REM_GE:
+    CLRLOC
+    LD A,(___DBL_RD+3)
+    LD HL,___DBL_BM+3
+    CP (HL)
+    RET NZ
+    LD A,(___DBL_RD+2)
+    DEC HL
+    CP (HL)
+    RET NZ
+    LD A,(___DBL_RD+1)
+    DEC HL
+    CP (HL)
+    RET NZ
+    LD A,(___DBL_RD)
+    DEC HL
+    CP (HL)
+    RET
+
+___DBL_REM_SUB:
+    LD HL,(___DBL_RD)
+    LD DE,(___DBL_BM)
+    OR A
+    SBC HL,DE
+    LD (___DBL_RD),HL
+    LD HL,(___DBL_RD+2)
+    LD DE,(___DBL_BM+2)
+    SBC HL,DE
+    LD (___DBL_RD+2),HL
+    RET
+
+___DBL_CMP:
+    LD (___DBL_NANP),A
+    CALL ___DBL_ENTER_BIN
+    CLRLOC
+    CALL ___DBL_IS_NAN_A
+    JP Z,@NAN
+    CALL ___DBL_IS_NAN_B
+    JP Z,@NAN
+    CALL ___DBL_MAG0_A
+    JP NZ,@CMP
+    CALL ___DBL_MAG0_B
+    JP NZ,@CMP
+    LD BC,0
+    JP ___DBL_LEAVE_INT
+@CMP:
+    LD A,(___DBL_B+3)
+    LD B,A
+    LD A,(___DBL_A+3)
+    XOR B
+    AND #80
+    JP NZ,@DIFF
+    LD A,(___DBL_A+3)
+    AND #7F
+    LD H,A
+    LD A,(___DBL_A+2)
+    LD L,A
+    LD A,(___DBL_B+3)
+    AND #7F
+    LD D,A
+    LD A,(___DBL_B+2)
+    LD E,A
+    OR A
+    SBC HL,DE
+    JP C,@LT
+    JP NZ,@GT
+    LD HL,(___DBL_A)
+    LD DE,(___DBL_B)
+    OR A
+    SBC HL,DE
+    JP C,@LT
+    JP NZ,@GT
+    LD BC,0
+    JP ___DBL_LEAVE_INT
+@DIFF:
+    LD A,(___DBL_A+3)
+    AND #80
+    JP Z,@GT
+@LT:
+    LD A,(___DBL_A+3)
+    AND #80
+    JP Z,@LT2
+    LD A,(___DBL_B+3)
+    AND #80
+    JP NZ,@GT2
+@LT2:
+    LD BC,#FFFF
+    JP ___DBL_LEAVE_INT
+@GT:
+    LD A,(___DBL_A+3)
+    AND #80
+    JP Z,@GT2
+    LD BC,#FFFF
+    JP ___DBL_LEAVE_INT
+@GT2:
+    LD BC,1
+    JP ___DBL_LEAVE_INT
+@NAN:
+    LD A,(___DBL_NANP)
+    OR A
+    JP Z,@LT2
+    JP @GT2
+
+___DBL_IS_NAN_A:
+    CLRLOC
+    LD A,(___DBL_A+3)
+    AND #7F
+    CP #7F
+    JP NZ,@NO
+    LD A,(___DBL_A+2)
+    AND #80
+    JP Z,@NO
+    LD A,(___DBL_A+2)
+    AND #7F
+    LD HL,(___DBL_A)
+    OR H
+    OR L
+    RET
+@NO:
+    OR 1
+    RET
+
+___DBL_IS_NAN_B:
+    CLRLOC
+    LD A,(___DBL_B+3)
+    AND #7F
+    CP #7F
+    JP NZ,@NO
+    LD A,(___DBL_B+2)
+    AND #80
+    JP Z,@NO
+    LD A,(___DBL_B+2)
+    AND #7F
+    LD HL,(___DBL_B)
+    OR H
+    OR L
+    RET
+@NO:
+    OR 1
+    RET
+
+___DBL_MAG0_A:
+    LD A,(___DBL_A+3)
+    AND #7F
+    LD HL,(___DBL_A+2)
+    OR L
+    LD HL,(___DBL_A)
+    OR H
+    OR L
+    RET
+
+___DBL_MAG0_B:
+    LD A,(___DBL_B+3)
+    AND #7F
+    LD HL,(___DBL_B+2)
+    OR L
+    LD HL,(___DBL_B)
+    OR H
+    OR L
+    RET
+
+___DBL_I32_TO_F:
+    CLRLOC
+    LD HL,(___DBL_A)
+    LD DE,(___DBL_A+2)
+    LD A,H
+    OR L
+    OR D
+    OR E
+    JP Z,@ZERO
+    XOR A
+    LD (___DBL_US),A
+    BIT 7,D
+    JP Z,@POS
+    LD A,D
+    CP -128
+    JP NZ,@NEG
+    LD A,E
+    OR H
+    OR L
+    JP NZ,@NEG
+    LD HL,#CF00
+    LD (___DBL_R+2),HL
+    LD HL,0
+    LD (___DBL_R),HL
+    RET
+@NEG:
+    LD A,1
+    LD (___DBL_US),A
+    LD A,L
+    CPL
+    LD L,A
+    LD A,H
+    CPL
+    LD H,A
+    LD A,E
+    CPL
+    LD E,A
+    LD A,D
+    CPL
+    LD D,A
+    INC HL
+    LD A,H
+    OR L
+    JP NZ,@POS
+    INC DE
+@POS:
+    LD (___DBL_UM),HL
+    LD (___DBL_UM+2),DE
+    LD B,0
+@FIND:
+    LD A,(___DBL_UM+3)
+    BIT 7,A
+    JP NZ,@FOUND
+    LD HL,___DBL_UM
+    PUSH BC
+    LD B,1
+    CALL ___DBL_SHL_AT
+    POP BC
+    INC B
+    JP @FIND
+@FOUND:
+    LD A,158
+    SUB B
+    LD L,A
+    LD H,0
+    LD (___DBL_UE),HL
+    LD A,B
+    CP 8
+    JP Z,@ALIGNED
+    JP C,@RIGHT
+    SUB 8
+    LD B,A
+    LD HL,___DBL_UM
+    CALL ___DBL_SHL_AT
+    JP @PACKI
+@RIGHT:
+    LD A,8
+    SUB B
+    LD B,A
+    LD HL,___DBL_UM
+    CALL ___DBL_SHR_AT
+    JP @PACKI
+@ALIGNED:
+@PACKI:
+    LD HL,___DBL_UM
+    LD B,3
+    CALL ___DBL_SHR_CLEAN
+    LD A,(___DBL_UM+2)
+    AND #7F
+    LD B,A
+    LD A,(___DBL_UE)
+    AND 1
+    JP Z,@NE
+    LD A,B
+    OR #80
+    LD B,A
+@NE:
+    LD A,(___DBL_UE)
+    SRL A
+    LD C,A
+    LD A,(___DBL_US)
+    OR A
+    JP Z,@NS
+    LD A,C
+    OR #80
+    LD C,A
+@NS:
+    LD H,C
+    LD L,B
+    LD (___DBL_R+2),HL
+    LD HL,(___DBL_UM)
+    LD (___DBL_R),HL
+    RET
+@ZERO:
+    LD HL,0
+    LD (___DBL_R),HL
+    LD (___DBL_R+2),HL
+    RET
+
+___DBL_I2D:
+    CALL ___DBL_ENTER_WORD
+    LD A,(___DBL_A+1)
+    RLA
+    LD HL,0
+    JP NC,@P
+    LD HL,#FFFF
+@P:
+    LD (___DBL_A+2),HL
+    CALL ___DBL_I32_TO_F
+    JP ___DBL_LEAVE
+
+___DBL_L2D:
+    CALL ___DBL_ENTER_UNARY
+    CALL ___DBL_I32_TO_F
+    JP ___DBL_LEAVE
+
+___DBL_F2D:
+    CLRLOC
+    CALL ___DBL_ENTER_WORD
+    LD A,(___DBL_A+1)
+    LD C,A
+    LD A,(___DBL_A)
+    LD B,A
+    XOR A
+    BIT 7,C
+    JP Z,@NS
+    LD A,1
+@NS:
+    LD (___DBL_US),A
+    LD A,C
+    AND #7C
+    RRCA
+    RRCA
+    LD L,A
+    LD H,0
+    LD A,C
+    AND 3
+    LD D,A
+    LD E,B
+    LD A,L
+    CP 31
+    JP Z,@SPEC
+    OR A
+    JP Z,@SUB
+    LD A,L
+    ADD A,112
+    LD L,A
+    LD (___DBL_UE),HL
+    LD A,D
+    OR #04
+    LD D,A
+    LD (___DBL_UM+2),DE
+    LD HL,0
+    LD (___DBL_UM),HL
+    JP ___DBL_PACK_LEAVE
+@SPEC:
+    LD A,D
+    OR E
+    JP Z,@INF
+    CALL ___DBL_NAN
+    JP ___DBL_LEAVE
+@INF:
+    LD HL,#7F80
+    LD (___DBL_R+2),HL
+    LD HL,0
+    LD (___DBL_R),HL
+    LD A,(___DBL_US)
+    OR A
+    JP Z,___DBL_LEAVE
+    LD A,#FF
+    LD (___DBL_R+3),A
+    JP ___DBL_LEAVE
+@SUB:
+    LD A,D
+    OR E
+    JP Z,@Z
+    LD HL,1
+    LD (___DBL_UE),HL
+    LD (___DBL_UM+2),DE
+    LD HL,0
+    LD (___DBL_UM),HL
+@SN:
+    LD A,(___DBL_UM+3)
+    BIT 2,A
+    JP NZ,@SDONE
+    LD HL,___DBL_UM+2
+    LD B,1
+    CALL ___DBL_SHL_AT
+    LD HL,(___DBL_UE)
+    DEC HL
+    LD (___DBL_UE),HL
+    JP @SN
+@SDONE:
+    LD A,(___DBL_UE)
+    ADD A,112
+    LD (___DBL_UE),A
+    XOR A
+    LD (___DBL_UE+1),A
+    JP ___DBL_PACK_LEAVE
+@Z:
+    LD HL,0
+    LD (___DBL_R),HL
+    LD (___DBL_R+2),HL
+    LD A,(___DBL_US)
+    OR A
+    JP Z,___DBL_LEAVE
+    LD A,#80
+    LD (___DBL_R+3),A
+    JP ___DBL_LEAVE
+
+___DBL_D2F:
+    CLRLOC
+    CALL ___DBL_ENTER_UNARY
+    LD HL,___DBL_A
+    CALL ___DBL_UNPACK
+    LD A,(___DBL_UC)
+    CP 3
+    JP Z,@NAN
+    CP 2
+    JP Z,@INF
+    OR A
+    JP Z,@ZERO
+    LD HL,(___DBL_UE)
+    LD DE,112
+    OR A
+    SBC HL,DE
+    BIT 7,H
+    JP NZ,@UNDER
+    LD A,H
+    OR A
+    JP NZ,@INF
+    LD A,L
+    CP 31
+    JP NC,@INF
+    LD (___DBL_HE),A
+    LD HL,___DBL_UM
+    LD B,3
+    CALL ___DBL_SHR_CLEAN
+    LD HL,___DBL_UM
+    LD B,13
+    CALL ___DBL_SHR_AT
+    LD A,(___DBL_UM+1)
+    AND #03
+    LD B,A
+    LD A,(___DBL_HE)
+    ADD A,A
+    ADD A,A
+    OR B
+    LD B,A
+    LD A,(___DBL_UM)
+    LD C,A
+    LD A,(___DBL_US)
+    OR A
+    JP Z,@DONE
+    LD A,B
+    OR #80
+    LD B,A
+@DONE:
+    JP ___DBL_LEAVE_INT
+@UNDER:
+    LD BC,0
+    JP ___DBL_LEAVE_INT
+@NAN:
+    LD BC,#7E00
+    JP ___DBL_LEAVE_INT
+@INF:
+    LD BC,#7C00
+    LD A,(___DBL_US)
+    OR A
+    JP Z,___DBL_LEAVE_INT
+    LD B,#FC
+    JP ___DBL_LEAVE_INT
+@ZERO:
+    LD BC,0
+    LD A,(___DBL_US)
+    OR A
+    JP Z,___DBL_LEAVE_INT
+    LD B,#80
+    JP ___DBL_LEAVE_INT
+
+___DBL_D2I:
+    CLRLOC
+    CALL ___DBL_ENTER_UNARY
+    LD HL,___DBL_A
+    CALL ___DBL_UNPACK
+    LD A,(___DBL_UC)
+    CP 3
+    JP Z,@Z
+    OR A
+    JP Z,@Z
+    CP 2
+    JP Z,@SAT
+    LD HL,(___DBL_UE)
+    LD DE,127
+    OR A
+    SBC HL,DE
+    BIT 7,H
+    JP NZ,@Z
+    LD A,H
+    OR A
+    JP NZ,@SAT
+    LD A,L
+    CP 15
+    JP NC,@SAT
+    LD (___DBL_HE),A
+    LD HL,___DBL_UM
+    LD B,3
+    CALL ___DBL_SHR_CLEAN
+    LD A,(___DBL_HE)
+    CP 23
+    JP NC,@WIDE
+    LD B,A
+    LD A,23
+    SUB B
+    LD B,A
+    LD HL,___DBL_UM
+    CALL ___DBL_SHR_CLEAN
+@HAVE:
+    LD HL,(___DBL_UM)
+    LD A,(___DBL_US)
+    OR A
+    JP Z,@POS
+    LD A,L
+    CPL
+    LD L,A
+    LD A,H
+    CPL
+    LD H,A
+    INC HL
+@POS:
+    LD B,H
+    LD C,L
+    BIT 7,B
+    JP Z,___DBL_LEAVE_INT
+    LD A,(___DBL_US)
+    OR A
+    JP NZ,___DBL_LEAVE_INT
+@SAT:
+    LD A,(___DBL_US)
+    OR A
+    JP Z,@PMAX
+    LD BC,#8000
+    JP ___DBL_LEAVE_INT
+@PMAX:
+    LD BC,#7FFF
+    JP ___DBL_LEAVE_INT
+@Z:
+    LD BC,0
+    JP ___DBL_LEAVE_INT
+@WIDE:
+    JP @SAT
+
+___DBL_D2L:
+    CLRLOC
+    CALL ___DBL_ENTER_UNARY
+    LD HL,___DBL_A
+    CALL ___DBL_UNPACK
+    LD A,(___DBL_UC)
+    CP 3
+    JP Z,@Z
+    OR A
+    JP Z,@Z
+    CP 2
+    JP Z,@SAT
+    LD HL,(___DBL_UE)
+    LD DE,127
+    OR A
+    SBC HL,DE
+    BIT 7,H
+    JP NZ,@Z
+    LD A,H
+    OR A
+    JP NZ,@SAT
+    LD A,L
+    CP 31
+    JP NC,@SAT
+    LD (___DBL_HE),A
+    LD HL,___DBL_UM
+    LD B,3
+    CALL ___DBL_SHR_CLEAN
+    LD A,(___DBL_HE)
+    CP 23
+    JP C,@RIGHT
+    SUB 23
+    JP Z,@HAVE
+    LD B,A
+    LD HL,___DBL_UM
+    CALL ___DBL_SHL_AT
+    JP @HAVE
+@RIGHT:
+    LD B,A
+    LD A,23
+    SUB B
+    LD B,A
+    LD HL,___DBL_UM
+    CALL ___DBL_SHR_CLEAN
+@HAVE:
+    LD A,(___DBL_US)
+    OR A
+    JP Z,@STORE
+    LD HL,(___DBL_UM)
+    LD A,L
+    CPL
+    LD L,A
+    LD A,H
+    CPL
+    LD H,A
+    LD (___DBL_UM),HL
+    LD HL,(___DBL_UM+2)
+    LD A,L
+    CPL
+    LD L,A
+    LD A,H
+    CPL
+    LD H,A
+    LD (___DBL_UM+2),HL
+    LD HL,(___DBL_UM)
+    INC HL
+    LD (___DBL_UM),HL
+    LD A,H
+    OR L
+    JP NZ,@STORE
+    LD HL,(___DBL_UM+2)
+    INC HL
+    LD (___DBL_UM+2),HL
+@STORE:
+    LD HL,(___DBL_UM)
+    LD (___DBL_R),HL
+    LD HL,(___DBL_UM+2)
+    LD (___DBL_R+2),HL
+    JP ___DBL_LEAVE
+@SAT:
+    LD A,(___DBL_US)
+    OR A
+    JP Z,@PMAX
+    LD HL,#8000
+    LD (___DBL_R+2),HL
+    LD HL,0
+    LD (___DBL_R),HL
+    JP ___DBL_LEAVE
+@PMAX:
+    LD HL,#7FFF
+    LD (___DBL_R+2),HL
+    LD HL,#FFFF
+    LD (___DBL_R),HL
+    JP ___DBL_LEAVE
+@Z:
+    LD HL,0
+    LD (___DBL_R),HL
+    LD (___DBL_R+2),HL
+    JP ___DBL_LEAVE
+
+___DBL_REM:
+    CALL ___DBL_ENTER_BIN
+    LD HL,(___DBL_A)
+    LD (___DBL_X),HL
+    LD HL,(___DBL_A+2)
+    LD (___DBL_X+2),HL
+    LD HL,(___DBL_B)
+    LD (___DBL_Y),HL
+    LD HL,(___DBL_B+2)
+    LD (___DBL_Y+2),HL
+    CALL ___DBL_DIV_RAW
+    LD HL,(___DBL_R)
+    LD (___DBL_A),HL
+    LD HL,(___DBL_R+2)
+    LD (___DBL_A+2),HL
+    LD HL,(___DBL_Y)
+    LD (___DBL_B),HL
+    LD HL,(___DBL_Y+2)
+    LD (___DBL_B+2),HL
+    CALL ___DBL_MUL_RAW
+    LD HL,(___DBL_R)
+    LD (___DBL_B),HL
+    LD HL,(___DBL_R+2)
+    LD (___DBL_B+2),HL
+    LD HL,(___DBL_X)
+    LD (___DBL_A),HL
+    LD HL,(___DBL_X+2)
+    LD (___DBL_A+2),HL
+    JP ___DBL_ADD_RAW
+
+___DBL_TMP:
+    DEFW 0
+___DBL_RET:
+    DEFW 0
+___DBL_STUB:
+    DEFW 0
+___DBL_N:
+    DEFB 0
+___DBL_STK:
+    DEFB 0
+___DBL_NANP:
+    DEFB 0
+___DBL_HE:
+    DEFB 0
+___DBL_US:
+    DEFB 0
+___DBL_UC:
+    DEFB 0
+___DBL_AS:
+    DEFB 0
+___DBL_AC:
+    DEFB 0
+___DBL_BS:
+    DEFB 0
+___DBL_BC:
+    DEFB 0
+___DBL_UE:
+    DEFW 0
+___DBL_AE:
+    DEFW 0
+___DBL_BE:
+    DEFW 0
+___DBL_A:
+    DEFW 0
+    DEFW 0
+___DBL_B:
+    DEFW 0
+    DEFW 0
+___DBL_R:
+    DEFW 0
+    DEFW 0
+___DBL_UM:
+    DEFW 0
+    DEFW 0
+___DBL_AM:
+    DEFW 0
+    DEFW 0
+___DBL_BM:
+    DEFW 0
+    DEFW 0
+___DBL_T:
+    DEFW 0
+    DEFW 0
+___DBL_M:
+    DEFW 0
+    DEFW 0
+___DBL_P:
+    DEFW 0
+    DEFW 0
+    DEFW 0
+    DEFW 0
+___DBL_Q:
+    DEFW 0
+    DEFW 0
+___DBL_RD:
+    DEFW 0
+    DEFW 0
+___DBL_X:
+    DEFW 0
+    DEFW 0
+___DBL_Y:
+    DEFW 0
+    DEFW 0

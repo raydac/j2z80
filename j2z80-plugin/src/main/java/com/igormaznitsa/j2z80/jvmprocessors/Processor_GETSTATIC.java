@@ -24,8 +24,6 @@ import org.apache.bcel.generic.GETSTATIC;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
-import org.apache.bcel.generic.Type;
-
 // class to process GETSTATIC with code 178
 public class Processor_GETSTATIC extends AbstractFieldProcessor {
 
@@ -53,7 +51,7 @@ public class Processor_GETSTATIC extends AbstractFieldProcessor {
       final ConstantPoolGen cpool = methodTranslator.getConstantPool();
       final ObjectType obj = (ObjectType) ins.getReferenceType(cpool);
       final String address = LabelAndFrameUtils.makeLabelNameForField(obj.getClassName(), ins.getFieldName(cpool), ins.getFieldType(cpool));
-      final String body = ins.getFieldType(cpool).getType() == Type.LONG.getType()
+      final String body = ins.getFieldType(cpool).getSize() == 2
           ? this.longTemplate : this.template;
 
       out.write(body.replace(MACROS_ADDRESS, address));

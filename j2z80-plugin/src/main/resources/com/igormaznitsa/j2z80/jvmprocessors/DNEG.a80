@@ -1,0 +1,8 @@
+; DNEG
+    POP BC
+    POP HL
+    LD A,H
+    XOR #80
+    LD H,A
+    PUSH HL
+    PUSH BC

@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.bcel.Const;
 import org.apache.bcel.classfile.AnnotationEntry;
 import org.apache.bcel.classfile.Attribute;
 import org.apache.bcel.classfile.Field;
@@ -174,14 +173,7 @@ public enum ClassUtils {
         continue;
       }
 
-      if (fld.getType().getType() == Const.T_DOUBLE) {
-        throw new IllegalStateException(
-            "Class " + classGen.getClassName() + " contains inappropriate field [" +
-                fld.toString() + ']');
-      }
-
-      final int slots = fld.getType().getType() == Const.T_LONG ? 2 : 1;
-      fieldNumber += slots * 2;
+      fieldNumber += fld.getType().getSize() * 2;
     }
 
     if (isJ2Z80ObjectClass(superClass)) {

@@ -17,47 +17,33 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import com.igormaznitsa.j2z80.translator.utils.LongWords;
 import java.io.IOException;
 import java.io.Writer;
-import org.apache.bcel.classfile.Constant;
-import org.apache.bcel.classfile.ConstantDouble;
-import org.apache.bcel.classfile.ConstantLong;
+import org.apache.bcel.generic.DLOAD;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-import org.apache.bcel.generic.LDC2_W;
 
-public class Processor_LDC2_W extends AbstractJvmCommandProcessor {
+public class Processor_DLOAD extends AbstractJvmCommandProcessor {
   private final String template;
 
-  public Processor_LDC2_W() {
+  public Processor_DLOAD() {
     super();
-    this.template = loadResourceFileAsString("LDC2_W.a80");
+    this.template = loadResourceFileAsString("DLOAD.a80");
   }
 
   @Override
   public String getName() {
-    return "LDC2_W";
+    return "DLOAD";
   }
 
   @Override
   public void process(final MethodTranslator methodTranslator, final Instruction instruction,
                       final InstructionHandle handle,
                       final ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
-    final LDC2_W ldc = (LDC2_W) instruction;
-    final Constant constant = methodTranslator.getConstantPool().getConstant(ldc.getIndex());
-    final int value;
-    if (constant instanceof ConstantLong) {
-      value = LongWords.requireIntRange(((ConstantLong) constant).getBytes());
-    } else if (constant instanceof ConstantDouble) {
-      value = Float.floatToRawIntBits((float) ((ConstantDouble) constant).getBytes());
-    } else {
-      throw new IllegalArgumentException(
-          "Unsupported constant pool item found in LDC2_W [" + constant + ']');
-    }
+    final int index = ((DLOAD) instruction).getIndex();
     out.write(this.template
-        .replace("%high%", LongWords.highImmediate(value))
-        .replace("%low%", LongWords.lowImmediate(value)));
+        .replace("%high%", Integer.toString(prepareLocalVariableIndex(index + 1)))
+        .replace(MACROS_INDEX, Integer.toString(prepareLocalVariableIndex(index))));
     out.write(NEXT_LINE);
   }
 }

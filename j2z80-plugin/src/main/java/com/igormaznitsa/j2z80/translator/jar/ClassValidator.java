@@ -17,17 +17,12 @@ package com.igormaznitsa.j2z80.translator.jar;
 
 import com.igormaznitsa.j2z80.utils.MutableObjectContainer;
 import com.igormaznitsa.j2z80.utils.Utils;
-import org.apache.bcel.Const;
 import org.apache.bcel.classfile.Constant;
-import org.apache.bcel.classfile.ConstantDouble;
 import org.apache.bcel.classfile.ConstantInteger;
 import org.apache.bcel.classfile.ConstantLong;
 import org.apache.bcel.classfile.ConstantUtf8;
-import org.apache.bcel.classfile.Field;
-import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.ConstantPoolGen;
-import org.apache.bcel.generic.Type;
 
 /**
  * The Class contains methods allow to check a compiled Java class to be translated
@@ -49,8 +44,6 @@ public enum ClassValidator {
 
     return checkClassFlags(cgen, result)
         && checkConstantPool(cgen, result)
-        && checkFields(cgen, result)
-        && checkMethods(cgen, result)
         ? null : result.get();
   }
 
@@ -87,10 +80,6 @@ public enum ClassValidator {
           result.set("Integer value must be bounded in 16 bit [" + Utils.intToString(value) + ']');
           break;
         }
-      } else if (curconst instanceof ConstantDouble) {
-        final double value = ((ConstantDouble) curconst).getBytes();
-        result.set("Double values are not allowed [" + value + ']');
-        break;
       } else if (curconst instanceof ConstantLong) {
         final long value = ((ConstantLong) curconst).getBytes();
         if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
@@ -98,66 +87,6 @@ public enum ClassValidator {
           break;
         }
       }
-    }
-
-    return result.isNull();
-  }
-
-  private static boolean checkFields(final ClassGen cgen, final MutableObjectContainer<String> result) {
-    boolean immediateBreak = false;
-    for (final Field field : cgen.getFields()) {
-      if (immediateBreak) {
-        break;
-      }
-
-      final Type type = field.getType();
-      final String fieldName = field.getName();
-
-      switch (type.getType()) {
-        case Const.T_DOUBLE: {
-          result.set("Detected disallowed 'double' field [" + fieldName + ']');
-          immediateBreak = true;
-        }
-        break;
-      }
-    }
-
-    return result.isNull();
-  }
-
-  private static boolean checkMethods(final ClassGen cgen, final MutableObjectContainer<String> result) {
-    boolean immediateBreak = false;
-    for (final Method method : cgen.getMethods()) {
-      if (immediateBreak) {
-        break;
-      }
-
-      final String methodName = method.getName() + ' ' + method.getSignature();
-
-      final Type returnType = method.getReturnType();
-
-      switch (returnType.getType()) {
-        case Const.T_DOUBLE: {
-          result.set("Method returns disallowed 'double' result [" + methodName + ']');
-          immediateBreak = true;
-        }
-        break;
-      }
-
-      // check args
-      if (result.isNull()) {
-        for (final Type arg : method.getArgumentTypes()) {
-
-          switch (arg.getType()) {
-            case Const.T_DOUBLE: {
-              result.set("Method needs disallowed 'double' argument [" + methodName + ']');
-              immediateBreak = true;
-            }
-            break;
-          }
-        }
-      }
-
     }
 
     return result.isNull();

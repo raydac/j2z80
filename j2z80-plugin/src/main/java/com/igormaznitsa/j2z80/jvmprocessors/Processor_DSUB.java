@@ -16,48 +16,32 @@
 
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import com.igormaznitsa.j2z80.api.additional.NeedsDoubleArithmeticManager;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-import com.igormaznitsa.j2z80.translator.utils.LongWords;
 import java.io.IOException;
 import java.io.Writer;
-import org.apache.bcel.classfile.Constant;
-import org.apache.bcel.classfile.ConstantDouble;
-import org.apache.bcel.classfile.ConstantLong;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
-import org.apache.bcel.generic.LDC2_W;
 
-public class Processor_LDC2_W extends AbstractJvmCommandProcessor {
+public class Processor_DSUB extends AbstractJvmCommandProcessor
+    implements NeedsDoubleArithmeticManager {
   private final String template;
 
-  public Processor_LDC2_W() {
+  public Processor_DSUB() {
     super();
-    this.template = loadResourceFileAsString("LDC2_W.a80");
+    this.template = loadResourceFileAsString("DSUB.a80");
   }
 
   @Override
   public String getName() {
-    return "LDC2_W";
+    return "DSUB";
   }
 
   @Override
   public void process(final MethodTranslator methodTranslator, final Instruction instruction,
                       final InstructionHandle handle,
                       final ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
-    final LDC2_W ldc = (LDC2_W) instruction;
-    final Constant constant = methodTranslator.getConstantPool().getConstant(ldc.getIndex());
-    final int value;
-    if (constant instanceof ConstantLong) {
-      value = LongWords.requireIntRange(((ConstantLong) constant).getBytes());
-    } else if (constant instanceof ConstantDouble) {
-      value = Float.floatToRawIntBits((float) ((ConstantDouble) constant).getBytes());
-    } else {
-      throw new IllegalArgumentException(
-          "Unsupported constant pool item found in LDC2_W [" + constant + ']');
-    }
-    out.write(this.template
-        .replace("%high%", LongWords.highImmediate(value))
-        .replace("%low%", LongWords.lowImmediate(value)));
+    out.write(this.template);
     out.write(NEXT_LINE);
   }
 }

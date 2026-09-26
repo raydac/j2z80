@@ -66,7 +66,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.bcel.Const;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantInteger;
 import org.apache.bcel.classfile.ConstantUtf8;
@@ -321,7 +320,7 @@ public class TranslatorImpl implements TranslatorContext {
       final String className = currentClass.getClassName();
       int offset = 0;
       for (final Field f : fieldList) {
-        final int width = f.getType().getType() == Const.T_LONG ? 4 : 2;
+        final int width = f.getType().getSize() * 2;
         list.add(
             LabelAndFrameUtils.makeLabelNameForFieldOffset(className, f.getName(), f.getType()) +
                 ": EQU " + offset);
@@ -333,7 +332,7 @@ public class TranslatorImpl implements TranslatorContext {
           final String label =
               LabelAndFrameUtils.makeLabelNameForField(className, f.getName(), f.getType());
           list.add(label + ": DEFW 0");
-          if (f.getType().getType() == Const.T_LONG) {
+          if (f.getType().getSize() == 2) {
             list.add("DEFW 0");
           }
         }

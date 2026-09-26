@@ -84,10 +84,12 @@ public class TestNEWARRAY extends AbstractTestBasedOnMemoryManager {
     assertStackEmpty();
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(timeout = 3000L)
   public void testArrayCreation_DoubleArray() throws Exception {
     push(1000);
-    assertAllocateCommand(new Instruction[] {new NEWARRAY(BasicType.DOUBLE)}, 2003);
+    assertAllocateCommand(new Instruction[] {new NEWARRAY(BasicType.DOUBLE)}, 4003);
+    assertEquals(getInitialMemoryAddress() + 3, pop());
+    assertStackEmpty();
   }
 
   @Test(timeout = 3000L)

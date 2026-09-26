@@ -1,0 +1,22 @@
+; DASTORE
+    POP BC
+    POP DE
+    POP HL
+    PUSH BC
+    LD B,H
+    LD C,L
+    SLA C
+    RL B
+    SLA C
+    RL B
+    POP HL
+    EX (SP),HL
+    ADD HL,BC
+    POP BC
+    LD (HL),C
+    INC HL
+    LD (HL),B
+    INC HL
+    LD (HL),E
+    INC HL
+    LD (HL),D

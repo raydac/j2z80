@@ -44,7 +44,7 @@ public class Processor_MULTIANEWARRAY extends AbstractJvmCommandProcessor implem
       return false;
     }
     final String name = pool.getConstantPool().getConstantString(index, Const.CONSTANT_Class);
-    return name != null && name.startsWith("[") && name.endsWith("J");
+    return name != null && name.startsWith("[") && (name.endsWith("J") || name.endsWith("D"));
   }
 
   @Override
@@ -53,7 +53,7 @@ public class Processor_MULTIANEWARRAY extends AbstractJvmCommandProcessor implem
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final MULTIANEWARRAY multiarraynew = (MULTIANEWARRAY) instruction;
     if (isLongArray(methodTranslator.getConstantPool(), multiarraynew.getIndex())) {
-      throw new IllegalArgumentException("multianewarray of long is not supported");
+      throw new IllegalArgumentException("multianewarray of long or double is not supported");
     }
     out.write(template.replace(MACROS_VALUE, Integer.toString(multiarraynew.getDimensions())));
     out.write(NEXT_LINE);

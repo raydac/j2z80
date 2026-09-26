@@ -1,0 +1,5 @@
+; DCONST
+    LD BC,%high%
+    PUSH BC
+    LD BC,%low%
+    PUSH BC

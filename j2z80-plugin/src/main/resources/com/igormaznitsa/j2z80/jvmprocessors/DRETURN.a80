@@ -1,0 +1,4 @@
+; DRETURN
+    POP BC
+    POP DE
+    RET
