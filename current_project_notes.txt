@@ -15,6 +15,7 @@
 - Frame size floors at argument slots so native methods (maxLocals=0, no Code attribute) still get a valid frame — unblocks main-jar verify.
 - Started Z80Processor JUnit tests in j2z80-plugin: single commands, a DJNZ loop, a two-word CALL return, and the double-argument word order.
 - JavaZ80Run compiles a Java class (entry mainz), translates it, runs it on Z80Processor, and reads static int fields. Covered: addition, loops, invokes, tableswitch and lookupswitch, and try/catch/finally (nested, subclass catch, throw from a callee, finally on break).
+- TryCatchFinallyTest also covers finally without exceptions: fall-through, return from try, continue/break, nested finally, finally around a callee invoked from several sites, and sequential try/finally blocks.
 - Exceptions are checked-only. Unchecked types (RuntimeException/Error and subclasses) are rejected at translate time. A method that declares throws clears/sets ___PENDING_EXCEPTION; call sites check that cell and jump to a covering catch or RET to propagate. Local athrow uses the same compile-time handler match (no global unwind table). Arithmetic/checkcast still JP via ___ATHROW_PROCESSING_CODE_ADDRESS (default 0).
 
 ## 2. Architecture & Technical Discoveries
