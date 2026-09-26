@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Opcode processors cast the BCEL instruction to pin its type. The local is unused when the template has no fields. -->
+    <Match>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+    </Match>
+    <!-- Branch targets arrive as InstructionHandle and are narrowed to BranchHandle. -->
+    <Match>
+        <Bug pattern="BC_UNCONFIRMED_CAST"/>
+    </Match>
+    <!-- Opcode tables and translator collaborators are shared on purpose. -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- Constructors reject invalid arguments. These types are not finalized. -->
+    <Match>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
+    <!-- The project classpath loader is not created under a SecurityManager. -->
+    <Match>
+        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+    </Match>
+</FindBugsFilter>

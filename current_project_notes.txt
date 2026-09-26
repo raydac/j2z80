@@ -1,4 +1,5 @@
 ## 1. Implementation Progress
+- SpotBugs 4.10.4.1 runs on j2z80-plugin during verify (medium and higher). Endemic patterns are listed in src/main/spotbugs/exclude.xml.
 - Fixed the embedded Z80 assembler: signed IX/IY displacements, byte immediates in -128..255 (so CP -128 assembles), rejection of LD (SP),n, case-insensitive (BC)/(DE)/(IX)/(IY), forward EQU chains, and DEFM as raw bytes.
 - Project version is 2.0.0-SNAPSHOT.
 - Added double support. Each Java double is two 16-bit slots holding IEEE binary32. Arithmetic, compare, i2d/l2d/f2d/d2i/d2l/d2f, fields, and double[] are implemented. drem is truncating remainder. multianewarray of double is rejected.
@@ -49,6 +50,7 @@
 - j2z80-plugin/.../FLOAT_ARITHMETIC_MANAGER.a80 — binary16 add/sub/mul/div/rem, i2f, f2i, cmp
 - j2z80-plugin/.../LONG_ARITHMETIC_MANAGER.a80 — 32-bit long add/sub/mul/div/rem, shifts, compare
 - j2z80-plugin/.../DOUBLE_ARITHMETIC_MANAGER.a80 — binary32 add/sub/mul/div, compare, conversions
+- mvn22 -pl j2z80-plugin -DskipTests spotbugs:check
 - mvn22 -pl j2z80-tests/main-jar -am verify
 
 ## 8. User Advice and Recommendations

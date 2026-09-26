@@ -385,7 +385,7 @@ public class ParsedAsmLine {
       return true;
     }
 
-    if (obj.getClass() == ParsedAsmLine.class) {
+    if (obj instanceof ParsedAsmLine) {
       final ParsedAsmLine that = (ParsedAsmLine) obj;
 
       return safeEquals(this.label, that.label)

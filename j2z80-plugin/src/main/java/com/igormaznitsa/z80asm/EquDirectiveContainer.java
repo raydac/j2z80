@@ -44,11 +44,7 @@ public class EquDirectiveContainer {
   }
 
   public List<EquDirectiveRecord> getValuesAsList() {
-    final List<EquDirectiveRecord> result = new ArrayList<>(directiveContainer.size());
-    for (final String key : directiveContainer.keySet()) {
-      result.add(directiveContainer.get(key));
-    }
-    return result;
+    return new ArrayList<>(this.directiveContainer.values());
   }
 
   public void clear() {

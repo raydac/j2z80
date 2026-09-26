@@ -54,6 +54,8 @@ public class AsmCommandRST extends AbstractAsmCommand {
       case 56:
         result = new byte[] {(byte) 0xFF};
         break;
+      default:
+        break;
     }
 
     Assertions.assertNotNull("Wrong RST argument [" + asm.getArgs()[0] + ']', result);

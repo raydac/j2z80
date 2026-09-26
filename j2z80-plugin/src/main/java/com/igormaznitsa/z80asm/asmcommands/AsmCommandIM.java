@@ -36,6 +36,8 @@ public class AsmCommandIM extends AbstractAsmCommand {
       case 2:
         result = new byte[] {(byte) 0xED, (byte) 0x5E};
         break;
+      default:
+        break;
     }
     Assertions.assertNotNull("IM mode must be 0,1 or 2 [" + number + ']', result);
     return result;

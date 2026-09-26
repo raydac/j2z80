@@ -41,7 +41,6 @@ public class Processor_IINC extends AbstractJvmCommandProcessor {
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final IINC iinc = (IINC) instruction;
-    iinc.getIncrement();
 
     out.write(template.replace(MACROS_INDEX, Integer.toString(prepareLocalVariableIndex(iinc.getIndex()))).replace(MACROS_VALUE, Integer.toString(iinc.getIncrement())));
     out.write(NEXT_LINE);

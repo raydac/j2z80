@@ -39,8 +39,8 @@ import org.apache.bcel.generic.ClassGen;
 public enum ClassUtils {
   ;
 
-  public static final String[] ALLOWED_JNI_ASM_EXTENSIONS = new String[] {".z80", ".a80", ".asm"};
-  public static final String[] ALLOWED_JNI_BIN_EXTENSIONS = new String[] {".bin"};
+  public static final List<String> ALLOWED_JNI_ASM_EXTENSIONS = List.of(".z80", ".a80", ".asm");
+  public static final List<String> ALLOWED_JNI_BIN_EXTENSIONS = List.of(".bin");
   private static final String
       IGNORE_ANNOTATION = "L" + J2Z80Ignore.class.getCanonicalName().replace('.', '/') + ';';
 
