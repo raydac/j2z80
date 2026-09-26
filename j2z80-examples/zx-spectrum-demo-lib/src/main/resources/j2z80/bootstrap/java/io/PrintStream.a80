@@ -1,8 +1,10 @@
 JAVA.LANG.SYSTEN.PRINTLN:
-    LD A,(IX-0)
-    CALL 5633
     LD L,(IX-2)
-    LD H,(IX-3)
+    LD H,(IX-1)
+    LD A,(IX-0)
+    PUSH HL
+    CALL 5633
+    POP HL
     LD B,0
     LD C,(HL)
     INC HL

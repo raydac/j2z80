@@ -11,7 +11,7 @@
     <artifactId>zx-spectrum-demo-lib</artifactId>
     <packaging>jar</packaging>
 
-    <description>A small stub for base Java classes to adapt their calls on the ZX-Spectrum 48 platform</description>
+    <description>ZX Spectrum 48 stubs: Java streams plus screen, keyboard, and beeper calls</description>
     <inceptionYear>2012</inceptionYear>
 
     <dependencies>

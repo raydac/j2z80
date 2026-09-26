@@ -11,8 +11,7 @@
     <artifactId>zx-spectrum-hello-world</artifactId>
     <packaging>jar</packaging>
 
-    <description>A Small 'Hello world' demo-application to check possibility of intercommunication with the ZX-Basic
-        standard ROM subroutines
+    <description>ZX Spectrum 48 demo: greeting, then a fixed-point Mandelbrot drawn through the spectrum library
     </description>
     <inceptionYear>2012</inceptionYear>
 
@@ -22,6 +21,11 @@
             <artifactId>zx-spectrum-demo-lib</artifactId>
             <version>${project.version}</version>
             <classifier>z80</classifier>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
