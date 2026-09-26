@@ -107,6 +107,14 @@ public interface TranslatorContext {
   void registerConstantPoolItem(String constantLabel, Constant item);
 
   /**
+   * Register a ROM-resident static {@code byte[]} (header emitted before the payload label).
+   *
+   * @param data the payload bytes, must not be null
+   * @return the assembler label of the first array element (the Java arrayref)
+   */
+  String registerStaticByteArrayTemplate(byte[] data);
+
+  /**
    * Register a boot class processor to be translated
    *
    * @param classProcessor a boot class processor, must not be null

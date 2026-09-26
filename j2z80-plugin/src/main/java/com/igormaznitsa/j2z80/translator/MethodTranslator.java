@@ -15,16 +15,24 @@
  */
 package com.igormaznitsa.j2z80.translator;
 
+import static com.igormaznitsa.j2z80.translator.utils.MethodUtils.isStaticInitializer;
+
 import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.jvmprocessors.AbstractJvmCommandProcessor;
+import com.igormaznitsa.j2z80.translator.optimize.StaticByteArrayInitMatch;
+import com.igormaznitsa.j2z80.translator.optimize.StaticByteArrayInitRewriter;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantString;
 import org.apache.bcel.classfile.ConstantUtf8;
@@ -84,37 +92,95 @@ public class MethodTranslator {
     final InstructionHandle[] handles = list.getInstructionHandles();
     final CodeExceptionGen[] exceptionHandlers = methodG.getExceptionHandlers();
 
+    final CompactedInits compactedInits = this.prepareCompactedByteArrayInits(methodG);
+
     for (final InstructionHandle handler : handles) {
-      final Instruction instruction = handler.getInstruction();
-      final AbstractJvmCommandProcessor processor = AbstractJvmCommandProcessor.findProcessor(instruction.getClass());
-
-      if (processor == null) {
-        throw new UnsupportedOperationException(
-            "J2Z80 doesn't support JVM instruction: " + instruction.getName());
-      }
-
-      getTranslatorContext().registerAdditionsUsedByClass(processor.getClass());
-
-      final StringWriter writer = new StringWriter(256);
-      try {
-        processor.process(this, instruction, handler, bootstrapClassLoader, writer);
-      } catch (IllegalArgumentException ex) {
-        getTranslatorContext().getLogger().logError(this.method + " [" + ex.getMessage() + ']');
-        throw ex;
+      if (compactedInits.skipHandles.contains(handler)) {
+        continue;
       }
 
       if (this.isLabeled(handler, exceptionHandlers)) {
-        // the instruction is a jump target so we label it
         final String methodJumpLabel =
             LabelAndFrameUtils.makeClassMethodJumpLabel(this.method.getClassInfo(),
                 this.method.getMethodGen(), handler.getPosition());
         result.add(methodJumpLabel + ":\r\n");
       }
 
+      final CompactedInit compacted = compactedInits.starts.get(handler);
+      if (compacted != null) {
+        result.add(this.emitCompactedByteArrayInit(compacted));
+        continue;
+      }
+
+      final Instruction instruction = handler.getInstruction();
+      final AbstractJvmCommandProcessor processor =
+          AbstractJvmCommandProcessor.findProcessor(instruction.getClass());
+
+      if (processor == null) {
+        throw new UnsupportedOperationException(
+            "J2Z80 doesn't support JVM instruction: " + instruction.getName());
+      }
+
+      this.getTranslatorContext().registerAdditionsUsedByClass(processor.getClass());
+
+      final StringWriter writer = new StringWriter(256);
+      try {
+        processor.process(this, instruction, handler, bootstrapClassLoader, writer);
+      } catch (IllegalArgumentException ex) {
+        this.getTranslatorContext().getLogger()
+            .logError(this.method + " [" + ex.getMessage() + ']');
+        throw ex;
+      }
+
       result.add(writer.toString());
     }
 
     return result;
+  }
+
+  private CompactedInits prepareCompactedByteArrayInits(final MethodGen methodG) {
+    if (!isStaticInitializer(methodG.getMethod())) {
+      return CompactedInits.empty();
+    }
+
+    final List<StaticByteArrayInitMatch> matches = StaticByteArrayInitRewriter.findMatches(methodG);
+    if (matches.isEmpty()) {
+      return CompactedInits.empty();
+    }
+
+    final Map<InstructionHandle, CompactedInit> starts = new HashMap<>();
+    final Set<InstructionHandle> skipHandles = new HashSet<>();
+
+    for (final StaticByteArrayInitMatch match : matches) {
+      final String templateLabel =
+          this.translatorContext.registerStaticByteArrayTemplate(match.getPayload());
+      this.translatorContext.getLogger().logInfo(
+          "Compacted static byte[] " + match.getClassName() + '#' + match.getFieldName()
+              + " (" + match.getLength() + " elements, ROM-resident)");
+
+      starts.put(match.getStartHandle(), new CompactedInit(match, templateLabel));
+
+      InstructionHandle cursor = match.getStartHandle().getNext();
+      while (cursor != null) {
+        skipHandles.add(cursor);
+        if (cursor == match.getEndHandle()) {
+          break;
+        }
+        cursor = cursor.getNext();
+      }
+    }
+
+    return new CompactedInits(starts, skipHandles);
+  }
+
+  private String emitCompactedByteArrayInit(final CompactedInit compacted) {
+    final StaticByteArrayInitMatch match = compacted.match;
+    final String fieldLabel = LabelAndFrameUtils.makeLabelNameForField(
+        match.getClassName(), match.getFieldName(), match.getFieldType());
+
+    return ""
+        + "    LD BC," + compacted.templateLabel + AbstractJvmCommandProcessor.NEXT_LINE
+        + "    LD (" + fieldLabel + "),BC" + AbstractJvmCommandProcessor.NEXT_LINE;
   }
 
   private boolean isLabeled(final InstructionHandle handle,
@@ -160,6 +226,31 @@ public class MethodTranslator {
       getTranslatorContext().registerConstantPoolItem(result, item);
     }
     return result;
+  }
+
+  private static final class CompactedInits {
+    private final Map<InstructionHandle, CompactedInit> starts;
+    private final Set<InstructionHandle> skipHandles;
+
+    private CompactedInits(final Map<InstructionHandle, CompactedInit> starts,
+                           final Set<InstructionHandle> skipHandles) {
+      this.starts = starts;
+      this.skipHandles = skipHandles;
+    }
+
+    private static CompactedInits empty() {
+      return new CompactedInits(Map.of(), Set.of());
+    }
+  }
+
+  private static final class CompactedInit {
+    private final StaticByteArrayInitMatch match;
+    private final String templateLabel;
+
+    private CompactedInit(final StaticByteArrayInitMatch match, final String templateLabel) {
+      this.match = match;
+      this.templateLabel = templateLabel;
+    }
   }
 
 }

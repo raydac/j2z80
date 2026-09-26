@@ -93,6 +93,8 @@ public class TranslatorImpl implements TranslatorContext {
   private final Set<Class<? extends J2ZAdditionalBlock>> registeredAdditions = new HashSet<>();
   private final Set<AbstractBootstrapClass> bootstrapClasses = new HashSet<>();
   private final Map<String, Constant> classPoolConstants = new HashMap<>();
+  private final Map<String, byte[]> staticByteArrayTemplates = new LinkedHashMap<>();
+  private int staticByteArrayTemplateCounter;
   private final Set<ClassID> classesForCheckCast = new HashSet<>();
   private String[] excludeResourcePatterns;
   private final OptimizationLevel optimizationLevel;
@@ -162,6 +164,8 @@ public class TranslatorImpl implements TranslatorContext {
     this.registeredAdditions.clear();
     this.bootstrapClasses.clear();
     this.classPoolConstants.clear();
+    this.staticByteArrayTemplates.clear();
+    this.staticByteArrayTemplateCounter = 0;
     this.classesForCheckCast.clear();
   }
 
@@ -233,6 +237,7 @@ public class TranslatorImpl implements TranslatorContext {
     this.processJniClasses(result);
     this.processIDs(result);
     this.processBinaryData(result);
+    this.processStaticByteArrayTemplates(result);
     this.processAdditions(result);
 
     result.addAll(makeClassSizeArray());
@@ -431,6 +436,35 @@ public class TranslatorImpl implements TranslatorContext {
     text.add("");
   }
 
+  private void processStaticByteArrayTemplates(final List<String> text) {
+    if (this.staticByteArrayTemplates.isEmpty()) {
+      return;
+    }
+
+    this.getLogger().logInfo("----PROCESS STATIC BYTE[] TEMPLATES----");
+    text.add("");
+    text.add("; Compacted static byte[] (ROM-resident, with array header)");
+    text.add("; -------------------------------------");
+
+    for (final Entry<String, byte[]> template : this.staticByteArrayTemplates.entrySet()) {
+      final String label = template.getKey();
+      final byte[] data = template.getValue();
+      final int length = data.length;
+      this.getLogger().logInfo(
+          "Added ROM-resident static byte[] " + label + " (" + length + " bytes)");
+
+      // Layout matches ___MEMORY_ALLOCATE_BYTEARRAY: size@-3, length@-2/-1, payload at label.
+      text.add("    DEFB 1 ; byte element size");
+      text.add("    DEFB #" + Integer.toHexString(length & 0xFF).toUpperCase(Locale.ENGLISH)
+          + ",#" + Integer.toHexString((length >>> 8) & 0xFF).toUpperCase(Locale.ENGLISH)
+          + " ; length");
+      text.addAll(asList(byteArrayToAsm(label + ": ; compacted static byte[] payload", data, -1)));
+    }
+
+    text.add("; -------------------------------------");
+    text.add("");
+  }
+
   private void processAdditions(final List<String> text) throws IOException {
     this.getLogger().logInfo("----PROCESS ADDITIONS----");
     boolean needMemoryManager = false;
@@ -542,6 +576,14 @@ public class TranslatorImpl implements TranslatorContext {
   @Override
   public void registerConstantPoolItem(final String constantLabel, final Constant item) {
     this.classPoolConstants.put(constantLabel, item);
+  }
+
+  @Override
+  public String registerStaticByteArrayTemplate(final byte[] data) {
+    assertNotNull("Static byte[] template must not be null", data);
+    final String label = "STATIC_BARRAY_TPL_" + this.staticByteArrayTemplateCounter++;
+    this.staticByteArrayTemplates.put(label, data.clone());
+    return label;
   }
 
   @Override

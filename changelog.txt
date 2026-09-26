@@ -1,4 +1,6 @@
 - 2.0.0 (SNAPSHOT)
+    - large static byte[] field initializers use compact in-place ROM data instead of huge fill code
+    - ZX Spectrum example opens with a line-art portrait drawn pixel-by-pixel instead of greeting text
     - ZX Spectrum example drives the 48K screen, keyboard, and beeper, and draws a Mandelbrot set
     - fixed ZX Spectrum text printing so a string is shown as text instead of BASIC keywords
     - fixed the Spectrum greeting so the beeper no longer resets the machine

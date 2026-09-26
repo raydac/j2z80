@@ -203,4 +203,36 @@ public class JavaZ80RunTest {
 
     assertEquals(63, run.staticInt("demo.LabeledLoops", "result"));
   }
+
+  @Test
+  public void compactedStaticByteArrayClinitPreservesContents() {
+    final JavaZ80Run run = JavaZ80Run.mainClass("demo.ByteBlob")
+        .file("demo/ByteBlob.java", """
+            package demo;
+
+            public class ByteBlob {
+              public static final byte[] DATA = {
+                  0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45,
+                  48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93
+              };
+              public static int length;
+              public static int checksum;
+
+              public static void mainz() {
+                length = DATA.length;
+                int sum = 0;
+                int index = 0;
+                while (index < DATA.length) {
+                  sum = sum + (DATA[index] & 0xFF);
+                  index = index + 1;
+                }
+                checksum = sum;
+              }
+            }
+            """)
+        .execute();
+
+    assertEquals(32, run.staticInt("demo.ByteBlob", "length"));
+    assertEquals(1488, run.staticInt("demo.ByteBlob", "checksum"));
+  }
 }

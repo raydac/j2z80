@@ -37,6 +37,11 @@ The parameter allows to set the optimization level, not there are only two level
  - none (default) - it makes nothing
  - base - it just removes unecessary stack command pairs like PUSH HL POP HL
 
+Independently of <optimization>, the translator always compacts large static byte[] initializers in <clinit>.
+A contiguous fill of 16 or more elements (NEWARRAY byte, then DUP/index/value/BASTORE for indices 0..n-1, then PUTSTATIC)
+is replaced by a ROM-resident array (3-byte header + DEFB payload). The static field points at that memory;
+there is no heap copy. Stores into the array write the program image in place (acceptable on RAM-loaded Z80 targets).
+
 Dependencies
 ----------------------
 The plugin allows to use project dependenices as libraries. To use a jar file as a library the jar file must have the z80 classifier.
