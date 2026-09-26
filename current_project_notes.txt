@@ -1,0 +1,39 @@
+## 1. Implementation Progress
+- Fixed stack frame allocation for INVOKESTATIC / INVOKESPECIAL: frame size now uses method maxLocals (bytes = maxLocals * 2), not only argument slots.
+- Fixed LabelAndFrameUtils.calculateFrameSizeForMethod: no longer double-counts `this` for instance methods (maxLocals already includes it).
+- Fixed bootstrap invoke static detection (INVOKESTATIC, was wrongly INVOKESPECIAL).
+- assertLocalVariablesNumber now checks MethodGen.getMaxLocals().
+- Test helper registerMockMethod now applies the maxLocals parameter via setMaxLocals.
+- Frame size floors at argument slots so native methods (maxLocals=0, no Code attribute) still get a valid frame — unblocks main-jar verify.
+
+## 2. Architecture & Technical Discoveries
+- Locals live at (IX - index*2); IX is frame top (local 0 / first arg).
+- ___BEFORE_INVOKE: A = arg area bytes, BC = full frame bytes; lowers SP and sets IX.
+- ___AFTER_INVOKE restores previous IX and discards the frame.
+- INVOKEVIRTUAL / INVOKEINTERFACE take frame size from VT/IT tables (LabelAndFrameUtils), so they were less affected than static/special.
+- Nested loops allocate extra local slots beyond args; undersized frames overwrite caller stack / return addresses.
+- Native JNI methods have no Code attribute → BCEL getMaxLocals() is 0; callers must still size the frame from argument count.
+
+## 3. Technical Debt & Refactoring
+- Processor_ISTORE uses raw `index << 1` instead of prepareLocalVariableIndex (missing bounds check).
+- MainPrefixPostfixGenerator still uses (maxLocals + 1) << 1 padding; intentional for main return slot — leave as-is unless revisited.
+- WithLocals invoke tests historically did not set maxLocals on MethodGen (fixed in registerMockMethod).
+
+## 4. Current Work In Progress
+- None (stack-frame fix verified via main-jar AcceptanceITCase).
+
+## 5. Known Issues & Limitations
+- IX displacement limits locals to index 0..64 (assertLocalVariablesNumber uses 64).
+- Only documented Z80 instructions in the embedded assembler.
+
+## 6. Open Questions & Pending Decisions
+- None for this frame-size fix.
+
+## 7. Useful References
+- docs/jni.txt — IX frame layout for JNI
+- j2z80-plugin/.../MEMORY_MANAGER.a80 — ___BEFORE_INVOKE / ___AFTER_INVOKE
+- mvn22 -pl j2z80-tests/main-jar -am verify
+
+## 8. User Advice and Recommendations
+- Nested loops / extra locals need correct maxLocals-based frames; regenerating after this fix should restore correct stack behavior.
+- Use `verify` (not only `package`) for main-jar — translate + AcceptanceIT run in integration-test.

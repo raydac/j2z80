@@ -25,7 +25,7 @@ import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.IOException;
 import java.io.Writer;
 import org.apache.bcel.generic.ConstantPoolGen;
-import org.apache.bcel.generic.INVOKESPECIAL;
+import org.apache.bcel.generic.INVOKESTATIC;
 import org.apache.bcel.generic.InvokeInstruction;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
@@ -76,13 +76,15 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
   }
 
   /**
-   * Calculate whole stack frame size in bytes for a method ignoring local variables.
+   * Calculate whole stack frame size in bytes for a method, including local variables.
    *
    * @param invokingMethod a method to be used for calculations, must not be null
    * @return the whole memory frame size in bytes
    */
-  public static int calculateTotalFrameSizeWithoutLocals(final MethodGen invokingMethod) {
-    return calculateArgumentBlockSize(invokingMethod.getArgumentTypes().length,
+  public static int calculateTotalFrameSizeWithLocals(final MethodGen invokingMethod) {
+    return calculateTotalFrameSizeWithLocals(
+        invokingMethod.getArgumentTypes().length,
+        invokingMethod.getMaxLocals(),
         invokingMethod.isStatic());
   }
 
@@ -112,25 +114,18 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
 
   /**
    * Calculate whole stack frame size in bytes based on max local variable number data.
+   * {@code maxLocals} already includes {@code this} for instance methods when present in the
+   * Code attribute; native methods often report {@code 0}, so argument slots are used as a floor.
    *
-   * @param args      the number of arguments for a method
-   * @param maxLocals the number of local variables for a method
+   * @param args      the number of arguments for a method (without {@code this})
+   * @param maxLocals the maximum number of local variables for a method
    * @param isStatic  the flag shows that the method is a static one if it is true
    * @return the memory frame size in bytes
    */
-  public int calculateTotalFrameSizeWithLocals(final int args, final int maxLocals,
-                                               final boolean isStatic) {
-    int argNumber = args;
-
-    if (!isStatic) {
-      argNumber++;
-    }
-
-    if (argNumber > maxLocals) {
-      throw new IllegalStateException("Frame size is less than arguments number");
-    }
-
-    return maxLocals << 1;
+  public static int calculateTotalFrameSizeWithLocals(final int args, final int maxLocals,
+                                                      final boolean isStatic) {
+    final int argSlots = args + (isStatic ? 0 : 1);
+    return Math.max(argSlots, maxLocals) << 1;
   }
 
   /**
@@ -168,7 +163,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
 
     boolean result = false;
     if (processor != null) {
-      final boolean isStaticCall = instruction instanceof INVOKESPECIAL;
+      final boolean isStaticCall = instruction instanceof INVOKESTATIC;
       final int argAreaSize = calculateArgumentBlockSize(methodArgs.length, isStaticCall);
       final int totalFrameSize = calculateTotalFrameSizeWithLocals(methodArgs.length,
           methodArgs.length + (isStaticCall ? 0 : 1), isStaticCall);

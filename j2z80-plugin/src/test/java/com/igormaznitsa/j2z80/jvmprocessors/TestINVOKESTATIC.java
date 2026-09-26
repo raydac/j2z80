@@ -16,6 +16,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.io.StringWriter;
@@ -63,6 +64,11 @@ public class TestINVOKESTATIC extends AbstractInvokeTest {
     processor.process(CLASS_PROCESSOR_MOCK, INSTRUCTION_INSTANCE, mock(InstructionHandle.class),
         this.getClass().getClassLoader(),
         writer);
+
+    final String generatedAsm = writer.toString();
+    assertTrue("Frame must reserve space for all locals",
+        generatedAsm.contains("LD BC," + (TEST_LOCALS_NUMBER << 1)));
+
     makePostfixWithBreakPoint("NOLABEL", writer);
 
     assertLinearExecutionToEnd(writer.toString());

@@ -146,8 +146,8 @@ public abstract class AbstractJvmCommandProcessor {
     if (!method.isInterface()) {
       final String label = method.getClassName() + '#' + method.getName() + " " + method.getSignature();
       final int MAX_VARIABLES = 64;
-      final int locals = (method.isStatic() ? 0 : 1) + method.getArgumentTypes().length;
-      Assertions.assertTrue("Max locals number for a mathod must be less than " + MAX_VARIABLES + " [" + locals + "] at " + label, locals < MAX_VARIABLES);
+      final int locals = method.getMaxLocals();
+      Assertions.assertTrue("Max locals number for a method must be less than " + MAX_VARIABLES + " [" + locals + "] at " + label, locals < MAX_VARIABLES);
     }
   }
 

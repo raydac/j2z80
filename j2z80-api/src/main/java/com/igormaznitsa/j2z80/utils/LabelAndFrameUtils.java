@@ -292,15 +292,17 @@ public final class LabelAndFrameUtils {
   }
 
   /**
-   * Calculate the stack frame size for a method
+   * Calculate the stack frame size for a method.
+   * {@code maxLocals} already includes {@code this} for instance methods.
    *
-   * @param argNumber the number of method arguments
+   * @param argNumber the number of method arguments (without {@code this})
    * @param maxLocals the maximum number of local variables
    * @param isStatic  the flag shows that the method is a static one if the flag is true
    * @return the stack frame size needed by the method in bytes
    */
   public static int calculateFrameSizeForMethod(final int argNumber, final int maxLocals, final boolean isStatic) {
-    return (Math.max(argNumber, maxLocals) + (isStatic ? 0 : 1)) << 1;
+    final int argSlots = argNumber + (isStatic ? 0 : 1);
+    return Math.max(argSlots, maxLocals) << 1;
   }
 
   /**

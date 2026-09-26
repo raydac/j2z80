@@ -60,14 +60,14 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
     }
 
     final int argumentMemorySize = calculateArgumentBlockSize(initingMethod);
-    final int totalMemorySize = calculateTotalFrameSizeWithoutLocals(initingMethod);
+    final int totalMemorySize = calculateTotalFrameSizeWithLocals(initingMethod);
     String prefix = "";
     String postfix = "";
 
 
     final String labelForMethod = LabelAndFrameUtils.makeLabelNameForMethod(initingMethod);
 
-    final boolean needsFrame = argumentMemorySize != 0 || totalMemorySize != 0;
+    final boolean needsFrame = totalMemorySize != 0;
 
     assertLocalVariablesNumber(initingMethod);
 
@@ -93,14 +93,14 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
       assertMethodIsNotNull(invokedMethod, methodTranslator, inv);
 
       final int argumentMemorySize = calculateArgumentBlockSize(invokedMethod);
-      final int totalMemorySize = calculateTotalFrameSizeWithoutLocals(invokedMethod);
+      final int totalMemorySize = calculateTotalFrameSizeWithLocals(invokedMethod);
       String prefix = "";
       String postfix = "";
 
 
       final String labelForMethod = getMethodLabel(methodTranslator, inv);
 
-      final boolean needsFrame = argumentMemorySize != 0 || totalMemorySize != 0;
+      final boolean needsFrame = totalMemorySize != 0;
 
       assertLocalVariablesNumber(invokedMethod);
 

@@ -243,6 +243,7 @@ public abstract class AbstractJvmCommandProcessorTest extends Z80 {
     }
 
     final MethodGen fakeMethod = new MethodGen(accessFlags, returnType, argTypes, argNames, methodName, className, new InstructionList(), CP_GEN_MOCK);
+    fakeMethod.setMaxLocals(Math.max(maxLocals, fakeMethod.getMaxLocals()));
 
     when(METHODCONTEXT_MOCK.findMethod(eq(new MethodID(fakeMethod)))).thenReturn(fakeMethod);
     return fakeMethod;

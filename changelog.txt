@@ -1,4 +1,5 @@
 - 1.1.0 (SNAPSHOT)
+    - fixed stack frame size for method calls so local variables (e.g. nested loops) are reserved
     - added SNA as a target format
     - adaptation for JDK 11 and Maven 3.8+
     - updated dependencies
