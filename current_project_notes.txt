@@ -1,4 +1,5 @@
 ## 1. Implementation Progress
+- README describes the language subset: narrowed types, checked exceptions, arrays, bump-heap objects with no free, ROM-resident static byte[], and the JNI frame.
 - Contiguous static byte[] fills in <clinit> (n>=16) become ROM-resident arrays (header+DEFB); the static field points at that payload (no heap copy).
 - ZX Spectrum 48 library: border, ink/paper/bright/flash, lower-screen colors, clear, pixel plot/unplot/point, attribute cells, print position, frame sync, keyboard matrix, and beeper. Hello-world draws a line-art portrait, then an attribute Mandelbrot and a zoomed seahorse view.
 - Portrait.DATA format: [n,x0,y0,...] where n=0 point, n=1 line, n>1 polyline segment count. Source: iam_line.svg path coords. Regenerate: `python3 tools/export_portrait_from_svg.py`.
