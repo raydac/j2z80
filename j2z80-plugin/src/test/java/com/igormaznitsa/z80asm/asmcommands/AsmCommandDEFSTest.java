@@ -1,5 +1,5 @@
 /* 
- * Copyright 2019 Igor Maznitsa.
+ * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.z80asm.AsmTranslator;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.igormaznitsa.z80asm.AsmTranslator;
+import org.junit.Test;
 
 public class AsmCommandDEFSTest {
   final AbstractAsmCommand defsCommand = AbstractAsmCommand.findCommandForName("DEFS");

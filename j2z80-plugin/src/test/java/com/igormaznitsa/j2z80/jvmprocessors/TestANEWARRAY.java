@@ -1,5 +1,5 @@
-/* 
- * Copyright 2019 Igor Maznitsa.
+/*
+ * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.bcel.generic.ANEWARRAY;
 import org.apache.bcel.generic.ARRAYLENGTH;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.POP;
 import org.apache.bcel.generic.SIPUSH;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class TestANEWARRAY extends AbstractTestBasedOnMemoryManager {
 

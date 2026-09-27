@@ -1,5 +1,5 @@
-/* 
- * Copyright 2019 Igor Maznitsa.
+/*
+ * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
