@@ -63,6 +63,12 @@ public interface NeedsMemoryManager extends J2ZAdditionalBlock {
   String SUB_ALLOCATE_OBJECT = "___MEMORY_ALLOCATE_OBJECT";
 
   /**
+   * The label of the subroutine that rewinds the heap top to an instance header.
+   * The instance and everything allocated after it are forgotten.
+   */
+  String SUB_FORGET_OBJECT = "___MEMORY_FORGET_OBJECT";
+
+  /**
    * The label of the subroutine to get the class UID of an object in the heap
    */
   String SUB_GET_OBJ_CLASS_ID = "___GET_OBJECT_CLASS_ID";

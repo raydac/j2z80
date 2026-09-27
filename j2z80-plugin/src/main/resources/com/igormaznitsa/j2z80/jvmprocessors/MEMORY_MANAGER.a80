@@ -69,6 +69,20 @@ ___MEMORY_ALLOCATE_OBJECT: ; BC - size in cells, DE - class id, the address in B
     POP HL
     RET
 ;-----------------------------------------------------------
+___MEMORY_FORGET_OBJECT: ; BC - instance reference (first field). Header is the 4 bytes before it. Null does nothing.
+    LD A,B
+    OR C
+    RET Z
+
+    LD H,B
+    LD L,C
+    DEC HL
+    DEC HL
+    DEC HL
+    DEC HL
+    LD (___MEMORY_MANAGER_TOP_POINTER),HL
+    RET
+;-----------------------------------------------------------
 ___GET_OBJECT_CLASS_ID: ; the object address (the first cell address) in BC, the Class ID in BC
     PUSH HL
     LD H,B

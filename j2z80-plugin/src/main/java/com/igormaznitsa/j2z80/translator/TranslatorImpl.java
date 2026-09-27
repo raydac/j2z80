@@ -94,13 +94,15 @@ public class TranslatorImpl implements TranslatorContext {
   private final Set<AbstractBootstrapClass> bootstrapClasses = new HashSet<>();
   private final Map<String, Constant> classPoolConstants = new HashMap<>();
   private final Map<String, byte[]> staticByteArrayTemplates = new LinkedHashMap<>();
-  private int staticByteArrayTemplateCounter;
   private final Set<ClassID> classesForCheckCast = new HashSet<>();
-  private String[] excludeResourcePatterns;
   private final OptimizationLevel optimizationLevel;
+  private int staticByteArrayTemplateCounter;
+  private String[] excludeResourcePatterns;
 
-  public TranslatorImpl(final TranslatorLogger logger, final OptimizationLevel optimization,
-                        final List<Path> jarArchives) {
+  public TranslatorImpl(final TranslatorLogger logger,
+                        final OptimizationLevel optimization,
+                        final List<Path> jarArchives
+  ) {
     this.optimizationLevel = optimization;
     this.messageLogger = logger == null ? new DefaultTranslatorLogger() : logger;
 

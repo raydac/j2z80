@@ -1,5 +1,6 @@
 package com.igormaznitsa.test.helloworld;
 
+import j2z80.Heap;
 import j2z80.spectrum.Keyboard;
 import j2z80.spectrum.Screen;
 import j2z80.spectrum.Sound;
@@ -12,8 +13,7 @@ public class main {
       waitForSpace();
       showOverview();
       waitForSpace();
-      showZoom();
-      waitForSpace();
+      showStars();
       showCurves();
       waitForSpace();
     }
@@ -26,7 +26,9 @@ public class main {
     Screen.border(Screen.GREEN);
     Portrait.draw();
     Screen.border(Screen.GREEN);
-    caption("Portrait   SPACE");
+    caption("press space (top #");
+    printAddress(Heap.top());
+    Screen.print(')');
     Sound.tone(80, 400);
   }
 
@@ -38,12 +40,24 @@ public class main {
     Sound.tone(80, 300);
   }
 
-  private static void showZoom() {
-    openPicture(Screen.RED);
-    paint(Mandelbrot.ZOOM_LEFT, Mandelbrot.ZOOM_TOP, Mandelbrot.ZOOM_STEP);
-    Screen.border(Screen.RED);
-    caption("Seahorse   SPACE");
-    Sound.tone(120, 220);
+  private static void showStars() {
+    Screen.colors(Screen.WHITE, Screen.BLACK, 1, 0);
+    Screen.clear();
+    Screen.clearPixels();
+    Screen.border(Screen.CYAN);
+    StarField sky = new StarField();
+    sky.draw();
+    Screen.border(Screen.CYAN);
+    caption("Stars      SPACE");
+    Sound.tone(90, 280);
+    releaseSpace();
+
+    while (Keyboard.down(Keyboard.ROW_SPACE, Keyboard.BIT_0) == 0) {
+      sky.step();
+      Screen.frame();
+    }
+
+    Heap.forget(sky);
   }
 
   private static void showCurves() {
@@ -89,6 +103,18 @@ public class main {
     Screen.lowerColors(Screen.YELLOW, Screen.BLUE, 1, 0);
     Screen.clearLower();
     System.err.println(text);
+  }
+
+  private static void printAddress(final int address) {
+    Screen.print(hexDigit(address, 12));
+    Screen.print(hexDigit(address, 8));
+    Screen.print(hexDigit(address, 4));
+    Screen.print(hexDigit(address, 0));
+  }
+
+  static int hexDigit(final int address, final int shift) {
+    final int nibble = (address >> shift) & 15;
+    return nibble > 9 ? 'A' + (nibble - 10) : '0' + nibble;
   }
 
   private static void waitForSpace() {

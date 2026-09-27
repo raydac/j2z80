@@ -65,5 +65,7 @@ public class Screen {
 
   public static native void at(final int row, final int column);
 
+  public static native void print(final int code);
+
   public static native void frame();
 }

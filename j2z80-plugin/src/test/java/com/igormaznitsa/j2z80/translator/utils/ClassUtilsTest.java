@@ -15,22 +15,21 @@
  */
 package com.igormaznitsa.j2z80.translator.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import com.igormaznitsa.j2z80.api.additional.J2ZAdditionalBlock;
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
 import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEINTERFACEManager;
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.jvmprocessors.Processor_INVOKEINTERFACE;
-import org.junit.Test;
-
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class ClassUtilsTest {
 
   @Test
-  public void testfindAllAdditionalBlocksInClass() {
+  public void testFindAllAdditionalBlocksInClass() {
     final Set<Class<? extends J2ZAdditionalBlock>> foundAdditions = ClassUtils.findAllAdditionalBlocksInClass(Processor_INVOKEINTERFACE.class);
     assertEquals("Must have 3 additional blocks", 3, foundAdditions.size());
     assertTrue("Must have " + NeedsATHROWManager.class.getCanonicalName(), foundAdditions.contains(NeedsATHROWManager.class));

@@ -35,7 +35,8 @@ public class Processor_NEW extends AbstractJvmCommandProcessor implements NeedsM
 
   public Processor_NEW() {
     super();
-    template = loadResourceFileAsString("NEW.a80").replace(MACROS_ADDRESS, SUB_ALLOCATE_OBJECT);
+    this.template =
+        loadResourceFileAsString("NEW.a80").replace(MACROS_ADDRESS, SUB_ALLOCATE_OBJECT);
   }
 
   @Override
@@ -47,8 +48,8 @@ public class Processor_NEW extends AbstractJvmCommandProcessor implements NeedsM
   public void process(final MethodTranslator methodTranslator, final Instruction instruction,
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
-    final NEW newins = (NEW) instruction;
-    final ObjectType type = newins.getLoadClassType(methodTranslator.getConstantPool());
+    final NEW newInstruction = (NEW) instruction;
+    final ObjectType type = newInstruction.getLoadClassType(methodTranslator.getConstantPool());
     final String className = type.getClassName();
 
     CheckedExceptionSupport.rejectUncheckedType(

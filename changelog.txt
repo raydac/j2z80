@@ -1,4 +1,6 @@
 - 2.0.0 (SNAPSHOT)
+    - Heap.forget(Object) rewinds the bump heap to that instance, releasing it and every object allocated after it; Heap.top() returns that address
+    - ZX Spectrum example replaces the zoomed Mandelbrot with a scattered 256-star field that Heap.forget releases on SPACE; the portrait line shows Heap.top() in hex
     - large static byte[] field initializers use compact in-place ROM data instead of huge fill code
     - ZX Spectrum example opens with a line-art portrait drawn pixel-by-pixel instead of greeting text
     - ZX Spectrum example drives the 48K screen, keyboard, and beeper, and draws a Mandelbrot set

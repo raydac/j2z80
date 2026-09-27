@@ -8,14 +8,16 @@ j2z80 is a Maven plugin that translates compiled JVM bytecode into Z80 machine c
 bytecode becomes a short native sequence, with only light cleanup of redundant stack pairs. The result is one binary
 image for a 64 KB address space. It can be started on a real Z80 machine or under an emulator.
 
-It is a translator, so the running program is native Z80. There is no bytecode interpreter and no garbage collector.
+It is a translator, so the running program is native Z80. There is no bytecode interpreter and no tracing garbage
+collector.
 
 The program entry point is `public static void mainz()`. The plugin reads a JAR (the project JAR by default), translates
 its classes, and writes assembler (`.a80`), a raw binary (`.bin`), or a ZX Spectrum 48K snapshot (`.sna`). Output
 formats, the start address, and the stack top are described in [docs/configuration.txt](docs/configuration.txt).
 
-The ZX Spectrum example draws a line-art portrait, an attribute Mandelbrot, and float/double curves, and waits for SPACE
-between pictures.
+The ZX Spectrum example draws a line-art portrait, an attribute Mandelbrot, a star field that `Heap.forget` releases,
+and float/double curves. SPACE moves from one picture to the next. The portrait line shows the current `Heap.top()`
+in hex (`press space (top #FAD0)`), so a later pass can be checked against the same address.
 
 ![Screenshot](docs/j2z80_hello_world.gif)
 
@@ -26,8 +28,7 @@ public static void mainz() {
     waitForSpace();
     showOverview();
     waitForSpace();
-    showZoom();
-    waitForSpace();
+    showStars();
     showCurves();
     waitForSpace();
   }
@@ -40,7 +41,8 @@ Classes, fields, constructors, virtual and interface calls, `instanceof`, and `c
 `null` succeeds. A method may use fewer than 64 local slots, because locals are addressed with a signed IX displacement.
 A `long` or a `double` occupies two slots. Enums are rejected. `synchronized` is ignored: the machine is
 single-threaded, and `monitorenter` / `monitorexit` only drop the reference. The standard Java library is absent.
-`java.lang.Object` provides `<init>` and `hashCode` (the object address). There is no `String` type with methods; a
+`java.lang.Object` provides `<init>` and `hashCode` (the object address). `j2z80.Heap` rewinds the bump heap; see
+[Objects and the heap](#objects-and-the-heap). There is no `String` type with methods; a
 string literal is a length byte followed by raw 8-bit characters, at most 255 of them, and every character must fit in 8
 bits.
 
@@ -122,11 +124,17 @@ because `multianewarray` of `long` or `double` is not implemented. One-dimension
 
 Nothing checks the index or the reference. An index past the end writes whatever follows the array in memory.
 
-## Objects
+## Objects and the heap
 
 `new` allocates an instance on a bump heap. The heap grows upward from a fixed start, and the stack grows downward from
-the stack top. The allocator writes a size word and a class id, then zeroes the fields. The reference points at the
-first field. When the heap meets the stack, further allocation overwrites the stack.
+the stack top. The free memory is the gap between `Heap.top()` and the stack. When the heap meets the stack, further
+allocation overwrites the stack. There is no check and no exception.
+
+Each instance starts with a 4-byte header: a word that counts field cells (one cell is two bytes), then a word that
+holds
+the class id. The reference points at the first field, four bytes after that header, and `hashCode()` returns that
+reference. The allocator zeroes the fields. Every address is a signed 16-bit value, so an address at or above 32768
+reads as a negative `int`.
 
 ```java
 public class Point {
@@ -142,9 +150,37 @@ public class Point {
 Point point = new Point(10, 20);
 ```
 
-There is no way to remove an object or an array. Dropping the last reference does not return the memory, and there is no
-`free`, no finalizer, and no collection cycle. Every `new` and every heap array stays until the program ends. Plan
-allocations so they fit in the gap between the heap start and the stack.
+Nothing collects garbage. Dropping the last reference does not release memory, and there is no finalizer. The release
+is `j2z80.Heap.forget`, which rewinds the bump pointer. `java.lang.Object` has no `forget()`.
+
+```java
+import j2z80.Heap;
+
+int mark = Heap.top();
+StarField sky = new StarField();
+Heap.
+
+forget(sky);
+```
+
+`Heap.forget(sky)` sets the bump pointer back to the address it had before `sky` was created. That address is the
+instance reference minus 4, and it is the same value `mark` holds. That instance and every instance allocated after it
+are released, and the next `new` reuses the space. Instances allocated earlier stay where they are.
+`Heap.forget(null)` does nothing. A forgotten reference is still a bit pattern in a local or a field: do not use it,
+and do not use anything that was allocated after it.
+
+`Heap.forget` applies to a class instance from `new`. An array has a 3-byte header (a size byte and a length word), so
+passing an array does not rewind to that array. A heap array stays until a later `Heap.forget` on an instance allocated
+before it rewinds over the array, or until the program ends. Allocate the owner first, then the arrays and the child
+instances. Forgetting the owner releases all of them.
+
+`Heap.top()` returns the bump pointer, the address where the next instance will be allocated, in the same signed 16-bit
+form as `hashCode()`.
+
+The Spectrum star field follows this pattern. `new StarField()` runs first, and its constructor then allocates
+`Star[256]` and 256 `Star` objects. SPACE calls `Heap.forget` on that `StarField`, which releases the array and every
+star. The portrait line prints `Heap.top()` in hex, so the address after that rewind can be compared with the address
+from the previous pass.
 
 ## Embedded arrays
 

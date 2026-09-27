@@ -269,6 +269,21 @@ j2z80.spectrum.Screen.at#[II]V:
     POP BC
     RET
 
+j2z80.spectrum.Screen.print#[I]V:
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    LD B,(IX-0)
+    CALL ZX.ROM.READY
+    LD A,#01
+    CALL ZX.CHAN.OPEN
+    LD A,B
+    RST 16
+    POP HL
+    POP DE
+    POP BC
+    RET
+
 j2z80.spectrum.Screen.frame#[]V:
     PUSH BC
     LD BC,#0C00

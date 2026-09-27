@@ -10,14 +10,17 @@ import static java.util.stream.Collectors.toList;
 import com.igormaznitsa.j2z80.TranslatorLogger;
 import com.igormaznitsa.j2z80.translator.TranslatorImpl;
 import com.igormaznitsa.j2z80.translator.optimizator.OptimizationLevel;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Stream;
@@ -25,6 +28,7 @@ import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import org.apache.bcel.generic.Type;
 
@@ -37,6 +41,8 @@ public final class JavaZ80Run {
 
   private final String mainClassName;
   private final Map<String, String> sources = new LinkedHashMap<>();
+  private final Map<String, UnaryOperator<byte[]>> classRewrites = new LinkedHashMap<>();
+  private boolean compileAgainstRuntimeClasspath;
   private Program program;
   private Z80Machine machine;
 
@@ -50,6 +56,18 @@ public final class JavaZ80Run {
 
   public JavaZ80Run file(final String relativePath, final String source) {
     this.sources.put(relativePath, source);
+    return this;
+  }
+
+  private static List<Path> runtimeClasspath() {
+    return Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator))
+        .filter(entry -> !entry.isEmpty())
+        .map(Path::of)
+        .collect(toList());
+  }
+
+  public JavaZ80Run withRuntimeClasspath() {
+    this.compileAgainstRuntimeClasspath = true;
     return this;
   }
 
@@ -84,12 +102,25 @@ public final class JavaZ80Run {
     return (short) bits;
   }
 
+  public JavaZ80Run rewrite(final String classFileName, final UnaryOperator<byte[]> rewrite) {
+    this.classRewrites.put(classFileName, rewrite);
+    return this;
+  }
+
+  public int wordAt(final String label) {
+    return this.machine.wordAt(this.program.addressOf(label));
+  }
+
   private void writeSources(final Path sourcesDir) throws IOException {
     for (final Map.Entry<String, String> source : this.sources.entrySet()) {
       final Path file = sourcesDir.resolve(source.getKey());
       createDirectories(file.getParent() == null ? sourcesDir : file.getParent());
       write(file, source.getValue().getBytes(UTF_8));
     }
+  }
+
+  public int addressOf(final String label) {
+    return this.program.addressOf(label);
   }
 
   private void compile(final Path sourcesDir, final Path classesDir) throws IOException {
@@ -102,6 +133,9 @@ public final class JavaZ80Run {
         UTF_8)) {
       final Iterable<? extends JavaFileObject> units =
           files.getJavaFileObjectsFromPaths(this.sourceFiles(sourcesDir));
+      if (this.compileAgainstRuntimeClasspath) {
+        files.setLocationFromPaths(StandardLocation.CLASS_PATH, runtimeClasspath());
+      }
       final Boolean compiled = compiler.getTask(null, files, diagnostics,
           List.of("--release", "11", "-d", classesDir.toString()), null, units).call();
       if (!Boolean.TRUE.equals(compiled)) {
@@ -120,9 +154,14 @@ public final class JavaZ80Run {
          Stream<Path> classFiles = find(classesDir, Integer.MAX_VALUE,
              (path, attributes) -> path.toString().endsWith(".class"))) {
       for (final Path classFile : classFiles.collect(toList())) {
-        archive.putNextEntry(
-            new JarEntry(classesDir.relativize(classFile).toString().replace('\\', '/')));
-        archive.write(java.nio.file.Files.readAllBytes(classFile));
+        final String entryName = classesDir.relativize(classFile).toString().replace('\\', '/');
+        byte[] bytes = java.nio.file.Files.readAllBytes(classFile);
+        final UnaryOperator<byte[]> rewrite = this.classRewrites.get(entryName);
+        if (rewrite != null) {
+          bytes = rewrite.apply(bytes);
+        }
+        archive.putNextEntry(new JarEntry(entryName));
+        archive.write(bytes);
         archive.closeEntry();
       }
     }

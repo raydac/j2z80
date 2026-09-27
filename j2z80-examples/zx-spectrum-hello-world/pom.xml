@@ -11,12 +11,17 @@
     <artifactId>zx-spectrum-hello-world</artifactId>
     <packaging>jar</packaging>
 
-    <description>ZX Spectrum 48 demo: line-art portrait, then a fixed-point Mandelbrot drawn through the spectrum
-        library
+    <description>ZX Spectrum 48 demo: line-art portrait, an attribute Mandelbrot, a star field released with
+        forget(), then float and double curves
     </description>
     <inceptionYear>2012</inceptionYear>
 
     <dependencies>
+        <dependency>
+            <groupId>com.igormaznitsa</groupId>
+            <artifactId>j2z80-api</artifactId>
+            <version>${j2z80.test.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.igormaznitsa</groupId>
             <artifactId>zx-spectrum-demo-lib</artifactId>
