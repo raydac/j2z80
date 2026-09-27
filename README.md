@@ -158,9 +158,7 @@ import j2z80.Heap;
 
 int mark = Heap.top();
 StarField sky = new StarField();
-Heap.
-
-forget(sky);
+Heap.forget(sky);
 ```
 
 `Heap.forget(sky)` sets the bump pointer back to the address it had before `sky` was created. That address is the
