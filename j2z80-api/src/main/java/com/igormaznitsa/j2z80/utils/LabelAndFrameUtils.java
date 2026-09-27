@@ -96,7 +96,8 @@ public final class LabelAndFrameUtils {
    * @see org.apache.bcel.generic.Type
    */
   public static String makeLabelNameForMethod(final String className, final String methodName, final Type resultType, final Type[] argumentTypes) {
-    return makeLabelNameForClass(className) + '.' + methodName + '#' + normalizeString(Type.getMethodSignature(resultType, argumentTypes));
+    return makeLabelNameForClass(className) + '.' + normalizeString(methodName) + '#' +
+        normalizeString(Type.getMethodSignature(resultType, argumentTypes));
   }
 
   /**
@@ -120,7 +121,8 @@ public final class LabelAndFrameUtils {
    * @see org.apache.bcel.generic.Type
    */
   public static String makeLabelNameForField(final String javaClassName, final String fieldName, final Type fieldType) {
-    return makeLabelNameForClass(javaClassName) + '.' + fieldName + '#' + normalizeString(fieldType.getSignature());
+    return makeLabelNameForClass(javaClassName) + '.' + normalizeString(fieldName) + '#' +
+        normalizeString(fieldType.getSignature());
   }
 
   /**
@@ -199,7 +201,8 @@ public final class LabelAndFrameUtils {
    * @return the generated string is the label for the memory area containing the offset data to the field
    */
   public static String makeLabelNameForFieldOffset(final String className, final String fieldName, final Type fieldType) {
-    return makeLabelNameForClass(className) + '.' + fieldName + '#' + normalizeString(fieldType.getSignature()) + "_OFFSET";
+    return makeLabelNameForClass(className) + '.' + normalizeString(fieldName) + '#' +
+        normalizeString(fieldType.getSignature()) + "_OFFSET";
   }
 
   /**
@@ -251,7 +254,7 @@ public final class LabelAndFrameUtils {
    * @return the generated string is the label for the class size information
    */
   public static String makeLabelForClassSizeInfo(final String className) {
-    return "___sizeof<" + className + ">____";
+    return "___sizeof<" + normalizeString(className) + ">____";
   }
 
   /**

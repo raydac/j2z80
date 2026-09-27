@@ -16,6 +16,7 @@
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEVIRTUALManager;
+import com.igormaznitsa.j2z80.translator.EnumSupport;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import java.io.IOException;
@@ -45,6 +46,10 @@ public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements 
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final INVOKEVIRTUAL inv = (INVOKEVIRTUAL) instruction;
+
+    if (EnumSupport.writeOrdinal(methodTranslator, inv, out)) {
+      return;
+    }
 
     final MethodGen invokedMethod = this.getInvokedMethod(methodTranslator, inv);
 

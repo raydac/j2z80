@@ -22,6 +22,8 @@
 - JavaZ80Run compiles a Java class (entry mainz), translates it, runs it on Z80Processor, and reads static int fields. Covered: addition, loops, invokes, tableswitch and lookupswitch, and try/catch/finally (nested, subclass catch, throw from a callee, finally on break).
 - TryCatchFinallyTest also covers finally without exceptions: fall-through, return from try, continue/break, nested finally, finally around a callee invoked from several sites, and sequential try/finally blocks.
 - Exceptions are checked-only. Unchecked types (RuntimeException/Error and subclasses) are rejected at translate time. A method that declares throws clears/sets ___PENDING_EXCEPTION; call sites check that cell and jump to a covering catch or RET to propagate. Local athrow uses the same compile-time handler match (no global unwind table). Arithmetic/checkcast still JP via ___ATHROW_PROCESSING_CODE_ADDRESS (default 0).
+- Record classes translate. java.lang.Record is a bootstrap superclass (constructor only). Compiler equals/hashCode/toString (invokedynamic ObjectMethods) are rewritten before translation. equals is component-wise; a nested record uses that record's equals, other references use identity. hashCode mixes component hashes with 31. toString returns null. A hand-written equals/hashCode/toString without invokedynamic is left as-is.
+- Enum constants translate. java.lang.Enum is a bootstrap superclass: the constructor stores the ordinal in the first payload cell and drops the name pointer. Instance fields start at byte offset 2. values() is rewritten to copy $VALUES (array.clone is not translated). valueOf's body returns null; call sites of name() and valueOf are rejected because there is no String. Enum types that extend java.lang.Enum run their static initializers before other classes, and synthetic $SwitchMap classes drop NoSuchFieldError handlers so switch can translate. compareTo and getDeclaringClass stay unsupported.
 
 ## 2. Architecture & Technical Discoveries
 - Static `byte[] DATA = {…}` is not a class-file blob: javac emits unrolled NEWARRAY+BASTORE in `<clinit>`. StaticByteArrayInitRewriter detects contiguous 0..n-1 fills (n>=16) ending in PUTSTATIC; MethodTranslator emits a ROM-resident array (size byte + length word + payload) and points the static field at the payload — no allocate/LDIR. Writes mutate the image in place.
@@ -37,7 +39,8 @@
 - Nested loops allocate extra local slots beyond args; undersized frames overwrite caller stack / return addresses.
 - Native JNI methods have no Code attribute → BCEL getMaxLocals() is 0; callers must still size the frame from argument count.
 - Embedded assembler (z80asm): IX/IY displacement is signed (-128..127). 8-bit immediates accept -128..255 so both CP -128 and CP 255 assemble. EQU is solved by repeating until stable; a cycle throws. DEFM writes one byte per Java char (0..255). Pattern opcodes are copied so callers cannot mutate the table.
-- Object layout from NEW: 2-byte cell count, 2-byte class id, then fields. The reference is the first field, so the heap top from before `new` is reference - 4. ___MEMORY_FORGET_OBJECT stores that address back into ___MEMORY_MANAGER_TOP_POINTER.
+- Object layout from NEW: 2-byte cell count, 2-byte class id, then fields. The reference is the first field, so the heap top from before `new` is reference - 4. ___MEMORY_FORGET_OBJECT stores that address back into ___MEMORY_MANAGER_TOP_POINTER. An enum adds one cell for the ordinal only on the class whose superclass is java.lang.Enum. Anonymous constant classes (ACC_ENUM, extending the enum) reuse that cell. Abstract non-enums still have size 0; abstract enums do not, because NEW allocates the constant class.
+- Assembler labels run method and field names through normalizeString. `$` in synthetic names (`$VALUES`, `$values`, `$SwitchMap`, `EnumUse$1`) becomes `S`, because `$` is the assembler's location counter. `#` remains the field/method signature separator.
 
 ## 3. Technical Debt & Refactoring
 - Processor_ISTORE uses raw `index << 1` instead of prepareLocalVariableIndex (missing bounds check).
@@ -55,6 +58,7 @@
 - 16-bit int model: mul/div wrap in 16 bits; shifts are 16-bit (IUSHR does not match a 32-bit Java >>>). No array bounds or null checks on field/array access.
 - char is stored as an 8-bit element.
 - Only checked exceptions are supported. Unchecked exceptions (RuntimeException, Error, subclasses) cannot be declared, thrown, caught, or subclassed. Runtime faults (e.g. divide by zero) still reset via ATHROW processing address.
+- Enum.name and Enum.valueOf are rejected at translate time (no String). compareTo and getDeclaringClass are unsupported. Record toString returns null. Record equals uses identity for reference components that are not themselves records. Lambdas (invokedynamic) inside a method are still unsupported.
 - Portrait DATA / static byte[] still count toward the 64K image; compacted byte[] costs ≈ 3 + payload bytes in the program image (field points there; no second heap copy).
 - Heap.forget is a stack rewind, not a tracing collector. A forgotten reference is still a bit pattern in a local or field. Arrays use a 3-byte header, so Heap.forget does not rewind to an array. java.lang.Object has no forget().
 
@@ -63,6 +67,8 @@
 
 ## 7. Useful References
 - mvn22 -pl j2z80-plugin -Dtest=StaticByteArrayInitRewriterTest test
+- mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=RecordRunTest test
+- mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=EnumRunTest test
 - mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=JavaZ80RunTest#compactedStaticByteArrayClinitPreservesContents test
 - docs/jni.txt — IX frame layout, wide args/results, IX must stay frame pointer
 - docs/configuration.txt — jarFile, formats (A80/BIN/SNA), stackTop 65533, goal translate
@@ -71,7 +77,7 @@
 - j2z80-plugin/.../FLOAT_ARITHMETIC_MANAGER.a80 — binary16 add/sub/mul/div/rem, i2f, f2i, cmp
 - j2z80-plugin/.../LONG_ARITHMETIC_MANAGER.a80 — 32-bit long add/sub/mul/div/rem, shifts, compare
 - j2z80-plugin/.../DOUBLE_ARITHMETIC_MANAGER.a80 — binary32 add/sub/mul/div, compare, conversions
-- Z80 emulation tests live in j2z80-tests/main-jar, not in the plugin. Z80Machine runs raw assembly. JavaZ80Run compiles sources, translates them with the plugin, and checks static int fields after mainz. Dependency is com.codingrodent.microprocessor:Z80Processor:4.2.0. Version 5.0.0 needs Java 25; mvn22 runs on JDK 22, and 4.2.0 is the newest jar that JDK can load. Those tests compile with release 17; translated fixtures and the plugin stay release 11.
+- Z80 emulation tests live in j2z80-tests/main-jar, not in the plugin. Z80Machine runs raw assembly. JavaZ80Run compiles sources, translates them with the plugin, and checks static int fields after mainz. Dependency is com.codingrodent.microprocessor:Z80Processor:4.2.0. Version 5.0.0 needs Java 25; mvn22 runs on JDK 22, and 4.2.0 is the newest jar that JDK can load. Those tests compile with release 17; translated fixtures and the plugin stay release 11, except RecordRunTest which compiles fixtures at release 17.
 - mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=ForgetHeapTest test
 - mvn22 -pl j2z80-tests/main-jar -am -Dtest=JavaZ80RunTest,Z80CommandTest,Z80WideArgumentTest test
 - mvn22 -pl j2z80-plugin -DskipTests spotbugs:check

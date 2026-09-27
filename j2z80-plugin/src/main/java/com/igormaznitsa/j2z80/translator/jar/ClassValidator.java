@@ -42,17 +42,7 @@ public enum ClassValidator {
   public static String validateClass(final ClassGen cgen) {
     final MutableObjectContainer<String> result = new MutableObjectContainer<>();
 
-    return checkClassFlags(cgen, result)
-        && checkConstantPool(cgen, result)
-        ? null : result.get();
-  }
-
-  private static boolean checkClassFlags(final ClassGen cgen, final MutableObjectContainer<String> result) {
-    if (cgen.isEnum()) {
-      result.set("Enum is not supported");
-    }
-
-    return result.isNull();
+    return checkConstantPool(cgen, result) ? null : result.get();
   }
 
   private static boolean checkConstantPool(final ClassGen cgen, final MutableObjectContainer<String> result) {

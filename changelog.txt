@@ -1,4 +1,6 @@
 - 2.0.0 (SNAPSHOT)
+    - enum constants, fields, ordinal, values, and switch translate; name and valueOf are rejected because String is not supported
+    - record classes translate, including constructors, accessors, equals, and hashCode; record toString returns null
     - Heap.forget(Object) rewinds the bump heap to that instance, releasing it and every object allocated after it; Heap.top() returns that address
     - ZX Spectrum example replaces the zoomed Mandelbrot with a scattered 256-star field that Heap.forget releases on SPACE; the portrait line shows Heap.top() in hex
     - large static byte[] field initializers use compact in-place ROM data instead of huge fill code

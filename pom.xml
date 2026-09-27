@@ -171,7 +171,7 @@
                         <configuration>
                             <rules>
                                 <enforceBytecodeVersion>
-                                    <maxJdkVersion>11</maxJdkVersion>
+                                    <maxJdkVersion>21</maxJdkVersion>
                                     <ignoredScopes>
                                         <scope>test</scope>
                                         <scope>provided</scope>
@@ -184,7 +184,8 @@
                                     </ignoredScopes>
                                 </banCircularDependencies>
                                 <requireJavaVersion>
-                                    <version>11</version>
+                                    <version>[21,)</version>
+                                    <message>Invalid Java Version! This project requires JDK 21 or higher.</message>
                                 </requireJavaVersion>
                                 <banDuplicateClasses>
                                     <scopes>
@@ -210,7 +211,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <compilerArgument>-Xlint:all</compilerArgument>
-                    <release>11</release>
+                    <release>21</release>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                 </configuration>

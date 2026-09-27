@@ -23,6 +23,7 @@ import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootstrapClass;
 import com.igormaznitsa.j2z80.ids.MethodID;
 import com.igormaznitsa.j2z80.translator.CheckedExceptionSupport;
+import com.igormaznitsa.j2z80.translator.EnumSupport;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import java.io.IOException;
 import java.io.Writer;
@@ -203,6 +204,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
       final ClassLoader bootstrapClassLoader,
       final Writer out
   ) throws IOException {
+    EnumSupport.rejectStringOnlyEnumUse(methodTranslator, instruction);
     final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
     final ObjectType objType = this.getObjectType(methodTranslator, instruction);
     final String methodName = instruction.getMethodName(constantPool);

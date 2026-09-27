@@ -93,7 +93,7 @@ public class ZClassPath {
   }
 
   private Method findMainMethodInClass(final ClassGen classGen, final String mainMethodName, final String mainMethodSignature) {
-    if (!classGen.isInterface() && !classGen.isEnum()) {
+    if (!classGen.isInterface()) {
       for (final Method method : classGen.getMethods()) {
         if (method.isStatic() && mainMethodName.equals(method.getName()) && mainMethodSignature.equals(method.getSignature())) {
           return method;

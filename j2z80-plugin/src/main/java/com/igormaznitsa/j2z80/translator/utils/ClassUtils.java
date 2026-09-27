@@ -83,7 +83,9 @@ public enum ClassUtils {
         || className.equals("java.lang.Throwable")
         || className.equals("java.lang.Exception")
         || className.equals("java.lang.RuntimeException")
-        || className.equals("java.lang.Error")) {
+        || className.equals("java.lang.Error")
+        || className.equals("java.lang.Record")
+        || className.equals("java.lang.Enum")) {
       return true;
     }
     final String bootstrapName = J2Z80_BOOTSTRAP_PACKAGE_PREFIX + '.';
@@ -91,7 +93,9 @@ public enum ClassUtils {
         || (bootstrapName + "java.lang.Throwable").equals(className)
         || (bootstrapName + "java.lang.Exception").equals(className)
         || (bootstrapName + "java.lang.RuntimeException").equals(className)
-        || (bootstrapName + "java.lang.Error").equals(className);
+        || (bootstrapName + "java.lang.Error").equals(className)
+        || (bootstrapName + "java.lang.Record").equals(className)
+        || (bootstrapName + "java.lang.Enum").equals(className);
   }
 
   public static List<Field> findAllFields(final ZClassPath archive, final ClassGen classGen) {
@@ -166,9 +170,28 @@ public enum ClassUtils {
   }
 
 
+  public static int instanceFieldByteOrigin(final ZClassPath classPath, final ClassGen classGen) {
+    return isEnumHierarchy(classPath, classGen) ? 2 : 0;
+  }
+
+  public static boolean isEnumHierarchy(final ZClassPath classPath, final ClassGen classGen) {
+    ClassGen current = classGen;
+    while (current != null) {
+      if (current.isEnum() && "java.lang.Enum".equals(current.getSuperclassName())) {
+        return true;
+      }
+      final String superName = current.getSuperclassName();
+      if (superName == null || isJ2Z80ObjectClass(superName)) {
+        return false;
+      }
+      current = classPath.findClassForName(superName);
+    }
+    return false;
+  }
+
   public static int calculateInstanceSize(final ZClassPath classPath, final ClassGen classGen) {
-    if (classGen.isInterface() || classGen.isEnum() || classGen.isAnnotation() ||
-        classGen.isAbstract()) {
+    if (classGen.isInterface() || classGen.isAnnotation()
+        || (classGen.isAbstract() && !classGen.isEnum())) {
       return 0;
     }
 
@@ -184,8 +207,10 @@ public enum ClassUtils {
       fieldNumber += fld.getType().getSize() * 2;
     }
 
+    final int cells = (fieldNumber << 1) + ("java.lang.Enum".equals(superClass) ? 1 : 0);
+
     if (isJ2Z80ObjectClass(superClass)) {
-      return (fieldNumber << 1);
+      return cells;
     }
 
     final ClassGen superClassGen = classPath.findClassForName(superClass);
@@ -194,7 +219,7 @@ public enum ClassUtils {
           "Not found superclass " + superClass + " for " + classGen.getClassName());
     }
 
-    return (fieldNumber << 1) + calculateInstanceSize(classPath, superClassGen);
+    return cells + calculateInstanceSize(classPath, superClassGen);
   }
 
   public static Method[] findBoostrapAwareMethods(final ClassGen classGen) {

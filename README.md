@@ -39,7 +39,8 @@ public static void mainz() {
 
 Classes, fields, constructors, virtual and interface calls, `instanceof`, and `checkcast` are translated. `checkcast` of
 `null` succeeds. A method may use fewer than 64 local slots, because locals are addressed with a signed IX displacement.
-A `long` or a `double` occupies two slots. Enums are rejected. `synchronized` is ignored: the machine is
+A `long` or a `double` occupies two slots. Enum constants, fields, `ordinal()`, `values()`, and `switch` are translated;
+`name()` and `valueOf` are rejected because there is no String. `synchronized` is ignored: the machine is
 single-threaded, and `monitorenter` / `monitorexit` only drop the reference. The standard Java library is absent.
 `java.lang.Object` provides `<init>` and `hashCode` (the object address). `j2z80.Heap` rewinds the bump heap; see
 [Objects and the heap](#objects-and-the-heap). There is no `String` type with methods; a

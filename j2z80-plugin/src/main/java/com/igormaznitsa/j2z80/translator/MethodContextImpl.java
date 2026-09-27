@@ -58,8 +58,7 @@ class MethodContextImpl implements MethodContext {
         this.methodIds.put(methodId, new ClassMethodInfo(classGen, method, idCounter));
         idCounter++;
 
-        if (!(classGen.isInterface() || classGen.isEnum()) &&
-            !(method.isNative() || method.isAbstract())) {
+        if (!classGen.isInterface() && !(method.isNative() || method.isAbstract())) {
           methodsToProcess.add(methodId);
         }
       }

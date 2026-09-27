@@ -181,6 +181,8 @@ public class TranslatorImpl implements TranslatorContext {
                                 final int stackTop, final String[] patternsExcludeBinResources,
                                 final ClassLoader bootstrapClassLoader)
       throws IOException {
+    RecordSupport.rewrite(this.workingClassPath.getAllClasses(), this.messageLogger);
+    EnumSupport.rewrite(this.workingClassPath.getAllClasses(), this.messageLogger);
     this.classContext.init();
     final List<MethodID> methodsToProcess =
         unmodifiableList(this.methodContext.findMethodsForProcessingInClassPath());
@@ -294,6 +296,7 @@ public class TranslatorImpl implements TranslatorContext {
         return -1;
       }
     });
+    this.runTopLevelEnumInitializersFirst(classesContainStaticInitializing);
 
     final Processor_INVOKESTATIC invokeStaticProc =
         (Processor_INVOKESTATIC) AbstractJvmCommandProcessor.findProcessor(INVOKESTATIC.class);
@@ -307,6 +310,22 @@ public class TranslatorImpl implements TranslatorContext {
     }
 
     return result;
+  }
+
+  private void runTopLevelEnumInitializersFirst(final List<ClassID> initializers) {
+    final List<ClassID> enumTypes = new ArrayList<>();
+    final List<ClassID> others = new ArrayList<>();
+    for (final ClassID id : initializers) {
+      final ClassGen classGen = this.classContext.findClassForID(id);
+      if (classGen.isEnum() && "java.lang.Enum".equals(classGen.getSuperclassName())) {
+        enumTypes.add(id);
+      } else {
+        others.add(id);
+      }
+    }
+    initializers.clear();
+    initializers.addAll(enumTypes);
+    initializers.addAll(others);
   }
 
   private void processIDs(final List<String> list) {
@@ -327,7 +346,7 @@ public class TranslatorImpl implements TranslatorContext {
     for (final ClassGen currentClass : this.workingClassPath.getAllClasses().values()) {
       final List<Field> fieldList = ClassUtils.findAllFields(this.workingClassPath, currentClass);
       final String className = currentClass.getClassName();
-      int offset = 0;
+      int offset = ClassUtils.instanceFieldByteOrigin(this.workingClassPath, currentClass);
       for (final Field f : fieldList) {
         final int width = f.getType().getSize() * 2;
         list.add(

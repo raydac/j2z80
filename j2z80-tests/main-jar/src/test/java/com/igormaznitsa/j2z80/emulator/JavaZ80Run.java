@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +44,7 @@ public final class JavaZ80Run {
   private final Map<String, String> sources = new LinkedHashMap<>();
   private final Map<String, UnaryOperator<byte[]>> classRewrites = new LinkedHashMap<>();
   private boolean compileAgainstRuntimeClasspath;
+  private int languageRelease = 11;
   private Program program;
   private Z80Machine machine;
 
@@ -71,11 +73,17 @@ public final class JavaZ80Run {
     return this;
   }
 
+  public JavaZ80Run languageRelease(final int languageRelease) {
+    this.languageRelease = languageRelease;
+    return this;
+  }
+
   public JavaZ80Run execute() {
     try {
       final Path root = createDirectories(Path.of("target", "z80-java"));
       final Path sourcesDir = createDirectories(root.resolve("src"));
       final Path classesDir = createDirectories(root.resolve("classes"));
+      this.emptyDirectory(classesDir);
       final Path jar = root.resolve(this.mainClassName.replace('.', '-') + ".jar");
       this.writeSources(sourcesDir);
       this.compile(sourcesDir, classesDir);
@@ -123,6 +131,16 @@ public final class JavaZ80Run {
     return this.program.addressOf(label);
   }
 
+  private void emptyDirectory(final Path directory) throws IOException {
+    try (Stream<Path> walk = find(directory, Integer.MAX_VALUE, (path, attributes) -> true)) {
+      for (final Path path : walk.sorted(Comparator.reverseOrder()).collect(toList())) {
+        if (!path.equals(directory)) {
+          java.nio.file.Files.deleteIfExists(path);
+        }
+      }
+    }
+  }
+
   private void compile(final Path sourcesDir, final Path classesDir) throws IOException {
     final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     if (compiler == null) {
@@ -137,7 +155,8 @@ public final class JavaZ80Run {
         files.setLocationFromPaths(StandardLocation.CLASS_PATH, runtimeClasspath());
       }
       final Boolean compiled = compiler.getTask(null, files, diagnostics,
-          List.of("--release", "11", "-d", classesDir.toString()), null, units).call();
+          List.of("--release", Integer.toString(this.languageRelease), "-d", classesDir.toString()),
+          null, units).call();
       if (!Boolean.TRUE.equals(compiled)) {
         throw new IllegalStateException("javac failed: " + diagnostics.getDiagnostics());
       }
