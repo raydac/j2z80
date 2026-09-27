@@ -67,7 +67,9 @@ public class Processor_LDC_W extends AbstractJvmCommandProcessor {
       strvalue = methodTranslator.registerUsedConstantPoolItem(index);
     } else {
       methodTranslator.getTranslatorContext().getLogger().logError("Unsupported constant pool element has been detected [" + cp_constant.toString() + ']');
-      throw new IllegalArgumentException("Unsupported constant pool item detected in LDCW instruction [" + cp_constant.toString() + ']');
+      throw new IllegalArgumentException(
+          "Unsupported constant pool item detected in LDCW instruction [" +
+              cp_constant + ']');
     }
 
     out.write(template.replace(MACROS_ADDRESS, strvalue));

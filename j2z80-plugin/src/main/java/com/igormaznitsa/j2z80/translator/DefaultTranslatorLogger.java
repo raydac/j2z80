@@ -18,7 +18,7 @@ package com.igormaznitsa.j2z80.translator;
 import com.igormaznitsa.j2z80.TranslatorLogger;
 
 /**
- * The class implements a logger to be used by a translator and it prints
+ * The class implements a logger to be used by a translator, and it prints
  * messages into System streams
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)

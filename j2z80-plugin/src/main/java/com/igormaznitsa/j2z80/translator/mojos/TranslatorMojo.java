@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -61,6 +62,8 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
 
   private final MavenProject project;
+
+  private final MavenSession session;
 
   private final ArtifactResolver artifactResolver;
 
@@ -88,8 +91,10 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   @Inject
   public TranslatorMojo(
       final MavenProject project,
+      final MavenSession session,
       final ArtifactResolver artifactResolver
   ) {
+    this.session = session;
     this.project = project;
     this.artifactResolver = artifactResolver;
   }
@@ -215,7 +220,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
       if ("z80".equalsIgnoreCase(artifact.getClassifier())) {
         try {
           final ArtifactResult art =
-              this.artifactResolver.resolveArtifact(this.project.getProjectBuildingRequest(),
+              this.artifactResolver.resolveArtifact(this.session.getProjectBuildingRequest(),
                   artifact);
           final File file = art.getArtifact().getFile();
           foundFiles.add(file.toPath());

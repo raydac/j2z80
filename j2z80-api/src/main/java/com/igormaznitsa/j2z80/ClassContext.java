@@ -16,10 +16,9 @@
 package com.igormaznitsa.j2z80;
 
 import com.igormaznitsa.j2z80.ids.ClassID;
-import org.apache.bcel.generic.ClassGen;
-
 import java.util.List;
 import java.util.Set;
+import org.apache.bcel.generic.ClassGen;
 
 /**
  * The interface describes context to work with classes
@@ -46,7 +45,7 @@ public interface ClassContext {
    * Find all interfaces which are implemented by the class (also it finds interfaces implemented by all class ancestors)
    *
    * @param className the canonical class name, must not be null
-   * @return the list of interfaces which are implemented by the class or one of its ancestor
+   * @return the set of id of interfaces which are implemented by the class or one of its ancestor
    */
   Set<ClassID> findAllClassesImplementInterface(String className);
 

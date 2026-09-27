@@ -91,7 +91,7 @@ public class MethodID {
   }
 
   /**
-   * Get the class Id for the class owns the method
+   * Get the class id for the class owns the method
    *
    * @return the class id object
    */

@@ -41,6 +41,6 @@ public class AsmTranslationException extends RuntimeException {
 
   @Override
   public String toString() {
-    return getMessage() + "\'" + getSrcString() + "\' at " + getLineNumber() + " line";
+    return getMessage() + "'" + getSrcString() + "' at " + getLineNumber() + " line";
   }
 }

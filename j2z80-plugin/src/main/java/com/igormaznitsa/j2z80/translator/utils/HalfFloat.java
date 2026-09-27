@@ -62,7 +62,6 @@ public final class HalfFloat {
     if (roundsUp(fraction & 0x1FFF, halfFraction)) {
       halfFraction++;
       if (halfFraction == 0x400) {
-        halfFraction = 0;
         if (halfExponent + 1 >= 0x1F) {
           return sign | POSITIVE_INFINITY;
         }

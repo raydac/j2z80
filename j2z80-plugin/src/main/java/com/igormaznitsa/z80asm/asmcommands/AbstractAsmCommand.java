@@ -193,9 +193,9 @@ public abstract class AbstractAsmCommand {
       Assertions.assertTrue("A Command must have the same name as its class name [" + name + ']', command.getName().equals(name));
       COMMAND_MAP.put(command.getName(), command);
     } catch (ClassNotFoundException ex) {
-      throw new IllegalArgumentException("Can't find any class for the \'" + name + "\' command", ex);
+      throw new IllegalArgumentException("Can't find any class for the '" + name + "' command", ex);
     } catch (Exception ex) {
-      throw new RuntimeException("Can't instantiate class for the \'" + name + "\' command", ex);
+      throw new RuntimeException("Can't instantiate class for the '" + name + "' command", ex);
     }
   }
 

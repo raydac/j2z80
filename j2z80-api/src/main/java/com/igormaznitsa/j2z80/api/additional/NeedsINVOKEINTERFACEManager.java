@@ -28,7 +28,7 @@ public interface NeedsINVOKEINTERFACEManager extends J2ZAdditionalBlock {
    */
   String SUB_INVOKE_INTERFACE = "___INVOKEINTERFACE";
   /**
-   * The name of the macros which should be replaced by an the invoke address table label
+   * The name of the macros which should be replaced by the invoke address table label
    */
   String MACROS_INVOKEINTERFACE_TABLE = "%invokeinterfacetable%";
 }

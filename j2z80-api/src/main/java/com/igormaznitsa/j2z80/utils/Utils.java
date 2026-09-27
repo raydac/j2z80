@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -92,6 +93,7 @@ public final class Utils {
       try {
         closeableOne.close();
       } catch (IOException ex) {
+        // ignored exception
       }
     }
   }
@@ -108,7 +110,7 @@ public final class Utils {
       throws IOException {
     final BufferedReader reader =
         new BufferedReader(new InputStreamReader(new FileInputStream(file), charSet));
-    final List<String> readString = new ArrayList<String>(256);
+    final List<String> readString = new ArrayList<>(256);
     try {
       while (true) {
         final String line = reader.readLine();
@@ -120,7 +122,7 @@ public final class Utils {
     } finally {
       silentlyClose(reader);
     }
-    return readString.toArray(new String[readString.size()]);
+    return readString.toArray(new String[0]);
   }
 
   /**
@@ -149,7 +151,8 @@ public final class Utils {
       throw new FileNotFoundException("Can't find resource " + resource);
     }
     final StringBuilder builder = new StringBuilder();
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(file, "UTF-8"));
+    final BufferedReader reader = new BufferedReader(new InputStreamReader(file,
+        StandardCharsets.UTF_8));
     try {
       while (true) {
         final String line = reader.readLine();
@@ -197,11 +200,7 @@ public final class Utils {
    * @return a hex string representation of the long
    */
   public static String longToString(final long value) {
-    final StringBuilder result = new StringBuilder();
-
-    result.append(value).append("(#").append(Long.toHexString(value).toUpperCase()).append(')');
-
-    return result.toString();
+    return value + "(#" + Long.toHexString(value).toUpperCase() + ')';
   }
 
   /**
@@ -240,7 +239,7 @@ public final class Utils {
    * @param firstLine           the first line for the result text block, it can be null
    * @param array               a byte array to be converted, must not be null
    * @param maxNumbersPerString the number of values allowed per a line, if -1 then it will be default value
-   * @return a string of lines converted byte values into asm compatible representation
+   * @return asm string lines representing converted array data
    */
   public static String[] byteArrayToAsm(final String firstLine, final byte[] array,
                                         final int maxNumbersPerString) {
@@ -272,7 +271,7 @@ public final class Utils {
   }
 
   /**
-   * Check a path for its compatibility with a ANT styled pattern
+   * Check a path for its compatibility with an ANT styled pattern
    *
    * @param path       a path to be checked, must not be null
    * @param antPattern a pattern to be used to check the path, must not be null

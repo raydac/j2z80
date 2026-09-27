@@ -123,9 +123,9 @@ public class AsmCommandLD extends AbstractAsmCommand {
 
     if (leftPartIsRegister && rightPartIsRegister) {
       return getPatternCase(asm.getSignature());
-    } else if (leftPartIsRegister && !rightPartIsRegister) {
+    } else if (leftPartIsRegister) {
       return getMachineCodeWhenLeftRegister(context, asm, leftPart, rightPart);
-    } else if (!leftPartIsRegister && rightPartIsRegister) {
+    } else if (rightPartIsRegister) {
       return getMachineCodeWhenRightRegister(context, asm, leftPart, rightPart);
     } else {
       return nonregisterAtBothPart(context, asm, leftPart, rightPart);

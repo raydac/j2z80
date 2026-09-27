@@ -178,8 +178,7 @@ public class MethodTranslator {
     final String fieldLabel = LabelAndFrameUtils.makeLabelNameForField(
         match.getClassName(), match.getFieldName(), match.getFieldType());
 
-    return ""
-        + "    LD BC," + compacted.templateLabel + AbstractJvmCommandProcessor.NEXT_LINE
+    return "    LD BC," + compacted.templateLabel + AbstractJvmCommandProcessor.NEXT_LINE
         + "    LD (" + fieldLabel + "),BC" + AbstractJvmCommandProcessor.NEXT_LINE;
   }
 

@@ -37,7 +37,7 @@ public enum ClassValidator {
    * Check a class to be compatible with the translator
    *
    * @param cgen a parsed compiled java class, must not be null
-   * @return null if the class is compatible and a incompatibility message string if the class is not compatible
+   * @return null if the class is compatible and an incompatibility message string if the class is not compatible
    */
   public static String validateClass(final ClassGen cgen) {
     final MutableObjectContainer<String> result = new MutableObjectContainer<>();
@@ -70,7 +70,9 @@ public enum ClassValidator {
 
         for (final char chr : str.toCharArray()) {
           if ((chr & 0xFF00) != 0) {
-            result.set("Detected a 16 bit coded symbol \'" + chr + "\', but only 8 bit chars allowed [\'" + str + "\']");
+            result.set("Detected a 16 bit coded symbol '" + chr +
+                "', but only 8 bit chars allowed ['" + str +
+                "']");
             break;
           }
         }

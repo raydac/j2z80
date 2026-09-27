@@ -69,7 +69,8 @@ public class Processor_NEWARRAY extends AbstractJvmCommandProcessor implements N
       }
       break;
       default: {
-        throw new IllegalArgumentException("Unsupported argument for NEWARRAY operation [" + newarray.getType().toString() + ']');
+        throw new IllegalArgumentException("Unsupported argument for NEWARRAY operation [" +
+            newarray.getType() + ']');
       }
     }
 

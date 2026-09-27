@@ -341,11 +341,13 @@ public class ParsedAsmLine {
   private static boolean safeEquals(final Object obj1, final Object obj2) {
     if (obj1 == null) {
       return obj2 == null;
-    } else if (obj2 == null) {
-      return obj1 == null;
-    } else {
-      return obj1.equals(obj2);
     }
+
+    if (obj2 == null) {
+      return false;
+    }
+
+    return obj1.equals(obj2);
   }
 
   public String getLabel() {

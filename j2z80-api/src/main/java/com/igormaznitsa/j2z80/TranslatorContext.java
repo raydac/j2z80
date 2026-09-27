@@ -32,12 +32,12 @@ public interface TranslatorContext {
   /**
    * The main method name.
    */
-  public static final String Z80_MAIN_METHOD_NAME = "mainz";
+  String Z80_MAIN_METHOD_NAME = "mainz";
 
   /**
    * The main method signature.
    */
-  public static final String Z80_MAIN_METHOD_SIGNATURE = Type.getMethodSignature(Type.VOID, new Type[0]);
+  String Z80_MAIN_METHOD_SIGNATURE = Type.getMethodSignature(Type.VOID, new Type[0]);
 
   /**
    * Translate compiled java classes into assembler text

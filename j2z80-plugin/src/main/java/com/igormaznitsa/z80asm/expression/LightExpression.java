@@ -72,7 +72,6 @@ public class LightExpression {
             if (result.length() == 0) {
               result.append("\"");
               insideString = true;
-              specialChar = false;
             } else {
               position--;
               atWorking = false;
@@ -127,9 +126,6 @@ public class LightExpression {
                   break;
                 case 'f':
                   result.append('\f');
-                  break;
-                case '"':
-                  result.append('\"');
                   break;
                 case '\'':
                   result.append('\'');
@@ -228,7 +224,7 @@ public class LightExpression {
         if (lastOperandStack == null) {
           if (lastOperation != null) {
             if ("-".equals(lastOperation)) {
-              lastOperandStack = 0 - operand;
+              lastOperandStack = -operand;
             } else {
               lastOperandStack = operand;
             }

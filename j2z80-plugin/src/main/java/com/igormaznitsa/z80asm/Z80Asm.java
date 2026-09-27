@@ -166,7 +166,7 @@ public class Z80Asm implements AsmTranslator {
     Assertions.assertTrue("Not-found some local labels " + Arrays.toString(localLabelExpectants.keySet().toArray()), localLabelExpectants.isEmpty());
   }
 
-  // return true if need to interrupt processing, otherwise false
+  // return true if you need to interrupt processing, otherwise false
   private boolean processOneLine(final String asmString, final int stringIndex) {
     final ParsedAsmLine parsed = new ParsedAsmLine(asmString);
 

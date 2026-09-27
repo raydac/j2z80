@@ -66,7 +66,7 @@ public abstract class AbstractJvmCommandProcessor {
    */
   public static final String MACROS_POSTFIX = "%postfix%";
   /**
-   * The macros name to be used for a object reference offset replacement
+   * The macros name to be used for an object reference offset replacement
    */
   public static final String MACROS_OBJREFOFFSET = "%objrefoffset%";
   /**

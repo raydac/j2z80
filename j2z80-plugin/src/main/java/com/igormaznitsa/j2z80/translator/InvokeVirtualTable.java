@@ -144,7 +144,7 @@ public class InvokeVirtualTable {
   }
 
   /**
-   * The class describes a record in a invoke virtual table
+   * The class describes a record in an invoke virtual table
    *
    * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
    */

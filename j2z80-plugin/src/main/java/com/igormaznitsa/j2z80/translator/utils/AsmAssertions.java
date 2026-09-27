@@ -60,7 +60,7 @@ public enum AsmAssertions {
   }
 
   /**
-   * Check that an integer can represent 16 bit address
+   * Check that an integer can represent 16-bit address
    *
    * @param value an integer value to be checked
    */
