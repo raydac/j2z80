@@ -70,6 +70,7 @@
 - mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=RecordRunTest test
 - mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=EnumRunTest test
 - mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=JavaZ80RunTest#compactedStaticByteArrayClinitPreservesContents test
+- README.md — Records and Enums: accessors, equals, hashCode, toString null; ordinal, values, fields, switch; name and valueOf rejected
 - docs/jni.txt — IX frame layout, wide args/results, IX must stay frame pointer
 - docs/configuration.txt — jarFile, formats (A80/BIN/SNA), stackTop 65533, goal translate
 - docs/asm.md — signed displacements, -128..255 immediates, forward EQU, DEFM bytes

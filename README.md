@@ -39,8 +39,8 @@ public static void mainz() {
 
 Classes, fields, constructors, virtual and interface calls, `instanceof`, and `checkcast` are translated. `checkcast` of
 `null` succeeds. A method may use fewer than 64 local slots, because locals are addressed with a signed IX displacement.
-A `long` or a `double` occupies two slots. Enum constants, fields, `ordinal()`, `values()`, and `switch` are translated;
-`name()` and `valueOf` are rejected because there is no String. `synchronized` is ignored: the machine is
+A `long` or a `double` occupies two slots. Records and enums are translated, with the limits in
+[Records](#records) and [Enums](#enums). `synchronized` is ignored: the machine is
 single-threaded, and `monitorenter` / `monitorexit` only drop the reference. The standard Java library is absent.
 `java.lang.Object` provides `<init>` and `hashCode` (the object address). `j2z80.Heap` rewinds the bump heap; see
 [Objects and the heap](#objects-and-the-heap). There is no `String` type with methods; a
@@ -180,6 +180,103 @@ The Spectrum star field follows this pattern. `new StarField()` runs first, and 
 `Star[256]` and 256 `Star` objects. SPACE calls `Heap.forget` on that `StarField`, which releases the array and every
 star. The portrait line prints `Heap.top()` in hex, so the address after that rewind can be compared with the address
 from the previous pass.
+
+## Records
+
+A record is translated as a class: final component fields, a constructor, and an accessor for each component. The
+compiler writes `equals`, `hashCode`, and `toString` as `invokedynamic`, which is not translated, so those three methods
+are rewritten first.
+
+```java
+public record Point(int x, int y) {
+  public int sum() {
+    return this.x + this.y;
+  }
+}
+
+Point left = new Point(3, 4);
+Point right = new Point(3, 4);
+boolean same = left.equals(right);
+int hash = left.hashCode();
+```
+
+`equals` walks the components. A component that is itself a record uses that record's `equals`. A `long` or a `double`
+component is compared as its two words, and a `float` component is compared by its bits. Any other reference is compared
+by identity, the same test as `==`. `left.equals(null)` is false. `hashCode` mixes those component hashes into a 16-bit
+`int`, so two equal records share a hash and a different component usually changes it. `toString()` returns `null`.
+
+If you write `equals`, `hashCode`, or `toString` yourself, and that body does not use `invokedynamic`, the method is
+translated as written. A lambda or a method reference is rejected, in a record and in any other class.
+
+## Enums
+
+An enum constant is an instance. `ordinal()`, `values()`, instance fields, a method body on a constant, and `switch` are
+translated. `==` tells two constants apart by identity.
+
+```java
+public enum Color {
+  RED, GREEN, BLUE
+}
+
+public enum Planet {
+  EARTH(9), MARS(3);
+
+  private final int mass;
+
+  Planet(final int mass) {
+    this.mass = mass;
+  }
+
+  public int mass() {
+    return this.mass;
+  }
+}
+
+int green = Color.GREEN.ordinal();
+Color blue = Color.values()[2];
+int earth = Planet.EARTH.mass();
+
+int selected;
+switch (Color.GREEN) {
+  case RED:
+    selected = 1;
+    break;
+  case GREEN:
+    selected = 2;
+    break;
+  default:
+    selected = 9;
+    break;
+}
+```
+
+`Color.RED.ordinal()` is 0 and `Color.GREEN.ordinal()` is 1. `values()` returns a new array of those same constants on
+every call. Storing into a slot of that array leaves the enum's own constants alone, so the next `values()` still
+starts with `RED`.
+
+A constant may be its own class and override a method:
+
+```java
+public enum Op {
+  ADD {
+    public int apply(final int left, final int right) {
+      return left + right;
+    }
+  },
+  SUB {
+    public int apply(final int left, final int right) {
+      return left - right;
+    }
+  };
+
+  public abstract int apply(int left, int right);
+}
+
+int sum = Op.ADD.apply(20, 22);
+```
+
+`name()` and `valueOf` are rejected when the class is translated, because there is no `String`. The constant's name is
+not available at run time. `compareTo` and `getDeclaringClass` are not supported.
 
 ## Embedded arrays
 
