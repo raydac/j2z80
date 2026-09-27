@@ -18,6 +18,13 @@ Local labels may be redefined. A local label name starts with the `@` character.
 To avoid name collisions or unexpected behavior, all currently known local labels can be cleared using the `CLRLOC`
 directive.
 
+## Operand rules
+
+- Mnemonics and register operands are matched case-insensitively (`ld a,(bc)`, `JP (IY)`, and so on).
+- IX/IY displacements are signed bytes in **-128..127** (for example `ADD A,(IX-1)`).
+- Immediate 8-bit operands accept **-128..255**, so both `CP -128` and `CP 255` assemble.
+- `LD (SP),n` is rejected (not a documented instruction).
+
 ## Special Directives
 
 **ENT `<address>`**  
@@ -33,7 +40,7 @@ Stores one or more byte values in memory (one memory cell per value).
 Stores one or more word values in memory (two memory cells per value).
 
 **DEFM `<string>`**  
-Stores a string in memory, using 8 bits per character.
+Stores a string as raw bytes: one byte per Java character in the range 0..255. Characters above 255 are rejected.
 
 **DEFS `<length>`**  
 Reserves a block of memory of the specified length in bytes.
@@ -42,7 +49,8 @@ Reserves a block of memory of the specified length in bytes.
 Clears all previously defined local labels.
 
 **`<label>:` EQU `<expression>`**  
-Assigns a numeric value to a label.
+Assigns a numeric value to a label. Forward EQU chains are resolved by repeated evaluation until values stabilize; a
+circular dependency throws.
 
 ## Expressions
 
@@ -64,4 +72,4 @@ Strings support the following escape sequences:
 - `\b` — backspace
 - `\"` — double quote
 - `\'` — single quote
-- `\\` — backslash  
+- `\\` — backslash

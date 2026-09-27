@@ -1,61 +1,75 @@
 Because the translator is a maven plugin, it can be configured.
 
+Goal and artifact
+-----------------
+Artifact: com.igormaznitsa:j2z80-plugin
+Goal: translate (default phase: install)
+
 Parameters
 -------------
-1. <jar>...</jar>
-There you should place the path to the jar which should be translated. The default value is ${project.build.directory}/${project.build.finalName}.jar so that in the default case you will translate your project result jar file.
+1. <jarFile>...</jarFile>
+Path to the jar which should be translated.
+Default: ${project.build.directory}${file.separator}${project.build.finalName}.jar
 
-2. <result>...</result>
-There you should place the path to the result file. The default value is ${project.build.directory}/${project.build.finalName}.bin
+2. <formats>...</formats>
+Set of output formats. Allowed values: A80, BIN, SNA.
+Default: A80 only.
+ - A80 — assembler source written to ${project.build.directory}/${project.build.finalName}.a80
+ - BIN — raw binary written to ${project.build.directory}/${project.build.finalName}.bin
+ - SNA — ZX Spectrum 48K snapshot written to ${project.build.directory}/${project.build.finalName}.sna
 
-3. <format>...</format>
-The parameter allows to choose the result file format. At present only 'bin' format (and it is the default one) is supported.
+                   <formats>
+                            <format>A80</format>
+                            <format>BIN</format>
+                            <format>SNA</format>
+                   </formats>
 
-4. <startAddress>...</startAddress>
-The parameter allows to set the start address of translated code. The first byte of the translated code will have the address. The default value is 28672.
+3. <startAddress>...</startAddress>
+Start address of the translated code (first byte). Default: 28672.
+For SNA, the address must be in 0x4000..0xFFFF.
 
-5. <stackTop>...</stackTop>
-The parameter allows to set the stack top value for the translated file, the default value is 65534.
+4. <stackTop>...</stackTop>
+Stack top for the translated program. Default: 65533.
+For SNA, the value must be in 0..0xFFFD.
 
-6. <logAsmText>...</logAsmText>
-It's a boolean parameter which allows to switch on logging of the translated ASM text on a console.
+5. <logAsmText>...</logAsmText>
+Boolean. If true, the translated assembler text is logged to the console. Default: false.
 
-7. <asmOutFile>...</asmOutFile>
-If you define the parameter then the translator will save the translated assembler text into the file.
-
-8. <excludeResources>...</excludeResources>
-Very often we can meet some special resources in jar files like MANIFEST.MF or some special property files. We don't need to have they in our result file and the configuration parameter can help us to exclude them all.
+6. <excludeResources>...</excludeResources>
+Resource patterns to exclude from embedding into the result.
 
                    <excludeResources>
                             <value>/**/*.xml</value>
                             <value>/**/*.properties</value>
-                            <value>/**/manifest.mf</value>
-                    </excludeResources>
+                            <value>/**/*.mf</value>
+                   </excludeResources>
 
-9. <optimization>...</optimization>
-The parameter allows to set the optimization level, not there are only two levels are accessible:
- - none (default) - it makes nothing
- - base - it just removes unecessary stack command pairs like PUSH HL POP HL
+7. <optimization>...</optimization>
+Optimization level:
+ - NONE (default) — no stack-pair cleanup
+ - BASIC — removes unnecessary stack command pairs such as PUSH HL / POP HL
 
-Independently of <optimization>, the translator always compacts large static byte[] initializers in <clinit>.
-A contiguous fill of 16 or more elements (NEWARRAY byte, then DUP/index/value/BASTORE for indices 0..n-1, then PUTSTATIC)
-is replaced by a ROM-resident array (3-byte header + DEFB payload). The static field points at that memory;
-there is no heap copy. Stores into the array write the program image in place (acceptable on RAM-loaded Z80 targets).
+Independently of <optimization>, the translator always compacts large static byte[]
+initializers in <clinit>. A contiguous fill of 16 or more elements (NEWARRAY byte,
+then DUP/index/value/BASTORE for indices 0..n-1, then PUTSTATIC) is replaced by a
+ROM-resident array (3-byte header + DEFB payload). The static field points at that
+memory; there is no heap copy. Stores into the array write the program image in place
+(acceptable on RAM-loaded Z80 targets).
 
 Dependencies
 ----------------------
-The plugin allows to use project dependenices as libraries. To use a jar file as a library the jar file must have the z80 classifier.
+The plugin uses project dependencies as libraries when the jar has the z80 classifier.
 
 Example:
 
     <dependencies>
         <dependency>
             <groupId>com.igormaznitsa</groupId>
-            <artifactId>Test_ExtJar</artifactId>
-            <version>1.0}</version>
+            <artifactId>zx-spectrum-demo-lib</artifactId>
+            <version>${j2z80.test.version}</version>
             <classifier>z80</classifier>
-        </dependency>    
-    </dependencies>    
+        </dependency>
+    </dependencies>
 
 
 
@@ -65,29 +79,34 @@ Example of the plugin configuration
         <plugins>
             <plugin>
                 <groupId>com.igormaznitsa</groupId>
-                <artifactId>J2Z80-Translator</artifactId>
-                <version>1.0</version>
+                <artifactId>j2z80-plugin</artifactId>
+                <version>2.0.0-SNAPSHOT</version>
                 <executions>
                     <execution>
-                        <phase>integration-test</phase>
+                        <phase>install</phase>
                         <goals>
-                            <goal>translate2z80</goal>
+                            <goal>translate</goal>
                         </goals>
+                        <configuration>
+                            <formats>
+                                <format>A80</format>
+                                <format>BIN</format>
+                                <format>SNA</format>
+                            </formats>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
+                    <optimization>BASIC</optimization>
+                    <startAddress>28672</startAddress>
+                    <stackTop>65533</stackTop>
+                    <logAsmText>false</logAsmText>
                     <excludeResources>
                             <value>/**/*.xml</value>
                             <value>/**/*.properties</value>
-                            <value>/**/manifest.mf</value>
+                            <value>/**/*.mf</value>
                     </excludeResources>
-                    <optimization>base</optimization>
-                    <startAddress>29000</startAddress>
-                    <stackTop>60000</stackTop>
-                    <logAsmText>true</logAsmText>
-                    <asmOutFile>${asmFile}</asmOutFile>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    

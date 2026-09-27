@@ -3,11 +3,30 @@ The Translator supports JNI calls to native code.
 
 Register usage
 ---------------
-The alternate register set can be used without restrictions. The HL,BC,DE values should be saved and restored before return. IY can be changed. IX is the frame index register and can be changed because it will be restored from the stack by the calling code. AF can be changed.
+The alternate register set can be used without restrictions. HL, BC and DE should be
+saved and restored before return unless they hold the method result (see below).
+IY may be changed. AF may be changed.
+
+IX is the frame pointer for the current invoke. Do not leave IX pointing elsewhere
+when you return: ___AFTER_INVOKE restores SP from the current IX, then pops the
+previous IX from the frame. If a ROM routine or helper borrows IX, push IX before
+the call and pop it afterward (see Spectrum Sound.tone).
+
 
 JNI call
 -------------
-Each call of JNI method creates a stack frame contains arguments for the method call. If the method is not a static one then the first argument will be the address of the class instance. The IX register contains the pointer to the first element of the frame and is being used as an index register.
+Each call of a JNI method creates a stack frame that contains the arguments.
+If the method is not static, the first argument is the address of the class instance.
+IX points at the first word of the frame and is used as the index register.
+
+Argument sizes (each slot is one 16-bit word, two bytes):
+ - boolean, byte, char, short, int, float, reference: one slot
+ - long, double: two slots; the low word is in the first slot (lower IX offset),
+   the high word in the next slot
+
+Before the frame is built, the translator exchanges each long/double pair on the
+operand stack so the low word lands in the first frame slot.
+
 
 a non static method
 -------------------
@@ -16,7 +35,7 @@ native void method(Object A, int B, int C)
 (IX-0)     ; Instance address (low byte)
 
 (IX-2+1) ; Object A (high byte)
-(IX-2) ; Object A (low byte
+(IX-2) ; Object A (low byte)
 
 (IX-4+1) ; Int B (high byte)
 (IX-4) ; Int B (low byte)
@@ -28,7 +47,7 @@ a static method
 -------------------
 native static void method(Object A, int B, int C)
 (IX-0+1) ; Object A (high byte)
-(IX-0) ; Object A (low byte
+(IX-0) ; Object A (low byte)
 
 (IX-2+1) ; Int B (high byte)
 (IX-2) ; Int B (low byte)
@@ -36,28 +55,68 @@ native static void method(Object A, int B, int C)
 (IX-4+1) ; Int C (high byte)
 (IX-4) ; Int C (low byte)
 
+a static method with a wide argument
+------------------------------------
+native static void method(long L, int N)
+(IX-0+1) ; L low word (high byte)
+(IX-0)   ; L low word (low byte)
+
+(IX-2+1) ; L high word (high byte)
+(IX-2)   ; L high word (low byte)
+
+(IX-4+1) ; Int N (high byte)
+(IX-4)   ; Int N (low byte)
+
+The same two-slot layout applies to double. Float occupies a single slot (IEEE binary16).
 
 
 JNI result
 --------------
-If a jni method should return a result, it can be returned through the BC register. If the method returns the void result then it should make just return and the value of BC will not be used by the calling code.
+void: any BC/DE values are ignored.
+
+int, boolean, byte, char, short, float, or reference: return the value in BC.
+
+long or double: return the low word in BC and the high word in DE.
+___AFTER_INVOKE preserves both BC and DE across frame teardown.
 
 
 Memory management
 -------------------
-The translator has the special module called "Memory manager", you can notify the Translator about your need to use the module through implementation of the com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager interface by your class and in the case the manager will be included into the result code. The manager has auxiliary methods allow to work with memory areas, arrays and objects. Reference and labels can be found in the interface source.
-The heap and the stack are growing towards each other. The stack grows top-down and the memory heap grows bottom-up.
-At present there is only possibility to reserve some memory block for your needs inside of a translated program, it is the usage of the DEFS assembler directive inside a JNI asm sources. To allocate dynamic memory areas in your program, the "new byte[]" command can be used.
+The translator has a "Memory manager" module. Notify the Translator that you need it
+by implementing com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager on your class;
+the manager is then included in the result. Labels and helpers are declared on that
+interface (___BEFORE_INVOKE, ___AFTER_INVOKE, allocation routines, and so on).
+
+Related additions (included only when used): NeedsFloatArithmeticManager,
+NeedsLongArithmeticManager, NeedsDoubleArithmeticManager, and others under
+com.igormaznitsa.j2z80.api.additional.
+
+The heap and the stack grow towards each other. The stack grows top-down and the
+heap grows bottom-up.
+
+To reserve a static block inside a translated program, use the DEFS directive in a
+JNI asm source. For dynamic areas, use new byte[] (or other array/object allocation).
 
 
 Assembler
 -----------
-The assembler which is being used is not very powerful one and supports only documented commands. When the translator meets a native method it an assembler source (which has ".a80",".asm" or ".z80" extension) file near the class and with the same name as the class name. I think that there should be way to include precompiled blocks but I need some time to think about it.
+The embedded assembler supports only documented Z80 instructions. When the translator
+meets a native method, it looks for an assembler source with the same name as the class
+and extension .a80, .asm, or .z80 (typically as a classpath resource next to the class).
+
+See docs/asm.md for directives and operand rules.
+
 
 The Upper-memory (different memory extenders 128K, 256K, 1024K)
 --------------------------------------------------------------------
-The translator knows nothing about different memory extenders and works only with the regular 64Kb memory area.
+The translator knows nothing about memory extenders and works only with the regular
+64Kb address space.
+
 
 Interruptions and HALT usage
 -------------------------------
-I think it should not make any problem to use interruptions in translated programms, so that HALT can be used too. I didn't make experiments with interruptions.
+Interrupts and HALT may be used, but care is required on ROM-hosted targets such as
+the ZX Spectrum 48K. Leaving interrupts enabled around HALT can let the ROM keyboard
+scan treat SPACE (or other keys) as BREAK and restart BASIC. Spectrum demo natives
+use a short busy delay for frame sync instead of HALT, and call DI after ROM BEEPER.
+Before calling Spectrum ROM routines, set ERR-NR to #FF and clear the new-key flag.
