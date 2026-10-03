@@ -17,7 +17,8 @@ public class StarField {
     for (int i = 0; i < COUNT; i++) {
       across = stir(across, 7, 5, 2);
       down = stir(down, 7, 3, 1);
-      this.stars[i] = new Star(across & 255, down % Screen.HEIGHT, 1 + (across & 3));
+      this.stars[i] = new Star(across & 255, down % Screen.HEIGHT, 1 + (across & 3),
+          (i & 1) == 0 ? StarType.FAST : StarType.SLOW);
     }
   }
 
@@ -35,10 +36,8 @@ public class StarField {
   }
 
   public void draw() {
-    int index = 0;
-    while (index < COUNT) {
-      this.plot(this.stars[index]);
-      index = index + 1;
+    for (final Star star : this.stars) {
+      star.draw();
     }
   }
 
@@ -55,9 +54,7 @@ public class StarField {
   }
 
   private void shift(final Star star) {
-    Screen.unplot(star.x, star.y);
-
     star.move();
-    Screen.plot(star.x, star.y);
+    star.draw();
   }
 }

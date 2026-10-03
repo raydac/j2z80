@@ -57,6 +57,8 @@ public class Screen {
 
   public static native void plot(final int x, final int y);
 
+  public static native void plot(final int x, final int y, final int color);
+
   public static native void unplot(final int x, final int y);
 
   public static native int point(final int x, final int y);

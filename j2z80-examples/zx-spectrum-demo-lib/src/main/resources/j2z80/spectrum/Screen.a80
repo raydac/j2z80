@@ -160,6 +160,51 @@ ZXS.PLOT.OUT:
     POP BC
     RET
 
+j2z80.spectrum.Screen.plot#[III]V:
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    CALL ZXS.COORDS
+    JR NZ,ZXS.PLOT.COLOR.OUT
+    LD A,(IX-2)
+    RRCA
+    RRCA
+    RRCA
+    AND #1F
+    LD L,A
+    LD H,0
+    ADD HL,HL
+    ADD HL,HL
+    ADD HL,HL
+    ADD HL,HL
+    ADD HL,HL
+    LD A,(IX-0)
+    RRCA
+    RRCA
+    RRCA
+    AND #1F
+    LD E,A
+    LD D,0
+    ADD HL,DE
+    LD DE,ZX.ATTRS
+    ADD HL,DE
+    LD A,(HL)
+    AND #F8
+    LD B,A
+    LD A,(IX-4)
+    AND 7
+    OR B
+    LD (HL),A
+    CALL ZXS.COORDS
+    CALL ZXS.PIXEL
+    OR (HL)
+    LD (HL),A
+ZXS.PLOT.COLOR.OUT:
+    POP HL
+    POP DE
+    POP BC
+    RET
+
 j2z80.spectrum.Screen.unplot#[II]V:
     PUSH BC
     PUSH DE
