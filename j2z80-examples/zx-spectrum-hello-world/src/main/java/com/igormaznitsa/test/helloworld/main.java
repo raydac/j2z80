@@ -24,7 +24,9 @@ public class main {
     Screen.clear();
     Screen.clearPixels();
     Screen.border(Screen.GREEN);
-    Portrait.draw();
+    Portrait.draw(Portrait.PANORAMA);
+    Screen.border(Screen.YELLOW);
+    Portrait.draw(Portrait.PORTRAIT);
     Screen.border(Screen.GREEN);
     caption("press space (top #");
     printAddress(Heap.top());
