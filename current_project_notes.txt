@@ -44,6 +44,7 @@
 - Native JNI methods have no Code attribute → BCEL getMaxLocals() is 0; callers must still size the frame from argument count.
 - Embedded assembler (z80asm): IX/IY displacement is signed (-128..127). 8-bit immediates accept -128..255 so both CP -128 and CP 255 assemble. EQU is solved by repeating until stable; a cycle throws. DEFM writes one byte per Java char (0..255). Pattern opcodes are copied so callers cannot mutate the table.
 - Object layout from NEW: 2-byte cell count, 2-byte class id, then fields. The reference is the first field, so the heap top from before `new` is reference - 4. ___MEMORY_FORGET_OBJECT stores that address back into ___MEMORY_MANAGER_TOP_POINTER. An enum adds one cell for the ordinal only on the class whose superclass is java.lang.Enum. Anonymous constant classes (ACC_ENUM, extending the enum) reuse that cell. Abstract non-enums still have size 0; abstract enums do not, because NEW allocates the constant class.
+- JNI resources and their DEFS blocks are emitted before the memory manager; heap starts after the full generated image. This protects image-resident native static data from normal heap growth, but allocations have no stack-top/64K boundary check, and native dynamic allocators are not coordinated.
 - Assembler labels run method and field names through normalizeString. `$` in synthetic names (`$VALUES`, `$values`, `$SwitchMap`, `EnumUse$1`) becomes `S`, because `$` is the assembler's location counter. `#` remains the field/method signature separator.
 
 ## 3. Technical Debt & Refactoring
@@ -58,6 +59,7 @@
 ## 5. Known Issues & Limitations
 - float is half precision, not Java float32. double is binary32, not Java float64. long is 32-bit, not Java's 64-bit long. drem truncates toward zero. Logical long shift is a 32-bit unsigned shift. multianewarray of long or double is not supported.
 - IX displacement limits locals to index 0..64 (assertLocalVariablesNumber uses 64).
+- Memory allocation is an unchecked bump pointer: exhaustion can collide with the downward-growing stack or wrap the 16-bit address space. Heap.forget also trusts its argument; only a valid ordinary live heap object is safe (not arrays, ROM data, or native-owned references).
 - Only documented Z80 instructions in the embedded assembler.
 - 16-bit int model: mul/div wrap in 16 bits; shifts are 16-bit (IUSHR does not match a 32-bit Java >>>). No array bounds or null checks on field/array access.
 - char is stored as an 8-bit element.

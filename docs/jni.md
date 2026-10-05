@@ -212,6 +212,25 @@ stack top-down. Use the assembler's `DEFS` directive in a JNI assembly resource
 to reserve a static block. Dynamic memory can be allocated with `new byte[]` or
 other supported object and array allocations.
 
+JNI assembly and its `DEFS` blocks are included in the generated image before
+the memory manager, so the initial heap pointer is after that static data.
+Ordinary upward heap allocations therefore do not overwrite static native data
+inside the image, as long as the image and stack are placed in non-overlapping
+memory.
+
+The allocator does not check allocations against `SP`, the configured stack
+top, or the 64 KB address-space boundary. Heap/stack collision and address
+wraparound are therefore possible if the program exhausts available memory.
+Native code that allocates dynamic memory must coordinate its memory range with
+the Java heap; the translator does not reserve or track native-managed buffers.
+
+`j2z80.Heap.forget(Object)` is only valid for a non-null ordinary object
+allocated on the Java heap. It rewinds to that object's header and releases it
+and all later allocations. Do not pass arrays, ROM-resident data, or references
+owned by native code: the runtime does not validate the reference or its
+allocation history, and a subsequent allocation can overwrite memory at the
+rewound address.
+
 ## Assembly resources and instruction set
 
 For a native method, the translator can load a class-level assembly resource named
