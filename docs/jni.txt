@@ -28,7 +28,7 @@ Before the frame is built, the translator exchanges each long/double pair on the
 operand stack so the low word lands in the first frame slot.
 
 
-a non static method
+An instance method
 -------------------
 native void method(Object A, int B, int C)
 (IX-0+1)   ; Instance address (high byte)
@@ -43,7 +43,7 @@ native void method(Object A, int B, int C)
 (IX-6+1) ; Int C (high byte)
 (IX-6) ; Int C (low byte)
 
-a static method
+A static method
 -------------------
 native static void method(Object A, int B, int C)
 (IX-0+1) ; Object A (high byte)
@@ -55,7 +55,7 @@ native static void method(Object A, int B, int C)
 (IX-4+1) ; Int C (high byte)
 (IX-4) ; Int C (low byte)
 
-a static method with a wide argument
+A static method with a wide argument
 ------------------------------------
 native static void method(long L, int N)
 (IX-0+1) ; L low word (high byte)
@@ -78,6 +78,22 @@ int, boolean, byte, char, short, float, or reference: return the value in BC.
 
 long or double: return the low word in BC and the high word in DE.
 ___AFTER_INVOKE preserves both BC and DE across frame teardown.
+
+
+Checked exceptions
+------------------
+The translator supports checked exceptions. A translated method that declares
+checked exceptions uses the hidden cell ___PENDING_EXCEPTION to report an exception
+to its caller; zero means no exception is pending. A throw is matched against the
+method's covering catch handlers. If no handler matches, the exception is propagated
+to the caller, which either transfers it to a matching handler or propagates it
+further.
+
+Unchecked exception types (RuntimeException, Error, and their subclasses) are not
+supported. Declarations and catch handlers for these types, and classes that extend
+them, are rejected at translation time. Explicitly throwing an unchecked exception
+is also unsupported. Runtime faults such as integer divide-by-zero and failed
+checkcast still use ___ATHROW_PROCESSING_CODE_ADDRESS, whose default is zero.
 
 
 Memory management
@@ -107,13 +123,13 @@ and extension .a80, .asm, or .z80 (typically as a classpath resource next to the
 See docs/asm.md for directives and operand rules.
 
 
-The Upper-memory (different memory extenders 128K, 256K, 1024K)
+Upper memory (128K, 256K, 1024K memory extenders)
 --------------------------------------------------------------------
 The translator knows nothing about memory extenders and works only with the regular
-64Kb address space.
+64 KB address space.
 
 
-Interruptions and HALT usage
+Interrupts and HALT
 -------------------------------
 Interrupts and HALT may be used, but care is required on ROM-hosted targets such as
 the ZX Spectrum 48K. Leaving interrupts enabled around HALT can let the ROM keyboard
