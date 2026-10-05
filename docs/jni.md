@@ -105,6 +105,7 @@ contains the method descriptor: `[II]V` means two `int` arguments and `void`
 return.
 
 ```asm
+; NativeMemory.a80
 demo.NativeMemory.writeByte#[II]V:
     PUSH HL
     LD H,(IX-0+1) ; address into HL
@@ -117,41 +118,78 @@ demo.NativeMemory.writeByte#[II]V:
 
 The method preserves `HL`, which it uses as a temporary; `AF` may be changed.
 
-## Example 2: `int` method with one argument and a checked exception
+## Example 2: `int` native method with one argument and a checked exception
 
-Checked exceptions are handled for translated Java methods. In this example,
-`parse` takes one `int`, returns an `int`, and declares `Signal`. Its caller
-catches that exception:
+Unlike translated Java methods, a native method's assembly body must maintain the
+pending-exception cell itself. This example uses a pre-created exception object:
+the native function takes one `int`, returns its value when nonnegative, and
+reports `ParseFailure` for a negative value.
 
 ```java
-final class ParseExample {
-  static final class Signal extends Exception {
-  }
+package demo;
 
-  static int parse(int value) throws Signal {
-    if (value < 0) {
-      throw new Signal();
-    }
-    return value;
-  }
+public class ParseFailure extends Exception {
+}
+```
 
-  static int parseOrZero(int value) {
+```java
+package demo;
+
+public class NativeParser {
+  private static final ParseFailure FAILURE = new ParseFailure();
+
+  public static native int parse(int value) throws ParseFailure;
+
+  public static int parseOrZero(int value) {
     try {
       return parse(value);
-    } catch (Signal signal) {
+    } catch (ParseFailure failure) {
       return 0;
     }
   }
 }
 ```
 
-On entry, a translated method declaring checked exceptions clears the hidden
-cell `___PENDING_EXCEPTION`; zero means that no exception is pending. When
-`parse` throws, its exception object is written to this cell. After the call,
-`parseOrZero` checks the cell and transfers the exception to its matching
-covering `catch` handler. If no handler matches, the exception is propagated to
-the caller. The translator resolves handler dispatch while translating the
-method; it does not use a runtime unwind table.
+Put the implementation in `demo/NativeParser.a80`. The label below matches the
+Java declaration `parse(int): int` (`[I]I` is its JVM descriptor). The native
+implementation clears the cell before either outcome, sets it to the exception
+reference on failure, and returns the ordinary result in `BC`:
+
+```asm
+; demo/NativeParser.a80
+demo.NativeParser.parse#[I]I:
+    PUSH HL                      ; preserve caller's HL
+    LD HL,0
+    LD (___PENDING_EXCEPTION),HL ; clear pending exception
+
+    LD C,(IX-0)                  ; argument: int value
+    LD B,(IX-0+1)
+    BIT 7,B                      ; negative signed 16-bit value?
+    JR NZ,NP.FAILURE
+
+    POP HL
+    RET                          ; BC still contains the input value
+
+NP.FAILURE:
+    LD BC,(demo.NativeParser.FAILURE#Ldemo.ParseFailurej)
+    LD (___PENDING_EXCEPTION),BC ; report the exception object
+    LD BC,0                      ; return value is ignored on exception
+    POP HL
+    RET
+```
+
+`___PENDING_EXCEPTION` is the hidden cell used by checked-exception handling.
+The static-field label above is the assembler form of
+`NativeParser.FAILURE`; field descriptors are encoded in labels, with `/`
+replaced by `.` and `;` by `j`. The pre-created exception instance is reused for
+each failure.
+
+After `parse` returns, the translated caller checks the cell. A matching
+covering `catch` handler receives the exception; if none matches, it is
+propagated to the caller. The translator resolves handler dispatch while
+translating the method; it does not use a runtime unwind table. Translated Java
+methods that declare checked exceptions clear the cell on entry and set it when
+returning an exception; native assembly must perform these steps explicitly.
 
 Only checked exception types are supported. Declarations and catch handlers for
 `RuntimeException`, `Error`, or their subclasses, and classes extending those
@@ -182,8 +220,8 @@ load a per-method file named `ClassName#methodName` with one of those extensions
 the method name must be unique in the class. A same-named `.bin` resource can be
 included as raw bytes. Resources are typically stored alongside the class on the
 classpath. The embedded assembler supports documented Z80 instructions and
-project-specific directives; see [Embedded Z80 Assembler](asm.md) for instruction
-operand rules and directives.
+project-specific directives. Operand rules and directives are documented in
+`docs/asm.md`.
 
 ## Address space and interrupts
 

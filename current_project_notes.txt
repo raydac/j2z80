@@ -17,7 +17,7 @@
 - assertLocalVariablesNumber now checks MethodGen.getMaxLocals().
 - Test helper registerMockMethod now applies the maxLocals parameter via setMaxLocals.
 - Frame size floors at argument slots so native methods (maxLocals=0, no Code attribute) still get a valid frame — unblocks main-jar verify.
-- Reworked the JNI guide as docs/jni.md with Markdown examples for a two-argument native void method and a checked-exception int method; docs/configuration.txt and docs/asm.md cover plugin parameters and assembler rules.
+- Reworked the JNI guide as docs/jni.md with embedded Java and assembly snippets for a two-argument native void method and a one-argument native int method that reports a checked exception through ___PENDING_EXCEPTION; examples use inline class-level assembly labels.
 - Started Z80Processor JUnit tests in j2z80-plugin: single commands, a DJNZ loop, a two-word CALL return, and the double-argument word order.
 - JavaZ80Run compiles a Java class (entry mainz), translates it, runs it on Z80Processor, and reads static int fields. Covered: addition, loops, invokes, tableswitch and lookupswitch, and try/catch/finally (nested, subclass catch, throw from a callee, finally on break).
 - TryCatchFinallyTest also covers finally without exceptions: fall-through, return from try, continue/break, nested finally, finally around a callee invoked from several sites, and sequential try/finally blocks.
