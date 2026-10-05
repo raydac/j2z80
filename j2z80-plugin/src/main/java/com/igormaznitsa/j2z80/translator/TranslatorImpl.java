@@ -242,9 +242,8 @@ public class TranslatorImpl implements TranslatorContext {
     this.processIDs(result);
     this.processBinaryData(result);
     this.processStaticByteArrayTemplates(result);
-    this.processAdditions(result);
-
     result.addAll(makeClassSizeArray());
+    this.processAdditions(result);
 
     if (this.optimizationLevel != null && this.optimizationLevel != OptimizationLevel.NONE) {
       this.getLogger().logWarning(
@@ -254,7 +253,7 @@ public class TranslatorImpl implements TranslatorContext {
       final AsmOptimizerChain chain = getOptimizators(this, optimizationLevel);
       final List<String> optimizedAsString = asStringLines(chain.processSources(asmLines));
 
-      optimizedAsString.add(0,
+      optimizedAsString.addFirst(
           "; optimization level is '" + this.optimizationLevel + '\'');
 
       return optimizedAsString;

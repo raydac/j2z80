@@ -4,7 +4,6 @@ import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.makeLabelNameForFi
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.find;
-import static java.nio.file.Files.write;
 import static java.util.stream.Collectors.toList;
 
 import com.igormaznitsa.j2z80.TranslatorLogger;
@@ -14,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -123,7 +123,7 @@ public final class JavaZ80Run {
     for (final Map.Entry<String, String> source : this.sources.entrySet()) {
       final Path file = sourcesDir.resolve(source.getKey());
       createDirectories(file.getParent() == null ? sourcesDir : file.getParent());
-      write(file, source.getValue().getBytes(UTF_8));
+      Files.writeString(file, source.getValue());
     }
   }
 
@@ -131,9 +131,13 @@ public final class JavaZ80Run {
     return this.program.addressOf(label);
   }
 
+  int generatedImageEndAddress() {
+    return this.program.origin() + this.program.image().length;
+  }
+
   private void emptyDirectory(final Path directory) throws IOException {
     try (Stream<Path> walk = find(directory, Integer.MAX_VALUE, (path, attributes) -> true)) {
-      for (final Path path : walk.sorted(Comparator.reverseOrder()).collect(toList())) {
+      for (final Path path : walk.sorted(Comparator.reverseOrder()).toList()) {
         if (!path.equals(directory)) {
           java.nio.file.Files.deleteIfExists(path);
         }
@@ -172,7 +176,7 @@ public final class JavaZ80Run {
          JarOutputStream archive = new JarOutputStream(output);
          Stream<Path> classFiles = find(classesDir, Integer.MAX_VALUE,
              (path, attributes) -> path.toString().endsWith(".class"))) {
-      for (final Path classFile : classFiles.collect(toList())) {
+      for (final Path classFile : classFiles.toList()) {
         final String entryName = classesDir.relativize(classFile).toString().replace('\\', '/');
         byte[] bytes = java.nio.file.Files.readAllBytes(classFile);
         final UnaryOperator<byte[]> rewrite = this.classRewrites.get(entryName);

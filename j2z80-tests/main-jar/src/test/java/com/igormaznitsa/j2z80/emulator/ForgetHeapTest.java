@@ -87,6 +87,7 @@ public class ForgetHeapTest {
     final int reused = address(run.staticInt("demo.ForgetHeap", "reusedAddress"));
     final int stride = middle - anchor;
 
+    assertEquals(run.generatedImageEndAddress(), heapStart);
     assertEquals(EXTRA_OBJECTS, run.staticInt("demo.ForgetHeap", "created"));
     assertEquals(heapStart + OBJECT_HEADER_BYTES, anchor);
     assertTrue(stride > OBJECT_HEADER_BYTES);
