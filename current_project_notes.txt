@@ -1,6 +1,7 @@
 ## 1. Implementation Progress
 - Added `docs/plugin.md` covering Maven plugin installation, build flow, goal usage, configuration parameters, and the generated heap-start placement.
 - Translator emits the memory manager as the final generated section after code, embedded data, and class-size symbols; when included, its initial heap pointer resolves to the generated image end.
+- Added a Java-to-Z80 integration test for `instanceof` with null, direct instances, subclass instances, and unrelated classes.
 - README Objects and the heap: 4-byte instance header, bump pointer, Heap.forget rewind (owner first, then children), Heap.top() as a signed 16-bit address, arrays not rewind targets. Also narrowed types, checked exceptions, ROM-resident static byte[], and the JNI frame.
 - j2z80.Heap.forget(Object) rewinds ___MEMORY_MANAGER_TOP_POINTER to the instance header (reference minus 4). That instance and everything allocated after it are released. Earlier instances stay. null is a no-op. Arrays are not this header. Heap.top() returns that pointer as a signed 16-bit int. java.lang.Object has no forget().
 - Contiguous static byte[] fills in <clinit> (n>=16) become ROM-resident arrays (header+DEFB); the static field points at that payload (no heap copy).
