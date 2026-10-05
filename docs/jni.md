@@ -87,60 +87,44 @@ low word on top; the translator arranges the argument frame separately.
 
 The invoke epilogue preserves `BC` and `DE` while tearing down the frame.
 
-## Example: Java declaration and assembly body
+## Example 1: `void` native method with two arguments
 
-Declare native methods in Java:
+This static method receives two one-slot arguments: the address at `IX+0` and
+the value at `IX-2`. It writes the low byte of `value` to the supplied address.
 
 ```java
-package com.igormaznitsa.memory;
+package demo;
 
-public class MemoryAccessor {
-  public static native void writeWordToMemory(int address, int value);
-  public static native int readWordFromMemory(int address);
+public class NativeMemory {
+  public static native void writeByte(int address, int value);
 }
 ```
 
-Place `MemoryAccessor.a80` beside the class as a classpath resource. Its method
-labels use the declaring class, method name, and JVM descriptor:
+Put `NativeMemory.a80` beside the class as a classpath resource. The method label
+contains the method descriptor: `[II]V` means two `int` arguments and `void`
+return.
 
 ```asm
-com.igormaznitsa.memory.MemoryAccessor.writeWordToMemory#[II]V:
+demo.NativeMemory.writeByte#[II]V:
+    PUSH HL
     LD H,(IX-0+1) ; address into HL
     LD L,(IX-0)
-    LD B,(IX-2+1) ; value into BC
-    LD C,(IX-2)
-
-    LD (HL),C
-    INC HL
-    LD (HL),B
-    RET
-
-com.igormaznitsa.memory.MemoryAccessor.readWordFromMemory#[I]I:
-    LD H,(IX-0+1)
-    LD L,(IX-0)
-    LD C,(HL)
-    INC HL
-    LD B,(HL)
+    LD A,(IX-2)    ; low byte of value
+    LD (HL),A
+    POP HL
     RET
 ```
 
-The example reads and writes little-endian words. On return from `readWordFromMemory`,
-the result is in `BC`.
+The method preserves `HL`, which it uses as a temporary; `AF` may be changed.
 
-## Checked exceptions
+## Example 2: `int` method with one argument and a checked exception
 
-Checked exceptions from translated Java methods are reported through the hidden
-cell `___PENDING_EXCEPTION`. Zero means that no exception is pending. A translated
-method declaring checked exceptions clears the cell on entry and sets it when
-returning an exception. The caller checks the cell after the call: a matching
-covering `catch` handler receives the exception; otherwise the exception is
-propagated to the caller's caller.
-
-The translator resolves handler dispatch while translating the method; it does
-not use a runtime unwind table. For example:
+Checked exceptions are handled for translated Java methods. In this example,
+`parse` takes one `int`, returns an `int`, and declares `Signal`. Its caller
+catches that exception:
 
 ```java
-final class ExceptionExample {
+final class ParseExample {
   static final class Signal extends Exception {
   }
 
@@ -151,7 +135,7 @@ final class ExceptionExample {
     return value;
   }
 
-  static int read(int value) {
+  static int parseOrZero(int value) {
     try {
       return parse(value);
     } catch (Signal signal) {
@@ -160,6 +144,14 @@ final class ExceptionExample {
   }
 }
 ```
+
+On entry, a translated method declaring checked exceptions clears the hidden
+cell `___PENDING_EXCEPTION`; zero means that no exception is pending. When
+`parse` throws, its exception object is written to this cell. After the call,
+`parseOrZero` checks the cell and transfers the exception to its matching
+covering `catch` handler. If no handler matches, the exception is propagated to
+the caller. The translator resolves handler dispatch while translating the
+method; it does not use a runtime unwind table.
 
 Only checked exception types are supported. Declarations and catch handlers for
 `RuntimeException`, `Error`, or their subclasses, and classes extending those
