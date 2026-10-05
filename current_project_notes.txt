@@ -17,7 +17,7 @@
 - assertLocalVariablesNumber now checks MethodGen.getMaxLocals().
 - Test helper registerMockMethod now applies the maxLocals parameter via setMaxLocals.
 - Frame size floors at argument slots so native methods (maxLocals=0, no Code attribute) still get a valid frame — unblocks main-jar verify.
-- Updated docs/jni.txt, docs/configuration.txt, and docs/asm.md for the JNI ABI (including checked exceptions), plugin parameters, and assembler rules.
+- Reworked the JNI guide as docs/jni.md with Markdown examples for the JNI ABI, including checked exceptions; docs/configuration.txt and docs/asm.md cover plugin parameters and assembler rules.
 - Started Z80Processor JUnit tests in j2z80-plugin: single commands, a DJNZ loop, a two-word CALL return, and the double-argument word order.
 - JavaZ80Run compiles a Java class (entry mainz), translates it, runs it on Z80Processor, and reads static int fields. Covered: addition, loops, invokes, tableswitch and lookupswitch, and try/catch/finally (nested, subclass catch, throw from a callee, finally on break).
 - TryCatchFinallyTest also covers finally without exceptions: fall-through, return from try, continue/break, nested finally, finally around a callee invoked from several sites, and sequential try/finally blocks.
@@ -71,7 +71,7 @@
 - mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=EnumRunTest test
 - mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=JavaZ80RunTest#compactedStaticByteArrayClinitPreservesContents test
 - README.md — Records and Enums: accessors, equals, hashCode, toString null; ordinal, values, fields, switch; name and valueOf rejected
-- docs/jni.txt — IX frame layout, wide args/results, IX must stay frame pointer
+- docs/jni.md — IX frame layout, wide args/results, checked exceptions, native Java/assembly example
 - docs/configuration.txt — jarFile, formats (A80/BIN/SNA), stackTop 65533, goal translate
 - docs/asm.md — signed displacements, -128..255 immediates, forward EQU, DEFM bytes
 - j2z80-plugin/.../MEMORY_MANAGER.a80 — ___BEFORE_INVOKE / ___AFTER_INVOKE

@@ -342,7 +342,7 @@ above.
 
 The assembler accepts documented Z80 instructions only. Displacements, immediates, and directives are listed
 in [docs/asm.md](docs/asm.md). The full frame layout, wide arguments, and the memory-manager labels are
-in [docs/jni.txt](docs/jni.txt).
+in [docs/jni.md](docs/jni.md).
 
 To call the memory manager or a numeric helper from your own assembly, implement the matching marker under
 `com.igormaznitsa.j2z80.api.additional` (`NeedsMemoryManager`, `NeedsFloatArithmeticManager`,
