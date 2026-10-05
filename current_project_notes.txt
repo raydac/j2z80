@@ -18,6 +18,7 @@
 - Test helper registerMockMethod now applies the maxLocals parameter via setMaxLocals.
 - Frame size floors at argument slots so native methods (maxLocals=0, no Code attribute) still get a valid frame — unblocks main-jar verify.
 - Reworked the JNI guide as docs/jni.md with embedded Java and assembly snippets for a two-argument native void method and a one-argument native int method that reports a checked exception through ___PENDING_EXCEPTION; examples use inline class-level assembly labels.
+- Reworked docs/asm.md against the embedded assembler implementation, documenting directives, operand limits, global/local labels, index-register displacement syntax, and examples; ASSERT is diagnostic output rather than a conditional assertion.
 - Started Z80Processor JUnit tests in j2z80-plugin: single commands, a DJNZ loop, a two-word CALL return, and the double-argument word order.
 - JavaZ80Run compiles a Java class (entry mainz), translates it, runs it on Z80Processor, and reads static int fields. Covered: addition, loops, invokes, tableswitch and lookupswitch, and try/catch/finally (nested, subclass catch, throw from a callee, finally on break).
 - TryCatchFinallyTest also covers finally without exceptions: fall-through, return from try, continue/break, nested finally, finally around a callee invoked from several sites, and sequential try/finally blocks.
@@ -73,7 +74,7 @@
 - README.md — Records and Enums: accessors, equals, hashCode, toString null; ordinal, values, fields, switch; name and valueOf rejected
 - docs/jni.md — IX frame layout, wide args/results, checked exceptions, native Java/assembly examples
 - docs/configuration.txt — jarFile, formats (A80/BIN/SNA), stackTop 65533, goal translate
-- docs/asm.md — signed displacements, -128..255 immediates, forward EQU, DEFM bytes
+- docs/asm.md — instruction subset, operand bounds, directives, expressions, label reuse, index addressing, examples
 - j2z80-plugin/.../MEMORY_MANAGER.a80 — ___BEFORE_INVOKE / ___AFTER_INVOKE
 - j2z80-plugin/.../FLOAT_ARITHMETIC_MANAGER.a80 — binary16 add/sub/mul/div/rem, i2f, f2i, cmp
 - j2z80-plugin/.../LONG_ARITHMETIC_MANAGER.a80 — 32-bit long add/sub/mul/div/rem, shifts, compare
