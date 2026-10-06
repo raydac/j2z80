@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
@@ -24,6 +25,7 @@ import org.apache.bcel.generic.GETFIELD;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
+
 // class to process GETFIELD with code 180
 public class Processor_GETFIELD extends AbstractFieldProcessor {
 
@@ -52,7 +54,9 @@ public class Processor_GETFIELD extends AbstractFieldProcessor {
       final ConstantPoolGen const_pool = methodTranslator.getConstantPool();
       final ObjectType objType = (ObjectType) getfield.getReferenceType(const_pool);
 
-      final String labelOffset = LabelAndFrameUtils.makeLabelNameForFieldOffset(objType.getClassName(), getfield.getFieldName(const_pool), getfield.getFieldType(const_pool));
+      final String labelOffset =
+          LabelAndFrameUtils.makeLabelNameForFieldOffset(objType.getClassName(),
+              getfield.getFieldName(const_pool), getfield.getFieldType(const_pool));
       final String body = getfield.getFieldType(const_pool).getSize() == 2
           ? this.longTemplate : this.template;
 

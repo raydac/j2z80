@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
@@ -42,7 +43,9 @@ public class Processor_IINC extends AbstractJvmCommandProcessor {
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final IINC iinc = (IINC) instruction;
 
-    out.write(template.replace(MACROS_INDEX, Integer.toString(prepareLocalVariableIndex(iinc.getIndex()))).replace(MACROS_VALUE, Integer.toString(iinc.getIncrement())));
+    out.write(
+        template.replace(MACROS_INDEX, Integer.toString(prepareLocalVariableIndex(iinc.getIndex())))
+            .replace(MACROS_VALUE, Integer.toString(iinc.getIncrement())));
     out.write(NEXT_LINE);
   }
 }

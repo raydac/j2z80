@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
@@ -41,7 +42,8 @@ public class Processor_ALOAD extends AbstractJvmCommandProcessor {
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final ALOAD aload = (ALOAD) instruction;
-    out.write(template.replace(MACROS_INDEX, Integer.toString(prepareLocalVariableIndex(aload.getIndex()))));
+    out.write(template.replace(MACROS_INDEX,
+        Integer.toString(prepareLocalVariableIndex(aload.getIndex()))));
     out.write(NEXT_LINE);
   }
 }

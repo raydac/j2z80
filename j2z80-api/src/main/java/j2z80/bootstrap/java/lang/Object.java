@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,12 +29,14 @@ import org.apache.bcel.generic.Type;
 public class Object extends AbstractBootstrapClass {
 
   @Override
-  public boolean doesInvokeNeedFrame(final TranslatorContext translator, final String methodName, final Type[] methodArguments, final Type resultType) {
+  public boolean doesInvokeNeedFrame(final TranslatorContext translator, final String methodName,
+                                     final Type[] methodArguments, final Type resultType) {
     return false;
   }
 
   @Override
-  public String[] generateInvocation(final TranslatorContext translator, final String methodName, final Type[] methodArguments, final Type resultType) {
+  public String[] generateInvocation(final TranslatorContext translator, final String methodName,
+                                     final Type[] methodArguments, final Type resultType) {
     if (methodArguments.length == 0) {
       if (resultType.getType() == Type.VOID.getType()) {
         if (methodName.equals("<init>")) {
@@ -42,7 +44,8 @@ public class Object extends AbstractBootstrapClass {
         }
       } else if (resultType.getType() == Type.INT.getType()) {
         if (methodName.equals("hashCode")) {
-          return new String[] {"; hashCode for Object just returns the object address which already on the stack"};
+          return new String[] {
+              "; hashCode for Object just returns the object address which already on the stack"};
         }
       }
     }
@@ -51,13 +54,15 @@ public class Object extends AbstractBootstrapClass {
   }
 
   @Override
-  public String[] generateFieldGetter(final TranslatorContext context, final String fieldName, final Type fieldType, final boolean isStatic) {
+  public String[] generateFieldGetter(final TranslatorContext context, final String fieldName,
+                                      final Type fieldType, final boolean isStatic) {
     this.throwBootClassExceptionForField(fieldName, fieldType);
     return null;
   }
 
   @Override
-  public String[] generateFieldSetter(final TranslatorContext context, final String fieldName, final Type fieldType, final boolean isStatic) {
+  public String[] generateFieldSetter(final TranslatorContext context, final String fieldName,
+                                      final Type fieldType, final boolean isStatic) {
     this.throwBootClassExceptionForField(fieldName, fieldType);
     return null;
   }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
@@ -20,8 +21,6 @@ import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import com.igormaznitsa.j2z80.utils.Utils;
-import org.apache.bcel.classfile.Method;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.bcel.classfile.Method;
 
 /**
  * The class allows to process classes containing JNI methods.
@@ -74,7 +74,10 @@ public class NativeClassProcessor {
       final String[] methodBody = readNativeResource(path, resourceName);
       if (methodBody != null) {
         if (jniMethodNames.contains(methodName)) {
-          final String errorMessage = "Found two or more JNI methods in " + classInfo.getCanonicalClassName() + " named " + methodName + " and one of them has the separated JNI file as the body. In the case the class must have only JNI method with the name.";
+          final String errorMessage =
+              "Found two or more JNI methods in " + classInfo.getCanonicalClassName() + " named " +
+                  methodName +
+                  " and one of them has the separated JNI file as the body. In the case the class must have only JNI method with the name.";
           theTranslator.getLogger().logError(errorMessage);
         }
         jniMethodBodies.put(method, methodBody);
@@ -96,7 +99,9 @@ public class NativeClassProcessor {
     if (!jniMethodBodies.isEmpty()) {
       for (final Map.Entry<Method, String[]> methodEntry : jniMethodBodies.entrySet()) {
         final Method method = methodEntry.getKey();
-        final String methodLabel = LabelAndFrameUtils.makeLabelNameForMethod(classInfo.getClassInfo().getClassName(), method.getName(), method.getReturnType(), method.getArgumentTypes());
+        final String methodLabel =
+            LabelAndFrameUtils.makeLabelNameForMethod(classInfo.getClassInfo().getClassName(),
+                method.getName(), method.getReturnType(), method.getArgumentTypes());
 
         result.add(methodLabel + ':');
 
@@ -108,7 +113,8 @@ public class NativeClassProcessor {
     return result.toArray(new String[0]);
   }
 
-  private String[] readNativeResource(final String path, final String resourceName) throws IOException {
+  private String[] readNativeResource(final String path, final String resourceName)
+      throws IOException {
     byte[] result = null;
     final String filePath = path + '/' + resourceName;
 
@@ -124,7 +130,8 @@ public class NativeClassProcessor {
     }
 
     if (result != null) {
-      return insertFirstStringIntoArray("; file " + readResourcePath, Utils.breakToLines(new String(result, StandardCharsets.UTF_8)));
+      return insertFirstStringIntoArray("; file " + readResourcePath,
+          Utils.breakToLines(new String(result, StandardCharsets.UTF_8)));
     }
 
     // find between bin files

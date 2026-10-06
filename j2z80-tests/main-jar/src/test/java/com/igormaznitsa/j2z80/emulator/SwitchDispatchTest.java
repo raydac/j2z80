@@ -20,7 +20,7 @@ public class SwitchDispatchTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.switchy.Dispatch")
         .file("demo/switchy/Dispatch.java", """
             package demo.switchy;
-
+            
             public class Dispatch {
               public static int tableBreak;
               public static int tableFall;
@@ -34,7 +34,7 @@ public class SwitchDispatchTest {
               public static int lookupHigh;
               public static int lookupDefault;
               public static int loopTotal;
-
+            
               public static void mainz() {
                 tableBreak = fromTable(1);
                 tableFall = fromTable(2);
@@ -49,7 +49,7 @@ public class SwitchDispatchTest {
                 lookupDefault = fromLookup(4);
                 loopTotal = accumulate();
               }
-
+            
               private static int fromTable(final int code) {
                 int value = 0;
                 switch (code) {
@@ -73,7 +73,7 @@ public class SwitchDispatchTest {
                 }
                 return value;
               }
-
+            
               private static int fromLookup(final int code) {
                 int value = 0;
                 switch (code) {
@@ -95,7 +95,7 @@ public class SwitchDispatchTest {
                 }
                 return value;
               }
-
+            
               private static int accumulate() {
                 int total = 0;
                 for (int index = 0; index < 6; index++) {

@@ -46,7 +46,8 @@ public class AsmCommandIN extends AbstractAsmCommand {
       if (!"A".equals(leftPart)) {
         throw new IllegalArgumentException("The left part must be A [" + leftPart + "]");
       }
-      final int number = new LightExpression(context, this, asm, extractCalculatedPart(port)).calculate();
+      final int number =
+          new LightExpression(context, this, asm, extractCalculatedPart(port)).calculate();
       AsmAssertions.assertUnsignedByte(number);
       return new byte[] {(byte) 0xDB, (byte) number};
     }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
@@ -27,8 +28,10 @@ import org.apache.bcel.generic.INVOKEINTERFACE;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
+
 // class to process INVOKEINTERFACE with code 185
-public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor implements NeedsATHROWManager, NeedsINVOKEINTERFACEManager {
+public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor
+    implements NeedsATHROWManager, NeedsINVOKEINTERFACEManager {
 
   private final String template;
 

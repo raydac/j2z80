@@ -6,17 +6,17 @@ import java.util.Objects;
 
 public record Program(int origin, byte[] image, Z80Asm assembler) {
 
-  public static Program assemble ( final String source){
+  public static Program assemble(final String source) {
     return assemble(List.of(source));
   }
 
-  public static Program assemble ( final List<String> lines){
+  public static Program assemble(final List<String> lines) {
     final Z80Asm assembler = new Z80Asm(lines);
     final byte[] image = assembler.process();
     return new Program(assembler.getDataOffset(), image, assembler);
   }
 
-  public int addressOf ( final String label){
+  public int addressOf(final String label) {
     return Objects.requireNonNull(this.assembler.findLabelAddress(label), label);
   }
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
@@ -79,16 +80,19 @@ public abstract class AbstractJvmCommandProcessor {
   public static final String MACROS_RECORDADDR = "%recordaddress%";
   public static final int MAX_LOCAL_VARIABLES = 64;
   // the map contains all processors for allowed jvm commands
-  private static final Map<Class<? extends Instruction>, AbstractJvmCommandProcessor> PROCESSORS = new HashMap<>();
+  private static final Map<Class<? extends Instruction>, AbstractJvmCommandProcessor> PROCESSORS =
+      new HashMap<>();
 
   static {
     try {
       // read the file containing all jvm commands, search processors and map them
       final String PROCESSOR_LIST_FILE = "processorlist.txt";
-      final InputStream file = AbstractJvmCommandProcessor.class.getResourceAsStream(PROCESSOR_LIST_FILE);
+      final InputStream file =
+          AbstractJvmCommandProcessor.class.getResourceAsStream(PROCESSOR_LIST_FILE);
       Objects.requireNonNull(file,
           "Can't find expected " + PROCESSOR_LIST_FILE + " in the same directory");
-      final BufferedReader reader = new BufferedReader(new InputStreamReader(file, StandardCharsets.UTF_8));
+      final BufferedReader reader =
+          new BufferedReader(new InputStreamReader(file, StandardCharsets.UTF_8));
       try {
         while (true) {
           final String line = reader.readLine();
@@ -98,10 +102,14 @@ public abstract class AbstractJvmCommandProcessor {
           if (line.trim().startsWith(";")) {
             continue;
           }
-          final String className = AbstractJvmCommandProcessor.class.getPackage().getName() + '.' + line;
-          final Class<? extends AbstractJvmCommandProcessor> cls = Class.forName(className).asSubclass(AbstractJvmCommandProcessor.class);
+          final String className =
+              AbstractJvmCommandProcessor.class.getPackage().getName() + '.' + line;
+          final Class<? extends AbstractJvmCommandProcessor> cls =
+              Class.forName(className).asSubclass(AbstractJvmCommandProcessor.class);
           final AbstractJvmCommandProcessor processor = cls.getDeclaredConstructor().newInstance();
-          final Class<? extends Instruction> bcelClass = Class.forName("org.apache.bcel.generic." + processor.getName()).asSubclass(Instruction.class);
+          final Class<? extends Instruction> bcelClass =
+              Class.forName("org.apache.bcel.generic." + processor.getName())
+                  .asSubclass(Instruction.class);
           PROCESSORS.put(bcelClass, processor);
         }
       } finally {
@@ -119,7 +127,8 @@ public abstract class AbstractJvmCommandProcessor {
    * @return found processor for the instruction or null if it is not supported
    * @see org.apache.bcel.generic.Instruction
    */
-  public static AbstractJvmCommandProcessor findProcessor(final Class<? extends Instruction> instruction) {
+  public static AbstractJvmCommandProcessor findProcessor(
+      final Class<? extends Instruction> instruction) {
     return PROCESSORS.get(instruction);
   }
 
@@ -133,7 +142,8 @@ public abstract class AbstractJvmCommandProcessor {
     final int result = index << 1;
 
     if (result < 0 || result > 128) {
-      throw new IllegalArgumentException("Incompatible local variable index detected [" + index + ']');
+      throw new IllegalArgumentException(
+          "Incompatible local variable index detected [" + index + ']');
     }
 
     return result;
@@ -146,7 +156,8 @@ public abstract class AbstractJvmCommandProcessor {
    */
   public static void assertLocalVariablesNumber(final MethodGen method) {
     if (!method.isInterface()) {
-      final String label = method.getClassName() + '#' + method.getName() + " " + method.getSignature();
+      final String label =
+          method.getClassName() + '#' + method.getName() + " " + method.getSignature();
       final int locals = method.getMaxLocals();
       if (locals >= MAX_LOCAL_VARIABLES) {
         throw new IllegalStateException("Max locals number for a method must be less than " +

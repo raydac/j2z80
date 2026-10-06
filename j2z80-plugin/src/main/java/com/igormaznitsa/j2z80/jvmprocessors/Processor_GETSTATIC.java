@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
@@ -24,6 +25,7 @@ import org.apache.bcel.generic.GETSTATIC;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
+
 // class to process GETSTATIC with code 178
 public class Processor_GETSTATIC extends AbstractFieldProcessor {
 
@@ -50,7 +52,9 @@ public class Processor_GETSTATIC extends AbstractFieldProcessor {
     if (!processBootstrapClassCall(methodTranslator, ins, bootstrapClassLoader, out)) {
       final ConstantPoolGen cpool = methodTranslator.getConstantPool();
       final ObjectType obj = (ObjectType) ins.getReferenceType(cpool);
-      final String address = LabelAndFrameUtils.makeLabelNameForField(obj.getClassName(), ins.getFieldName(cpool), ins.getFieldType(cpool));
+      final String address =
+          LabelAndFrameUtils.makeLabelNameForField(obj.getClassName(), ins.getFieldName(cpool),
+              ins.getFieldType(cpool));
       final String body = ins.getFieldType(cpool).getSize() == 2
           ? this.longTemplate : this.template;
 

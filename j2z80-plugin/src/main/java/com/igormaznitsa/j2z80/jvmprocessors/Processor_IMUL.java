@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
@@ -25,7 +26,8 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 
 // class to process IMUL with code 104
-public class Processor_IMUL extends AbstractJvmCommandProcessor implements NeedsINTArithmeticManager, NeedsATHROWManager {
+public class Processor_IMUL extends AbstractJvmCommandProcessor
+    implements NeedsINTArithmeticManager, NeedsATHROWManager {
   private final String template;
 
   public Processor_IMUL() {

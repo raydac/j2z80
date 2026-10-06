@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.utils;
 
 import static java.util.Arrays.stream;
@@ -71,7 +72,9 @@ public final class LabelAndFrameUtils {
    * @see ClassMethodInfo
    */
   public static String makeLabelNameForMethod(final ClassMethodInfo methodInfo) {
-    return makeLabelNameForMethod(methodInfo.getClassInfo().getClassName(), methodInfo.getMethodInfo().getName(), methodInfo.getMethodInfo().getReturnType(), methodInfo.getMethodInfo().getArgumentTypes());
+    return makeLabelNameForMethod(methodInfo.getClassInfo().getClassName(),
+        methodInfo.getMethodInfo().getName(), methodInfo.getMethodInfo().getReturnType(),
+        methodInfo.getMethodInfo().getArgumentTypes());
   }
 
   /**
@@ -82,7 +85,8 @@ public final class LabelAndFrameUtils {
    * @see org.apache.bcel.generic.MethodGen
    */
   public static String makeLabelNameForMethod(final MethodGen methodGen) {
-    return makeLabelNameForMethod(methodGen.getClassName(), methodGen.getName(), methodGen.getReturnType(), methodGen.getArgumentTypes());
+    return makeLabelNameForMethod(methodGen.getClassName(), methodGen.getName(),
+        methodGen.getReturnType(), methodGen.getArgumentTypes());
   }
 
   /**
@@ -95,7 +99,8 @@ public final class LabelAndFrameUtils {
    * @return the generated string is the label for the method
    * @see org.apache.bcel.generic.Type
    */
-  public static String makeLabelNameForMethod(final String className, final String methodName, final Type resultType, final Type[] argumentTypes) {
+  public static String makeLabelNameForMethod(final String className, final String methodName,
+                                              final Type resultType, final Type[] argumentTypes) {
     return makeLabelNameForClass(className) + '.' + normalizeString(methodName) + '#' +
         normalizeString(Type.getMethodSignature(resultType, argumentTypes));
   }
@@ -120,7 +125,8 @@ public final class LabelAndFrameUtils {
    * @return the generated string is the label of the class field
    * @see org.apache.bcel.generic.Type
    */
-  public static String makeLabelNameForField(final String javaClassName, final String fieldName, final Type fieldType) {
+  public static String makeLabelNameForField(final String javaClassName, final String fieldName,
+                                             final Type fieldType) {
     return makeLabelNameForClass(javaClassName) + '.' + normalizeString(fieldName) + '#' +
         normalizeString(fieldType.getSignature());
   }
@@ -200,7 +206,8 @@ public final class LabelAndFrameUtils {
    * @param fieldType the field type signature, must not be null
    * @return the generated string is the label for the memory area containing the offset data to the field
    */
-  public static String makeLabelNameForFieldOffset(final String className, final String fieldName, final Type fieldType) {
+  public static String makeLabelNameForFieldOffset(final String className, final String fieldName,
+                                                   final Type fieldType) {
     return makeLabelNameForClass(className) + '.' + normalizeString(fieldName) + '#' +
         normalizeString(fieldType.getSignature()) + "_OFFSET";
   }
@@ -230,8 +237,10 @@ public final class LabelAndFrameUtils {
    * @param instructionPosition the destination instruction position inside the method code block
    * @return the generated string is the label for the destination instruction inside the method code
    */
-  public static String makeClassMethodJumpLabel(final ClassMethodInfo methodInfo, final int instructionPosition) {
-    return makeClassMethodJumpLabel(methodInfo.getClassInfo(), methodInfo.getMethodGen(), instructionPosition);
+  public static String makeClassMethodJumpLabel(final ClassMethodInfo methodInfo,
+                                                final int instructionPosition) {
+    return makeClassMethodJumpLabel(methodInfo.getClassInfo(), methodInfo.getMethodGen(),
+        instructionPosition);
   }
 
   /**
@@ -242,7 +251,8 @@ public final class LabelAndFrameUtils {
    * @param instructionPosition the destination instruction position inside the method code block
    * @return the generated string is the label for the destination instruction inside the method code
    */
-  public static String makeClassMethodJumpLabel(final ClassGen classGen, final MethodGen method, final int instructionPosition) {
+  public static String makeClassMethodJumpLabel(final ClassGen classGen, final MethodGen method,
+                                                final int instructionPosition) {
     final String methodLabel = makeLabelNameForMethod(method);
     return methodLabel + "." + Integer.toHexString(instructionPosition).toUpperCase();
   }
@@ -296,7 +306,10 @@ public final class LabelAndFrameUtils {
    * @param argType    the argument type signatures, must not be null
    * @return the generated string is the label for a virtual method table record
    */
-  public static String makeLabelForVirtualMethodRecord(final String className, final String methodName, final Type returnType, final Type[] argType) {
+  public static String makeLabelForVirtualMethodRecord(final String className,
+                                                       final String methodName,
+                                                       final Type returnType,
+                                                       final Type[] argType) {
     return makeLabelNameForMethod(className, methodName, returnType, argType) + "_VT_REC";
   }
 
@@ -309,7 +322,8 @@ public final class LabelAndFrameUtils {
    * @param isStatic  the flag shows that the method is a static one if the flag is true
    * @return the stack frame size needed by the method in bytes
    */
-  public static int calculateFrameSizeForMethod(final int argNumber, final int maxLocals, final boolean isStatic) {
+  public static int calculateFrameSizeForMethod(final int argNumber, final int maxLocals,
+                                                final boolean isStatic) {
     final int argSlots = argNumber + (isStatic ? 0 : 1);
     return Math.max(argSlots, maxLocals) << 1;
   }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsINVOKEVIRTUALManager;
@@ -26,8 +27,10 @@ import org.apache.bcel.generic.INVOKEVIRTUAL;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
+
 // class to process INVOKEVIRTUAL with code 182
-public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements NeedsINVOKEVIRTUALManager {
+public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor
+    implements NeedsINVOKEVIRTUALManager {
 
   private final String template;
 
@@ -57,7 +60,10 @@ public class Processor_INVOKEVIRTUAL extends AbstractInvokeProcessor implements 
       assertMethodIsNotNull(invokedMethod, methodTranslator, inv);
       assertMethodIsNotNull(invokedMethod, methodTranslator, inv);
 
-      final String recordLabel = LabelAndFrameUtils.makeLabelForVirtualMethodRecord(invokedMethod.getClassName(), invokedMethod.getName(), invokedMethod.getReturnType(), invokedMethod.getArgumentTypes());
+      final String recordLabel =
+          LabelAndFrameUtils.makeLabelForVirtualMethodRecord(invokedMethod.getClassName(),
+              invokedMethod.getName(), invokedMethod.getReturnType(),
+              invokedMethod.getArgumentTypes());
 
       final int argumentsBlockSize = calculateArgumentBlockSize(invokedMethod);
       final int offsetOnStackToTheObjectRef = calculateObjectOffsetOnStack(argumentsBlockSize);

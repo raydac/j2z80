@@ -11,10 +11,10 @@ public class JavaZ80RunTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.Add")
         .file("demo/Add.java", """
             package demo;
-
+            
             public class Add {
               public static int result;
-
+            
               public static void mainz() {
                 result = 20 + 22;
               }
@@ -30,11 +30,11 @@ public class JavaZ80RunTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.Measure")
         .file("demo/Pair.java", """
             package demo;
-
+            
             public class Pair {
               public static int left;
               public static int right;
-
+            
               public static int gap() {
                 return right - left;
               }
@@ -42,16 +42,16 @@ public class JavaZ80RunTest {
             """)
         .file("demo/Measure.java", """
             package demo;
-
+            
             public class Measure {
               public static int result;
-
+            
               public static void mainz() {
                 Pair.left = 8;
                 Pair.right = 30;
                 result = scale(sumThrough(10)) + Pair.gap();
               }
-
+            
               private static int sumThrough(final int limit) {
                 int total = 0;
                 int index = 1;
@@ -61,7 +61,7 @@ public class JavaZ80RunTest {
                 }
                 return total;
               }
-
+            
               private static int scale(final int value) {
                 if (value > 50) {
                   return value + value;
@@ -80,10 +80,10 @@ public class JavaZ80RunTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.ForLoop")
         .file("demo/ForLoop.java", """
             package demo;
-
+            
             public class ForLoop {
               public static int result;
-
+            
               public static void mainz() {
                 int total = 0;
                 for (int index = 1; index <= 12; index++) {
@@ -109,10 +109,10 @@ public class JavaZ80RunTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.WhileLoop")
         .file("demo/WhileLoop.java", """
             package demo;
-
+            
             public class WhileLoop {
               public static int result;
-
+            
               public static void mainz() {
                 int total = 0;
                 int index = 0;
@@ -140,10 +140,10 @@ public class JavaZ80RunTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.NestedLoops")
         .file("demo/NestedLoops.java", """
             package demo;
-
+            
             public class NestedLoops {
               public static int result;
-
+            
               public static void mainz() {
                 int total = 0;
                 for (int row = 1; row <= 4; row++) {
@@ -177,10 +177,10 @@ public class JavaZ80RunTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.LabeledLoops")
         .file("demo/LabeledLoops.java", """
             package demo;
-
+            
             public class LabeledLoops {
               public static int result;
-
+            
               public static void mainz() {
                 int total = 0;
                 outer:
@@ -209,7 +209,7 @@ public class JavaZ80RunTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.ByteBlob")
         .file("demo/ByteBlob.java", """
             package demo;
-
+            
             public class ByteBlob {
               public static final byte[] DATA = {
                   0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45,
@@ -217,7 +217,7 @@ public class JavaZ80RunTest {
               };
               public static int length;
               public static int checksum;
-
+            
               public static void mainz() {
                 length = DATA.length;
                 int sum = 0;

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
@@ -24,6 +25,7 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUTSTATIC;
+
 // class to process PUTSTATIC with code 179
 public class Processor_PUTSTATIC extends AbstractFieldProcessor {
 
@@ -49,7 +51,8 @@ public class Processor_PUTSTATIC extends AbstractFieldProcessor {
     if (!this.processBootstrapClassCall(methodTranslator, putstatic, bootstrapClassLoader, out)) {
       final ConstantPoolGen constantPool = methodTranslator.getConstantPool();
       final ObjectType objType = (ObjectType) putstatic.getReferenceType(constantPool);
-      final String label = LabelAndFrameUtils.makeLabelNameForField(objType.getClassName(), putstatic.getFieldName(constantPool), putstatic.getFieldType(constantPool));
+      final String label = LabelAndFrameUtils.makeLabelNameForField(objType.getClassName(),
+          putstatic.getFieldName(constantPool), putstatic.getFieldType(constantPool));
       final String body = putstatic.getFieldType(constantPool).getSize() == 2
           ? this.longTemplate : this.template;
 

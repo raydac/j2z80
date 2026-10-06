@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
 import java.util.ArrayList;
@@ -314,7 +315,8 @@ public class ParsedAsmLine {
 
     final char firstChar = label.charAt(0);
     if (firstChar == '#' || firstChar == '%') {
-      throw new IllegalArgumentException("The label start char can be wrong recognized [" + firstChar + ']');
+      throw new IllegalArgumentException(
+          "The label start char can be wrong recognized [" + firstChar + ']');
     }
 
     try {
@@ -329,7 +331,8 @@ public class ParsedAsmLine {
         case ';':
         case '-':
         case '+':
-          throw new IllegalArgumentException("Label contains a symbol which can be wrong recognized [" + chr + ']');
+          throw new IllegalArgumentException(
+              "Label contains a symbol which can be wrong recognized [" + chr + ']');
         default:
           if (Character.isWhitespace(chr)) {
             throw new IllegalArgumentException(

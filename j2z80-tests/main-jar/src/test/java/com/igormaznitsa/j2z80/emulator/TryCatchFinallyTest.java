@@ -11,7 +11,7 @@ public class TryCatchFinallyTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.ex.FinallyOnly")
         .file("demo/ex/FinallyOnly.java", """
             package demo.ex;
-
+            
             public class FinallyOnly {
               public static int fallThrough;
               public static int earlyReturn;
@@ -24,7 +24,7 @@ public class TryCatchFinallyTest {
               public static int calleeB;
               public static int calleeC;
               public static int sequential;
-
+            
               public static void mainz() {
                 fallThrough = withFallThrough(2);
                 earlyReturn = withEarlyReturn(7);
@@ -39,7 +39,7 @@ public class TryCatchFinallyTest {
                 calleeC = withCallee(3);
                 sequential = withSequential();
               }
-
+            
               private static int withFallThrough(final int seed) {
                 int value = seed;
                 try {
@@ -49,7 +49,7 @@ public class TryCatchFinallyTest {
                 }
                 return value;
               }
-
+            
               private static int withEarlyReturn(final int seed) {
                 try {
                   earlyReturnSide = earlyReturnSide + 1;
@@ -58,7 +58,7 @@ public class TryCatchFinallyTest {
                   earlyReturnSide = earlyReturnSide + 10;
                 }
               }
-
+            
               private static int withContinue(final int limit) {
                 int value = 0;
                 for (int index = 0; index < limit; index++) {
@@ -73,7 +73,7 @@ public class TryCatchFinallyTest {
                 }
                 return value;
               }
-
+            
               private static int withBreak(final int limit) {
                 int value = 0;
                 for (int index = 0; index < limit; index++) {
@@ -88,7 +88,7 @@ public class TryCatchFinallyTest {
                 }
                 return value;
               }
-
+            
               private static void withNested(final int seed) {
                 try {
                   try {
@@ -101,7 +101,7 @@ public class TryCatchFinallyTest {
                   nestedOuter = nestedOuter + 100;
                 }
               }
-
+            
               private static int withCallee(final int seed) {
                 int value = seed;
                 try {
@@ -111,11 +111,11 @@ public class TryCatchFinallyTest {
                 }
                 return value;
               }
-
+            
               private static int bump(final int value) {
                 return value + 3;
               }
-
+            
               private static int withSequential() {
                 int value = 0;
                 try {
@@ -157,25 +157,25 @@ public class TryCatchFinallyTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.ex.Guard")
         .file("demo/ex/Signal.java", """
             package demo.ex;
-
+            
             public class Signal extends Exception {
             }
             """)
         .file("demo/ex/Bomb.java", """
             package demo.ex;
-
+            
             public class Bomb extends Signal {
             }
             """)
         .file("demo/ex/Other.java", """
             package demo.ex;
-
+            
             public class Other extends Signal {
             }
             """)
         .file("demo/ex/Guard.java", """
             package demo.ex;
-
+            
             public class Guard {
               public static int normalFinally;
               public static int caught;
@@ -188,14 +188,14 @@ public class TryCatchFinallyTest {
               public static int outerCatch;
               public static int outerFinally;
               public static int breakFinally;
-
+            
               public static void mainz() throws Signal {
                 try {
                   normalFinally = 1;
                 } finally {
                   normalFinally = normalFinally + 10;
                 }
-
+            
                 try {
                   throwSignal(new Bomb());
                 } catch (Other other) {
@@ -205,7 +205,7 @@ public class TryCatchFinallyTest {
                 } finally {
                   finallyOnThrow = finallyOnThrow + 5;
                 }
-
+            
                 try {
                   throwSignal(new Bomb());
                 } catch (Signal signal) {
@@ -213,7 +213,7 @@ public class TryCatchFinallyTest {
                 } finally {
                   parentFinally = parentFinally + 1;
                 }
-
+            
                 try {
                   try {
                     boom();
@@ -227,7 +227,7 @@ public class TryCatchFinallyTest {
                 } finally {
                   outerFinally = outerFinally + 1;
                 }
-
+            
                 int value = 0;
                 for (int index = 0; index < 3; index++) {
                   try {
@@ -241,11 +241,11 @@ public class TryCatchFinallyTest {
                 }
                 breakFinally = value;
               }
-
+            
               private static void throwSignal(final Signal signal) throws Signal {
                 throw signal;
               }
-
+            
               private static void boom() throws Signal {
                 throw new Bomb();
               }

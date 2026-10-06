@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.ids;
 
 import java.util.Objects;
@@ -62,7 +63,8 @@ public class ClassMethodInfo {
    * @param methodInfo the Method object describes the method
    * @param methodGen  the MethodGen object for the method
    */
-  public ClassMethodInfo(final ClassGen classInfo, final Method methodInfo, final MethodGen methodGen) {
+  public ClassMethodInfo(final ClassGen classInfo, final Method methodInfo,
+                         final MethodGen methodGen) {
     this(classInfo, methodInfo, -1);
     this.lazyMethodGen = methodGen;
   }

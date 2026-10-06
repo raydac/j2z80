@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator.optimizator;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
@@ -33,5 +34,6 @@ public interface AsmOptimizer {
    * @param asmParsedLines a list contains parsed assembler lines without spaces and nulls
    * @return a list contains optimized assembler lines
    */
-  List<ParsedAsmLine> optimizeAsmText(TranslatorContext context, List<ParsedAsmLine> asmParsedLines);
+  List<ParsedAsmLine> optimizeAsmText(TranslatorContext context,
+                                      List<ParsedAsmLine> asmParsedLines);
 }

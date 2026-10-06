@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.exceptions;
 
 /**
@@ -25,7 +26,8 @@ public class AsmTranslationException extends RuntimeException {
   private final String srcString;
   private final int lineNumber;
 
-  public AsmTranslationException(final String message, final String srcString, final int lineNumber, final Throwable cause) {
+  public AsmTranslationException(final String message, final String srcString, final int lineNumber,
+                                 final Throwable cause) {
     super(message, cause);
     this.srcString = srcString;
     this.lineNumber = lineNumber;

@@ -10,7 +10,8 @@ public enum AsmAssertions {
    */
   public static void assertSignedByte(final int value) {
     if (value < Byte.MIN_VALUE || value > Byte.MAX_VALUE) {
-      throw new IllegalArgumentException("Signed byte must be in " + Byte.MIN_VALUE + ".." + Byte.MAX_VALUE + " [" + value + ']');
+      throw new IllegalArgumentException(
+          "Signed byte must be in " + Byte.MIN_VALUE + ".." + Byte.MAX_VALUE + " [" + value + ']');
     }
   }
 
@@ -44,7 +45,9 @@ public enum AsmAssertions {
    */
   public static void assertSignedShort(final int value) {
     if (value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
-      throw new IllegalArgumentException("Signed short must be in " + Short.MIN_VALUE + ".." + Short.MAX_VALUE + " [" + value + ']');
+      throw new IllegalArgumentException(
+          "Signed short must be in " + Short.MIN_VALUE + ".." + Short.MAX_VALUE + " [" + value +
+              ']');
     }
   }
 
@@ -66,7 +69,8 @@ public enum AsmAssertions {
    */
   public static void assertAddress(final int value) {
     if (value < 0 || value > 0xFFFF) {
-      throw new IllegalArgumentException("Address must be in the 0x0...0xFFFF interval [0x" + Integer.toHexString(value).toUpperCase() + ']');
+      throw new IllegalArgumentException("Address must be in the 0x0...0xFFFF interval [0x" +
+          Integer.toHexString(value).toUpperCase() + ']');
     }
   }
 
@@ -93,7 +97,8 @@ public enum AsmAssertions {
     }
     for (final char c : labelName.toCharArray()) {
       if (Character.isWhitespace(c)) {
-        throw new IllegalArgumentException("Label name must not contain any kind of a white character [" + labelName + ']');
+        throw new IllegalArgumentException(
+            "Label name must not contain any kind of a white character [" + labelName + ']');
       }
     }
   }
@@ -106,7 +111,8 @@ public enum AsmAssertions {
   public static void assertLocalLabelName(final String labelName) {
     checkLabelNameChars(labelName);
     if (!labelName.startsWith("@")) {
-      throw new IllegalArgumentException("Must be a local label name, it starts with the @ symbol [" + labelName + ']');
+      throw new IllegalArgumentException(
+          "Must be a local label name, it starts with the @ symbol [" + labelName + ']');
     }
   }
 
@@ -118,7 +124,8 @@ public enum AsmAssertions {
   public static void assertGlobalLabelName(final String labelName) {
     checkLabelNameChars(labelName);
     if (labelName.startsWith("@")) {
-      throw new IllegalArgumentException("Must be a global label name, it must not start with the @ symbol [" + labelName + ']');
+      throw new IllegalArgumentException(
+          "Must be a global label name, it must not start with the @ symbol [" + labelName + ']');
     }
   }
 

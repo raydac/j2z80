@@ -191,10 +191,10 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
   /**
    * Check the invoke instruction for a bootstrap class and if the invoked class is a bootstrap one then the method will process it by a special way.
    *
-   * @param methodTranslator a method translator called the method, must not be null
-   * @param instruction      an invoke instruction to be checked, must not be null
+   * @param methodTranslator     a method translator called the method, must not be null
+   * @param instruction          an invoke instruction to be checked, must not be null
    * @param bootstrapClassLoader bootstrap class loader, must not be null
-   * @param out              the output stream to write commands
+   * @param out                  the output stream to write commands
    * @return true if the instruction invokes a bootstrap class, and it has been processed by the method, else false
    * @throws IOException it will be thrown if any transport problem in the method
    */

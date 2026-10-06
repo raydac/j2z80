@@ -46,7 +46,8 @@ public class AsmCommandOUT extends AbstractAsmCommand {
       if (!"A".equals(rightPart)) {
         throw new IllegalArgumentException("The right operand must be A [" + rightPart + ']');
       }
-      final int number = new LightExpression(context, this, asm, extractCalculatedPart(port)).calculate();
+      final int number =
+          new LightExpression(context, this, asm, extractCalculatedPart(port)).calculate();
       AsmAssertions.assertUnsignedByte(number);
       return new byte[] {(byte) 0xD3, (byte) number};
     }

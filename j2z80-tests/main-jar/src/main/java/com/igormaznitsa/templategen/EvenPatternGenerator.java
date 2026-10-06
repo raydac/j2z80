@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.templategen;
 
 import com.igormaznitsa.j2z80test.Main;
 
 public class EvenPatternGenerator extends Main.AbstractTemplateGen {
 
-    @Override
-    public int getValueForAddress(final int address) {
-        return address ^ 0x5555;
-    }
-    
+  @Override
+  public int getValueForAddress(final int address) {
+    return address ^ 0x5555;
+  }
+
 }

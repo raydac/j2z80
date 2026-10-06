@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.memory;
 
 public class MemoryAccessor {
-    public native static void writeWordToMemory(int address, int value);
-    public native static int readWordFromMemory(int address);
+  public native static void writeWordToMemory(int address, int value);
+
+  public native static int readWordFromMemory(int address);
 }

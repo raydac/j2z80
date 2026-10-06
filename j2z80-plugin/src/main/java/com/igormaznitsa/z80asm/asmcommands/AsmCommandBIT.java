@@ -35,7 +35,8 @@ public class AsmCommandBIT extends AbstractAsmCommand {
 
     final int baseCode = 0x40 + (number << 3);
     if (isIndexRegisterReference(arg1)) {
-      final int offset = new LightExpression(context, this, asm, extractCalculatedPart(arg1)).calculate();
+      final int offset =
+          new LightExpression(context, this, asm, extractCalculatedPart(arg1)).calculate();
       AsmAssertions.assertSignedByte(offset);
       final byte prefix = arg1.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
       return new byte[] {prefix, (byte) 0xCB, (byte) offset, (byte) (baseCode + 6)};

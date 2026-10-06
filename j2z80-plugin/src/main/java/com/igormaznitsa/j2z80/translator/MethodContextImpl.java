@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator;
 
 import static com.igormaznitsa.j2z80.translator.utils.ClassUtils.hasJ2Z80Ignore;

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.ClassContext;
@@ -29,14 +30,18 @@ public class InvokeinterfaceTable {
   private final TranslatorContext translator;
   private final List<Record> records = new ArrayList<>();
 
-  public InvokeinterfaceTable(final TranslatorContext translator, final Set<MethodID> calledInterfaceMethods) {
+  public InvokeinterfaceTable(final TranslatorContext translator,
+                              final Set<MethodID> calledInterfaceMethods) {
     this.translator = translator;
     final ClassContext classContext = translator.getClassContext();
     for (final MethodID method : calledInterfaceMethods) {
-      final Set<ClassID> successors = classContext.findAllClassesImplementInterface(method.getClassName());
+      final Set<ClassID> successors =
+          classContext.findAllClassesImplementInterface(method.getClassName());
       final Record newRecord = new Record(method);
       for (final ClassID s : successors) {
-        newRecord.addInheritedMethod(new MethodID(s.getClassName(), method.getMethodName(), method.getReturnType(), method.getArgs()));
+        newRecord.addInheritedMethod(
+            new MethodID(s.getClassName(), method.getMethodName(), method.getReturnType(),
+                method.getArgs()));
       }
       records.add(newRecord);
     }
@@ -76,7 +81,8 @@ public class InvokeinterfaceTable {
             LabelAndFrameUtils.countArgumentSlots(meth.getArgumentTypes()), meth.getMaxLocals(),
             false);
 
-        result.append("DEFW ").append(LabelAndFrameUtils.makeLabelForClassID(method.getClassID())).append(',')
+        result.append("DEFW ").append(LabelAndFrameUtils.makeLabelForClassID(method.getClassID()))
+            .append(',')
             .append(method.getMethodLabel()).append(',')
             .append(frameSize)
             .append('\n');

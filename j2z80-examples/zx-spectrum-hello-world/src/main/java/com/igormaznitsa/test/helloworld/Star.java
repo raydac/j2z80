@@ -4,11 +4,10 @@ import j2z80.spectrum.Screen;
 
 public class Star {
 
+  public final StarType type;
   public int x;
   public int y;
   public int speed;
-
-  public final StarType type;
 
   public Star(final int x, final int y, final int speed, final StarType type) {
     this.x = x;

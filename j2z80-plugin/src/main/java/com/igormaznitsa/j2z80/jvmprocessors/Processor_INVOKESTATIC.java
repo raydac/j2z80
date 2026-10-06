@@ -1,4 +1,4 @@
-/* 
+/*
 
  * Copyright 2012-2026 Igor Maznitsa.
 
@@ -93,7 +93,9 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
 
     for (final Method method : ClassUtils.findBoostrapAwareMethods(classGen)) {
 
-      if (method.isStatic() && "<clinit>".equals(method.getName()) && method.getArgumentTypes().length == 0 && method.getReturnType().getType() == Type.VOID.getType()) {
+      if (method.isStatic() && "<clinit>".equals(method.getName()) &&
+          method.getArgumentTypes().length == 0 &&
+          method.getReturnType().getType() == Type.VOID.getType()) {
 
         initingMethod = new MethodGen(method, classGen.getClassName(), classGen.getConstantPool());
 
@@ -138,7 +140,9 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
     }
 
 
-    final String res = template.replace(MACROS_ADDRESS, labelForMethod).replace(MACROS_PREFIX, prefix).replace(MACROS_POSTFIX, postfix) + '\n';
+    final String res =
+        template.replace(MACROS_ADDRESS, labelForMethod).replace(MACROS_PREFIX, prefix)
+            .replace(MACROS_POSTFIX, postfix) + '\n';
 
 
     return Utils.breakToLines(res);
@@ -197,8 +201,9 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
       postfix += pushReturnedValueAndCheckException(methodTranslator, handle, invokedMethod);
 
 
-
-      final String res = template.replace(MACROS_ADDRESS, labelForMethod).replace(MACROS_PREFIX, prefix).replace(MACROS_POSTFIX, postfix);
+      final String res =
+          template.replace(MACROS_ADDRESS, labelForMethod).replace(MACROS_PREFIX, prefix)
+              .replace(MACROS_POSTFIX, postfix);
 
 
       out.write(res);

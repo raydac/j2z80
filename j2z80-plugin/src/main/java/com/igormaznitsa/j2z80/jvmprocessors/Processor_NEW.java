@@ -63,7 +63,8 @@ public class Processor_NEW extends AbstractJvmCommandProcessor implements NeedsM
 
     final String classInfoLabel = LabelAndFrameUtils.makeLabelForClassSizeInfo(type);
 
-    out.write(template.replace(MACROS_VALUE, classInfoLabel).replace(MACROS_ID, Integer.toString(classID)));
+    out.write(template.replace(MACROS_VALUE, classInfoLabel)
+        .replace(MACROS_ID, Integer.toString(classID)));
     out.write(NEXT_LINE);
   }
 }

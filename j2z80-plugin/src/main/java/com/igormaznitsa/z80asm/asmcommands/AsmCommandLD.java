@@ -138,30 +138,36 @@ public class AsmCommandLD extends AbstractAsmCommand {
     return "LD";
   }
 
-  private byte[] nonregisterAtBothPart(final AsmTranslator context, final ParsedAsmLine asm, final String leftPart, final String rightPart) {
+  private byte[] nonregisterAtBothPart(final AsmTranslator context, final ParsedAsmLine asm,
+                                       final String leftPart, final String rightPart) {
     if (!isIndexRegisterReference(leftPart)) {
       throw new IllegalArgumentException("Unsupported LD arguments: " + leftPart);
     }
-    final int offset = new LightExpression(context, this, asm, extractCalculatedPart(leftPart)).calculate();
+    final int offset =
+        new LightExpression(context, this, asm, extractCalculatedPart(leftPart)).calculate();
     AsmAssertions.assertSignedByte(offset);
 
     if (isInBrakes(rightPart)) {
       throw new IllegalArgumentException("Wrong pointer usage in the right part: " + rightPart);
     }
 
-    final int data = new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
+    final int data =
+        new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
     AsmAssertions.assertUnsignedByte(data);
 
     final byte prefix = leftPart.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
     return new byte[] {prefix, (byte) 0x36, (byte) offset, (byte) data};
   }
 
-  private byte[] getMachineCodeWhenLeftRegister(final AsmTranslator context, final ParsedAsmLine asm, final String leftPart, final String rightPart) {
+  private byte[] getMachineCodeWhenLeftRegister(final AsmTranslator context,
+                                                final ParsedAsmLine asm, final String leftPart,
+                                                final String rightPart) {
 
     byte[] result = null;
 
     if (isIndexRegisterReference(rightPart)) {
-      final int offset = new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
+      final int offset =
+          new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
       AsmAssertions.assertSignedByte(offset);
       final byte prefix = rightPart.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
 
@@ -185,7 +191,8 @@ public class AsmCommandLD extends AbstractAsmCommand {
         throw new IllegalArgumentException("The left part must be A,B,C,D,E,H or L: " + leftPart);
       }
     } else if (isRegister16Name(leftPart) || ("A".equals(leftPart) && isInBrakes(rightPart))) {
-      final int address = new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
+      final int address =
+          new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
 
       final byte lowByte = (byte) address;
       final byte highByte = (byte) (address >>> 8);
@@ -242,7 +249,8 @@ public class AsmCommandLD extends AbstractAsmCommand {
         }
       }
     } else {
-      final int value = new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
+      final int value =
+          new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
       AsmAssertions.assertUnsignedByte(value);
       final byte valueByte = (byte) value;
       if ("(HL)".equals(leftPart)) {
@@ -271,7 +279,9 @@ public class AsmCommandLD extends AbstractAsmCommand {
     return result;
   }
 
-  private byte[] getMachineCodeWhenRightRegister(final AsmTranslator context, final ParsedAsmLine asm, final String leftPart, final String rightPart) {
+  private byte[] getMachineCodeWhenRightRegister(final AsmTranslator context,
+                                                 final ParsedAsmLine asm, final String leftPart,
+                                                 final String rightPart) {
     byte[] result = null;
 
     if (!isInBrakes(leftPart)) {
@@ -279,7 +289,8 @@ public class AsmCommandLD extends AbstractAsmCommand {
     }
 
     if (isIndexRegisterReference(leftPart)) {
-      final int offset = new LightExpression(context, this, asm, extractCalculatedPart(leftPart)).calculate();
+      final int offset =
+          new LightExpression(context, this, asm, extractCalculatedPart(leftPart)).calculate();
       AsmAssertions.assertSignedByte(offset);
       final byte prefix = leftPart.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
 
@@ -301,7 +312,8 @@ public class AsmCommandLD extends AbstractAsmCommand {
 
       requireNonNull(result, () -> "The right part must be A,B,C,D,E,H or L: " + rightPart);
     } else {
-      final int address = new LightExpression(context, this, asm, extractCalculatedPart(leftPart)).calculate();
+      final int address =
+          new LightExpression(context, this, asm, extractCalculatedPart(leftPart)).calculate();
       AsmAssertions.assertAddress(address);
       final byte lowByte = (byte) address;
       final byte highByte = (byte) (address >>> 8);

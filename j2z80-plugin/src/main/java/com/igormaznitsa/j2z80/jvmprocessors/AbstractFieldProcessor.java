@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootstrapClass;
@@ -40,10 +41,10 @@ public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor
    * Check the invoke instruction for a bootstrap class and if the field is situated in
    * a bootstrap class  then the method will process it by a special way.
    *
-   * @param methodTranslator a method translator, must not be null
-   * @param instruction      a field instruction, must not be null
+   * @param methodTranslator     a method translator, must not be null
+   * @param instruction          a field instruction, must not be null
    * @param bootstrapClassLoader bootstrap class loader, must not be null
-   * @param out              a writer to make output for assembler instructions, must not be null
+   * @param out                  a writer to make output for assembler instructions, must not be null
    * @return true if the field instruction processes a bootstrap class field, else false
    * @throws IOException it will be thrown if there is any transport level error
    */
@@ -71,7 +72,8 @@ public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor
         AbstractBootstrapClass.findProcessor(className, bootstrapClassLoader);
 
     if (processor != null) {
-      final boolean isStaticCall = (instruction instanceof PUTSTATIC) || (instruction instanceof GETSTATIC);
+      final boolean isStaticCall =
+          (instruction instanceof PUTSTATIC) || (instruction instanceof GETSTATIC);
 
       if (instruction instanceof PUTSTATIC || instruction instanceof PUTFIELD) {
         for (final String s : processor.generateFieldSetter(methodTranslator.translatorContext(),
@@ -91,7 +93,8 @@ public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor
         }
 
       } else {
-        throw new IllegalArgumentException("Unsupported field operation detected [" + instruction + ']');
+        throw new IllegalArgumentException(
+            "Unsupported field operation detected [" + instruction + ']');
       }
       out.write(NEXT_LINE);
 

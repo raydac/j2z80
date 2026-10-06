@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator.jar;
 
 import static java.util.Collections.unmodifiableMap;
@@ -58,7 +59,8 @@ public class ZClassPath {
         File.pathSeparator));
   }
 
-  public ClassGen findMainClass(final String mainClassName, final String mainMethod, final String mainMethodSignature) {
+  public ClassGen findMainClass(final String mainClassName, final String mainMethod,
+                                final String mainMethodSignature) {
     if (mainClassName != null) {
       this.mainClass = classMap.get(mainClassName);
       if (this.mainClass != null) {
@@ -92,10 +94,12 @@ public class ZClassPath {
     return false;
   }
 
-  private Method findMainMethodInClass(final ClassGen classGen, final String mainMethodName, final String mainMethodSignature) {
+  private Method findMainMethodInClass(final ClassGen classGen, final String mainMethodName,
+                                       final String mainMethodSignature) {
     if (!classGen.isInterface()) {
       for (final Method method : classGen.getMethods()) {
-        if (method.isStatic() && mainMethodName.equals(method.getName()) && mainMethodSignature.equals(method.getSignature())) {
+        if (method.isStatic() && mainMethodName.equals(method.getName()) &&
+            mainMethodSignature.equals(method.getSignature())) {
           return method;
         }
       }

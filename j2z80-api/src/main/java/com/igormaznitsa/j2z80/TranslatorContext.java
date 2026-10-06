@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80;
 
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootstrapClass;
@@ -46,7 +47,7 @@ public interface TranslatorContext {
    * @param startAddress          the start address for translation
    * @param stackTopAddress       the stack top address to be used by the compiled code
    * @param excludeBinResPatterns patterns to be used to exclude met resources in JAR files
-   * @param bootstrapClassLoader bootstrap class loader, must not be null
+   * @param bootstrapClassLoader  bootstrap class loader, must not be null
    * @return assembler text of translated Java classes
    * @throws IOException it will be thrown if there is any transport problem
    */

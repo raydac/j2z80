@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
@@ -24,6 +25,7 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.PUTFIELD;
+
 // class to process PUTFIELD with code 181
 public class Processor_PUTFIELD extends AbstractFieldProcessor {
 
@@ -51,7 +53,9 @@ public class Processor_PUTFIELD extends AbstractFieldProcessor {
       final ConstantPoolGen const_pool = methodTranslator.getConstantPool();
       final ObjectType objType = (ObjectType) putfield.getReferenceType(const_pool);
 
-      final String labelOffset = LabelAndFrameUtils.makeLabelNameForFieldOffset(objType.getClassName(), putfield.getFieldName(const_pool), putfield.getFieldType(const_pool));
+      final String labelOffset =
+          LabelAndFrameUtils.makeLabelNameForFieldOffset(objType.getClassName(),
+              putfield.getFieldName(const_pool), putfield.getFieldType(const_pool));
       final String body = putfield.getFieldType(const_pool).getSize() == 2
           ? this.longTemplate : this.template;
 

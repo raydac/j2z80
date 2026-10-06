@@ -49,7 +49,8 @@ public class AsmCommandSBC extends AbstractAsmCommand {
         if (!isRegisterName(argRight)) {
           int number;
           if (isIndexRegisterReference(argRight)) {
-            number = new LightExpression(context, this, asm, extractCalculatedPart(argRight)).calculate();
+            number = new LightExpression(context, this, asm,
+                extractCalculatedPart(argRight)).calculate();
             AsmAssertions.assertSignedByte(number);
             return argRight.startsWith("(IX") ? new byte[] {(byte) 0xDD, (byte) 0x9E, (byte) number}
                 : new byte[] {(byte) 0xFD, (byte) 0x9E, (byte) number};

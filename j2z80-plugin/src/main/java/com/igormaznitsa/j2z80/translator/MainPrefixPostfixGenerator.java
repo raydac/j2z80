@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
@@ -35,7 +36,8 @@ public class MainPrefixPostfixGenerator {
    * @param startAddress  the start address of the main method
    * @param stackInitAddr the value to init stack just after start
    */
-  public MainPrefixPostfixGenerator(final ClassMethodInfo mainMethod, final int startAddress, final int stackInitAddr) {
+  public MainPrefixPostfixGenerator(final ClassMethodInfo mainMethod, final int startAddress,
+                                    final int stackInitAddr) {
     this.method = mainMethod;
     this.initStack = stackInitAddr;
     this.startAddress = startAddress;

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
@@ -24,7 +25,8 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 
 // class to process ARRAYLENGTH with code 190
-public class Processor_ARRAYLENGTH extends AbstractJvmCommandProcessor implements NeedsMemoryManager {
+public class Processor_ARRAYLENGTH extends AbstractJvmCommandProcessor
+    implements NeedsMemoryManager {
   private final String template;
 
   public Processor_ARRAYLENGTH() {

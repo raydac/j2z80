@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
@@ -28,7 +29,8 @@ import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
 
 // class to process INSTANCEOF with code 193
-public class Processor_INSTANCEOF extends AbstractJvmCommandProcessor implements NeedsMemoryManager, NeedsInstanceofManager {
+public class Processor_INSTANCEOF extends AbstractJvmCommandProcessor
+    implements NeedsMemoryManager, NeedsInstanceofManager {
   private final String template;
 
   public Processor_INSTANCEOF() {

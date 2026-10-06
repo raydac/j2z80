@@ -33,7 +33,8 @@ public class LightExpression {
   private final ParsedAsmLine asmLineParameters;
   private int position;
 
-  public LightExpression(final AsmTranslator context, final AbstractAsmCommand command, final ParsedAsmLine line, final String expression) {
+  public LightExpression(final AsmTranslator context, final AbstractAsmCommand command,
+                         final ParsedAsmLine line, final String expression) {
     this.context = context;
     this.expression = expression;
     this.callingCommand = command;
@@ -131,7 +132,8 @@ public class LightExpression {
                   result.append('\'');
                   break;
                 default:
-                  throw new IllegalArgumentException("Unsupported special char detected [\\" + chr + ']');
+                  throw new IllegalArgumentException(
+                      "Unsupported special char detected [\\" + chr + ']');
               }
             } else {
               result.append(chr);

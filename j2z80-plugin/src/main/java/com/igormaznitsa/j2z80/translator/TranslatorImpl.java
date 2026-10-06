@@ -141,6 +141,12 @@ public class TranslatorImpl implements TranslatorContext {
     return result;
   }
 
+  static boolean matchesResourcePattern(final String resourcePath, final String pattern) {
+    final String normalizedPath =
+        resourcePath.startsWith("/") ? resourcePath : '/' + resourcePath;
+    return SelectorUtils.matchPath(pattern, normalizedPath, false);
+  }
+
   public ClassGen findOverriddenMethodOnPath(final String className, final String superClassName,
                                              final MethodGen method) {
     ClassGen classGen = this.workingClassPath.findClassForName(className);
@@ -412,12 +418,6 @@ public class TranslatorImpl implements TranslatorContext {
       this.getLogger().logInfo("Process " + classInfo);
       text.addAll(asList(processor.findNativeSources(classContext.findClassInfoForID(classInfo))));
     }
-  }
-
-  static boolean matchesResourcePattern(final String resourcePath, final String pattern) {
-    final String normalizedPath =
-        resourcePath.startsWith("/") ? resourcePath : '/' + resourcePath;
-    return SelectorUtils.matchPath(pattern, normalizedPath, false);
   }
 
   private void processBinaryData(final List<String> text) {

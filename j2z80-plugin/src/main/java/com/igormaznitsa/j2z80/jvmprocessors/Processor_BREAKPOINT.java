@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsBREAKPOINTManager;
@@ -24,12 +25,14 @@ import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 
 // class to process BREAKPOINT with code 202
-public class Processor_BREAKPOINT extends AbstractJvmCommandProcessor implements NeedsBREAKPOINTManager {
+public class Processor_BREAKPOINT extends AbstractJvmCommandProcessor
+    implements NeedsBREAKPOINTManager {
   private final String template;
 
   public Processor_BREAKPOINT() {
     super();
-    template = loadResourceFileAsString("BREAKPOINT.a80").replace(MACROS_ADDRESS, BREAKPOINT_PROCESSING_MANAGER);
+    template = loadResourceFileAsString("BREAKPOINT.a80").replace(MACROS_ADDRESS,
+        BREAKPOINT_PROCESSING_MANAGER);
   }
 
   @Override

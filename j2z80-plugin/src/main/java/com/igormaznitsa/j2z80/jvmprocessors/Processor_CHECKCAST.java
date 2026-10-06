@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsATHROWManager;
@@ -30,7 +31,9 @@ import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.ObjectType;
 
 // class to process CHECKCAST with code 192
-public class Processor_CHECKCAST extends AbstractJvmCommandProcessor implements NeedsMemoryManager, NeedsCheckcastManager, NeedsInstanceofManager, NeedsATHROWManager {
+public class Processor_CHECKCAST extends AbstractJvmCommandProcessor
+    implements NeedsMemoryManager, NeedsCheckcastManager, NeedsInstanceofManager,
+    NeedsATHROWManager {
 
   private final String template;
 

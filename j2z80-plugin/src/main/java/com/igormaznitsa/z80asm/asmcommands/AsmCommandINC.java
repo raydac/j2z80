@@ -46,7 +46,8 @@ public class AsmCommandINC extends AbstractAsmCommand {
 
     if (isIndexRegisterReference(arg)) {
       final byte prefix = arg.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
-      final int offset = new LightExpression(context, this, asm, extractCalculatedPart(arg)).calculate();
+      final int offset =
+          new LightExpression(context, this, asm, extractCalculatedPart(arg)).calculate();
       AsmAssertions.assertSignedByte(offset);
       return new byte[] {prefix, (byte) 0x34, (byte) offset};
     } else {

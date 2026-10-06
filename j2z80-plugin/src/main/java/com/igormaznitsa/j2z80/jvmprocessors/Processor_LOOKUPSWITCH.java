@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
@@ -67,7 +68,8 @@ public class Processor_LOOKUPSWITCH extends AbstractJvmCommandProcessor {
             LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.method(),
                 target.getPosition());
 
-        out.write("DEFW #" + Integer.toHexString(match & 0xFFFF).toUpperCase(Locale.ENGLISH) + "\n");
+        out.write(
+            "DEFW #" + Integer.toHexString(match & 0xFFFF).toUpperCase(Locale.ENGLISH) + "\n");
         out.write("DEFW " + jumpLabel + "\n");
       }
     }

@@ -51,7 +51,9 @@ public abstract class AbstractAsmCommand {
     REGISTER_ORDER.put("L", 5);
     REGISTER_ORDER.put("(HL)", 6);
 
-    REGISTER_NAME.addAll(Arrays.asList("A", "B", "C", "D", "E", "H", "L", "BC", "DE", "HL", "IX", "IY", "AF", "AF'", "R", "I", "(BC)", "(DE)", "(HL)", "SP", "(SP)"));
+    REGISTER_NAME.addAll(
+        Arrays.asList("A", "B", "C", "D", "E", "H", "L", "BC", "DE", "HL", "IX", "IY", "AF", "AF'",
+            "R", "I", "(BC)", "(DE)", "(HL)", "SP", "(SP)"));
     REGISTER_NAME_16.addAll(Arrays.asList("BC", "DE", "HL", "SP", "IX", "IY"));
     addCommand("NOP");
     addCommand("ADC");
@@ -195,7 +197,8 @@ public abstract class AbstractAsmCommand {
   private static void addCommand(final String name) {
     final String className = AbstractAsmCommand.class.getPackage().getName() + ".AsmCommand" + name;
     try {
-      final Class<? extends AbstractAsmCommand> commandClass = Class.forName(className).asSubclass(AbstractAsmCommand.class);
+      final Class<? extends AbstractAsmCommand> commandClass =
+          Class.forName(className).asSubclass(AbstractAsmCommand.class);
       final AbstractAsmCommand command = commandClass.getDeclaredConstructor().newInstance();
       if (!command.getName().equals(name)) {
         throw new IllegalArgumentException(

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator;
 
 import static com.igormaznitsa.j2z80.translator.utils.ClassUtils.findBoostrapAwareMethods;
@@ -67,10 +68,12 @@ public class InvokeVirtualTable {
     }
   }
 
-  private void makeRecordsForVirtualMethods(final ClassGen classGen, final Collection<ClassMethodInfo> methods) {
+  private void makeRecordsForVirtualMethods(final ClassGen classGen,
+                                            final Collection<ClassMethodInfo> methods) {
     final ClassContext classContext = translator.getClassContext();
 
-    final List<String> allAncestors = new ArrayList<>(classContext.findAllClassAncestors(classGen.getClassName()));
+    final List<String> allAncestors =
+        new ArrayList<>(classContext.findAllClassAncestors(classGen.getClassName()));
     allAncestors.add(classGen.getClassName());
 
     for (final String className : allAncestors) {
@@ -79,7 +82,8 @@ public class InvokeVirtualTable {
       for (final ClassMethodInfo m : methods) {
         final Record record = findRecord(new ClassID(ancestor.getClassName()), m.getMethodInfo());
 
-        if (!m.getMethodInfo().isAbstract() && classContext.isAccessible(m.getClassInfo(), ancestor.getClassName())) {
+        if (!m.getMethodInfo().isAbstract() &&
+            classContext.isAccessible(m.getClassInfo(), ancestor.getClassName())) {
           record.addCase(m);
         }
       }

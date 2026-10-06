@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator.optimizator.base;
 
-import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
+import static java.util.Arrays.asList;
 
+import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 public enum OptimizationState implements OptimizationConst {
 

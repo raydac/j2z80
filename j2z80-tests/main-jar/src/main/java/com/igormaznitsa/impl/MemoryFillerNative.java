@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.impl;
 
 import com.igormaznitsa.j2z80test.Main.AbstractTemplateGen;
 
 public class MemoryFillerNative extends MemoryFillerJava {
 
-    @Override
-    public native void fillArea(final AbstractTemplateGen generator, final int startAddress, final int endAddress);
+  @Override
+  public native void fillArea(final AbstractTemplateGen generator, final int startAddress,
+                              final int endAddress);
 
 }

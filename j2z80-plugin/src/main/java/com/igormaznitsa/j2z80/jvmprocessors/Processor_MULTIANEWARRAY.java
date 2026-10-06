@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
@@ -26,17 +27,14 @@ import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MULTIANEWARRAY;
 
 // class to process MULTIANEWARRAY with code 197
-public class Processor_MULTIANEWARRAY extends AbstractJvmCommandProcessor implements NeedsMemoryManager {
+public class Processor_MULTIANEWARRAY extends AbstractJvmCommandProcessor
+    implements NeedsMemoryManager {
   private final String template;
 
   public Processor_MULTIANEWARRAY() {
     super();
-    template = loadResourceFileAsString("MULTIANEWARRAY.a80").replace(MACROS_ADDRESS, SUB_ALLOCATE_AMULTIARRAY);
-  }
-
-  @Override
-  public String getName() {
-    return "MULTIANEWARRAY";
+    template = loadResourceFileAsString("MULTIANEWARRAY.a80").replace(MACROS_ADDRESS,
+        SUB_ALLOCATE_AMULTIARRAY);
   }
 
   private static boolean isLongArray(final ConstantPoolGen pool, final int index) {
@@ -45,6 +43,11 @@ public class Processor_MULTIANEWARRAY extends AbstractJvmCommandProcessor implem
     }
     final String name = pool.getConstantPool().getConstantString(index, Const.CONSTANT_Class);
     return name != null && name.startsWith("[") && (name.endsWith("J") || name.endsWith("D"));
+  }
+
+  @Override
+  public String getName() {
+    return "MULTIANEWARRAY";
   }
 
   @Override

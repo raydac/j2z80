@@ -56,16 +56,16 @@ public final class JavaZ80Run {
     return new JavaZ80Run(mainClassName);
   }
 
-  public JavaZ80Run file(final String relativePath, final String source) {
-    this.sources.put(relativePath, source);
-    return this;
-  }
-
   private static List<Path> runtimeClasspath() {
     return Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator))
         .filter(entry -> !entry.isEmpty())
         .map(Path::of)
         .collect(toList());
+  }
+
+  public JavaZ80Run file(final String relativePath, final String source) {
+    this.sources.put(relativePath, source);
+    return this;
   }
 
   public JavaZ80Run withRuntimeClasspath() {

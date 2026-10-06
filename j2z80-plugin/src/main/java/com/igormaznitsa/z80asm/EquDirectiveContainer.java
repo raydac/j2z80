@@ -36,7 +36,8 @@ public class EquDirectiveContainer {
     return directiveContainer.get(requireNonNull(associatedLabel, "Label is null"));
   }
 
-  public EquDirectiveRecord addRecord(final String associatedLabel, final ParsedAsmLine parsedAsmLine, final int pcCounter) {
+  public EquDirectiveRecord addRecord(final String associatedLabel,
+                                      final ParsedAsmLine parsedAsmLine, final int pcCounter) {
     requireNonNull(associatedLabel, "Label Must not be null");
     requireNonNull(parsedAsmLine, "Line must not be null");
     return this.directiveContainer.put(associatedLabel,
@@ -57,7 +58,8 @@ public class EquDirectiveContainer {
     private final ParsedAsmLine parsedAsmLine;
     private final String associatedLabel;
 
-    public EquDirectiveRecord(final String associatedLabel, final ParsedAsmLine parsedAsmString, final int pcCounter) {
+    public EquDirectiveRecord(final String associatedLabel, final ParsedAsmLine parsedAsmString,
+                              final int pcCounter) {
       this.pcCounterState = pcCounter;
       this.parsedAsmLine = parsedAsmString;
       this.associatedLabel = associatedLabel;

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.translator.jar;
 
 import com.igormaznitsa.j2z80.utils.MutableObjectContainer;
@@ -45,7 +46,8 @@ public enum ClassValidator {
     return checkConstantPool(cgen, result) ? null : result.get();
   }
 
-  private static boolean checkConstantPool(final ClassGen cgen, final MutableObjectContainer<String> result) {
+  private static boolean checkConstantPool(final ClassGen cgen,
+                                           final MutableObjectContainer<String> result) {
     final ConstantPoolGen cpool = cgen.getConstantPool();
 
     for (int index = 1; index < cpool.getSize(); index++) {

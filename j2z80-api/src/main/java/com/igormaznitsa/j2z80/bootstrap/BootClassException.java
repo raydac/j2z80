@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.bootstrap;
 
 /**
@@ -36,7 +37,8 @@ public class BootClassException extends RuntimeException {
    * @param methodOrFieldName the source method or field
    * @param signature         the method or field signature
    */
-  public BootClassException(final String message, final String className, final String methodOrFieldName, final String signature) {
+  public BootClassException(final String message, final String className,
+                            final String methodOrFieldName, final String signature) {
     super(message);
     this.className = className;
     this.methodOrFieldName = methodOrFieldName;

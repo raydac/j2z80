@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.z80asm.asmcommands;
 
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
@@ -45,7 +46,8 @@ public class AsmCommandDEC extends AbstractAsmCommand {
 
     if (isIndexRegisterReference(arg)) {
       final byte prefix = arg.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
-      final int offset = new LightExpression(context, this, asm, extractCalculatedPart(arg)).calculate();
+      final int offset =
+          new LightExpression(context, this, asm, extractCalculatedPart(arg)).calculate();
       AsmAssertions.assertSignedByte(offset);
       return new byte[] {prefix, (byte) 0x35, (byte) offset};
     } else {

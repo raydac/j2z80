@@ -33,7 +33,8 @@ public class AsmCommandRES extends AbstractAsmCommand {
     final String register = asm.getArgs()[1];
     final int baseCode = 0x80 + (number << 3);
     if (isIndexRegisterReference(register)) {
-      final int offset = new LightExpression(context, this, asm, extractCalculatedPart(register)).calculate();
+      final int offset =
+          new LightExpression(context, this, asm, extractCalculatedPart(register)).calculate();
       AsmAssertions.assertSignedByte(offset);
       final byte prefix = register.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
       return new byte[] {prefix, (byte) 0xCB, (byte) offset, (byte) (baseCode + 6)};
