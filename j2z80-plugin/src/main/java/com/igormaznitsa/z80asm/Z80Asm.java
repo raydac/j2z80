@@ -28,6 +28,8 @@ import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import com.igormaznitsa.z80asm.exceptions.AsmTranslationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,10 +59,10 @@ public class Z80Asm implements AsmTranslator {
   private final String[] sources;
 
   public Z80Asm(final File file) throws IOException {
-    this(Arrays.asList(Utils.readTextFileAsStringArray(file, "UTF-8")));
+    this(Arrays.asList(Utils.readTextFileAsStringArray(file, StandardCharsets.UTF_8)));
   }
 
-  public Z80Asm(final File file, final String charSet) throws IOException {
+  public Z80Asm(final File file, final Charset charSet) throws IOException {
     this(Arrays.asList(Utils.readTextFileAsStringArray(file, charSet)));
   }
 

@@ -40,7 +40,7 @@ public abstract class AbstractJvmCommandProcessor {
   /**
    * The next line constant
    */
-  public static final String NEXT_LINE = Utils.NEXT_LINE;
+  public static final String NEXT_LINE = "\n";
   /**
    * The macros name to be used for an address replacement
    */

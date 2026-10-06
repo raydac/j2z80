@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
+import org.apache.commons.io.IOUtils;
 
 /**
  * It is an Auxiliary class contains some useful methods.
@@ -40,8 +42,6 @@ import java.util.StringTokenizer;
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public final class Utils {
-  public static final String NEXT_LINE = "\r\n";
-  private static final AntPathMatcher ANT_MATCHER = new AntPathMatcher();
   private static final String[] EMPTY_STRING_ARRAY = {};
 
   private Utils() {
@@ -78,11 +78,6 @@ public final class Utils {
     return toStringArray(tokens);
   }
 
-
-  public static boolean hasText(String str) {
-    return (str != null && !str.isBlank());
-  }
-
   /**
    * Silently close any closeable object
    *
@@ -106,7 +101,7 @@ public final class Utils {
    * @return a string array contains each text line as an element
    * @throws IOException it will be thrown if there is any transport problem
    */
-  public static String[] readTextFileAsStringArray(final File file, final String charSet)
+  public static String[] readTextFileAsStringArray(final File file, final Charset charSet)
       throws IOException {
     final BufferedReader reader =
         new BufferedReader(new InputStreamReader(new FileInputStream(file), charSet));
@@ -146,26 +141,14 @@ public final class Utils {
    */
   public static String readTextResource(final Class<?> thisClass, final String resource)
       throws IOException {
-    final InputStream file = thisClass.getResourceAsStream(resource);
-    if (file == null) {
+    final InputStream resourceStream = thisClass.getResourceAsStream(resource);
+    if (resourceStream == null) {
       throw new FileNotFoundException("Can't find resource " + resource);
     }
-    final StringBuilder builder = new StringBuilder();
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(file,
-        StandardCharsets.UTF_8));
-    try {
-      while (true) {
-        final String line = reader.readLine();
-        if (line == null) {
-          break;
-        }
-        builder.append(line).append(NEXT_LINE);
-      }
-      return builder.toString();
-    } finally {
-      silentlyClose(reader);
+    try (InputStream input = resourceStream) {
+      final List<String> lines = IOUtils.readLines(input, StandardCharsets.UTF_8);
+      return lines.isEmpty() ? "" : String.join("\n", lines) + '\n';
     }
-
   }
 
   /**
@@ -270,16 +253,4 @@ public final class Utils {
     return breakToLines(buffer.toString());
   }
 
-  /**
-   * Check a path for its compatibility with an ANT styled pattern
-   *
-   * @param path       a path to be checked, must not be null
-   * @param antPattern a pattern to be used to check the path, must not be null
-   * @return true if the path is compatible with the pattern
-   */
-  public static boolean checkPathForAntPattern(final String path, final String antPattern) {
-    String newPath = path.startsWith("/") ? path : '/' + path;
-    return ANT_MATCHER.match(antPattern.toLowerCase(Locale.ENGLISH),
-        newPath.toLowerCase(Locale.ENGLISH));
-  }
 }

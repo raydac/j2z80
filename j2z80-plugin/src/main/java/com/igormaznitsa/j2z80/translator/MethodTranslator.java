@@ -103,7 +103,7 @@ public class MethodTranslator {
         final String methodJumpLabel =
             LabelAndFrameUtils.makeClassMethodJumpLabel(this.method.getClassInfo(),
                 this.method.getMethodGen(), handler.getPosition());
-        result.add(methodJumpLabel + ":\r\n");
+        result.add(methodJumpLabel + ":\n");
       }
 
       final CompactedInit compacted = compactedInits.starts.get(handler);

@@ -166,7 +166,8 @@ This translates the configured jar and emits the selected output formats.
 
 `excludeResources`
 
-- Resource globs to skip while embedding the output.
+- Case-insensitive Ant-style path patterns for resources to omit from the output. Resource paths
+  are matched from the root, so patterns should start with `/`.
 - Example:
 
 ```xml

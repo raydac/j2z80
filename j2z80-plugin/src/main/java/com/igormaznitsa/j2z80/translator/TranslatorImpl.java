@@ -74,6 +74,7 @@ import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.INVOKESTATIC;
 import org.apache.bcel.generic.MethodGen;
+import org.codehaus.plexus.util.SelectorUtils;
 
 /**
  * The class is the Translator implementation. It is the core central class which implements the main work-flow.
@@ -414,6 +415,12 @@ public class TranslatorImpl implements TranslatorContext {
     }
   }
 
+  static boolean matchesResourcePattern(final String resourcePath, final String pattern) {
+    final String normalizedPath =
+        resourcePath.startsWith("/") ? resourcePath : '/' + resourcePath;
+    return SelectorUtils.matchPath(pattern, normalizedPath, false);
+  }
+
   private void processBinaryData(final List<String> text) {
     this.getLogger().logInfo("----PROCESS BINARY DATA----");
 
@@ -429,7 +436,7 @@ public class TranslatorImpl implements TranslatorContext {
       if (this.excludeResourcePatterns != null && this.excludeResourcePatterns.length > 0) {
         String matchedPattern = null;
         for (final String pattern : this.excludeResourcePatterns) {
-          if (Utils.checkPathForAntPattern(path, pattern)) {
+          if (matchesResourcePattern(path, pattern)) {
             matchedPattern = pattern;
             break;
           }

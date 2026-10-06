@@ -51,12 +51,14 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverExcepti
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 
 /**
- * Maven mojo to translate a compiled Java classes from a Jar into Z80 binary
- * code through assembler stage.
+ * Translates a built Java archive into Z80 assembly and binary output during a Maven build.
+ *
+ * <p>The mojo resolves any project dependencies that provide Z80 classes, loads the generated
+ * JAR, translates the bytecode, and writes the requested output formats to the build directory.
  */
 @SuppressWarnings("unused")
 @Mojo(name = "translate",
-    defaultPhase = LifecyclePhase.INSTALL,
+    defaultPhase = LifecyclePhase.PACKAGE,
     threadSafe = true,
     requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
@@ -67,26 +69,48 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
 
   private final ArtifactResolver artifactResolver;
 
-  @Parameter(name = "jarFile", defaultValue = "${project.build.directory}${file.separator}${project.build.finalName}.jar")
+  /**
+   * The JAR file to translate. By default, it is the project output JAR in the build directory.
+   */
+  @Parameter(property = "j2z80.jarFile",
+      defaultValue = "${project.build.directory}${file.separator}${project.build.finalName}.jar")
   private File jarFile;
 
-  @Parameter(name = "formats")
+  /**
+   * Target output formats produced by the translation.
+   */
+  @Parameter(property = "j2z80.formats")
   private Set<Format> formats = Set.of(Format.A80);
 
-  @Parameter(name = "startAddress", defaultValue = "28672")
+  /**
+   * Start address of the translated program in the target address space (0..65535).
+   */
+  @Parameter(property = "j2z80.startAddress", defaultValue = "28672")
   private int startAddress;
 
-  @Parameter(name = "stackTop", defaultValue = "65533")
+  /**
+   * Initial stack pointer value for the generated program (0..65535).
+   */
+  @Parameter(property = "j2z80.stackTop", defaultValue = "65533")
   private int stackTop;
 
-  @Parameter(name = "logAsmText", defaultValue = "false")
+  /**
+   * Whether to log the generated assembly text in the Maven output.
+   */
+  @Parameter(property = "j2z80.logAsmText", defaultValue = "false")
   private boolean logAsmText;
 
-  @Parameter(name = "excludeResources")
-  private String[] excludeResources;
+  /**
+   * Resource patterns to exclude from translation.
+   */
+  @Parameter(property = "j2z80.excludeResources")
+  private String[] excludeResources = new String[0];
 
-  @Parameter(name = "optimization")
-  private OptimizationLevel optimization;
+  /**
+   * Optimization level applied to the translated output.
+   */
+  @Parameter(property = "j2z80.optimization")
+  private OptimizationLevel optimization = OptimizationLevel.NONE;
 
   @Inject
   public TranslatorMojo(
@@ -100,18 +124,18 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   }
 
   public File getJarFile() {
-    return jarFile;
+    return this.jarFile;
   }
 
-  public void setJarFile(File jarFile) {
+  public void setJarFile(final File jarFile) {
     this.jarFile = jarFile;
   }
 
   public int getStartAddress() {
-    return startAddress;
+    return this.startAddress;
   }
 
-  public void setStartAddress(int startAddress) {
+  public void setStartAddress(final int startAddress) {
     this.startAddress = startAddress;
   }
 
@@ -119,15 +143,15 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
     return this.stackTop;
   }
 
-  public void setStackTop(int stackTop) {
+  public void setStackTop(final int stackTop) {
     this.stackTop = stackTop;
   }
 
   public boolean isLogAsmText() {
-    return logAsmText;
+    return this.logAsmText;
   }
 
-  public void setLogAsmText(boolean logAsmText) {
+  public void setLogAsmText(final boolean logAsmText) {
     this.logAsmText = logAsmText;
   }
 
@@ -135,7 +159,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
     return this.excludeResources;
   }
 
-  public void setExcludeResources(String[] excludeResources) {
+  public void setExcludeResources(final String[] excludeResources) {
     this.excludeResources = excludeResources;
   }
 
@@ -143,7 +167,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
     return this.optimization;
   }
 
-  public void setOptimization(OptimizationLevel optimization) {
+  public void setOptimization(final OptimizationLevel optimization) {
     this.optimization = optimization;
   }
 
@@ -151,14 +175,17 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
     return this.formats;
   }
 
-  public void setFormats(Set<Format> formats) {
+  public void setFormats(final Set<Format> formats) {
     this.formats = formats;
   }
 
   @Override
   public void execute() throws MojoExecutionException {
     try {
-
+      if (this.jarFile == null || !this.jarFile.isFile()) {
+        throw new MojoExecutionException(
+            "The JAR file to translate is missing or invalid: " + this.jarFile);
+      }
 
       final List<Path> z80ClassPath =
           concat(this.getDependencyFilePaths().stream(), Stream.of(this.jarFile.toPath())).collect(
@@ -166,9 +193,9 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
       final ClassLoader z80classLoader =
           JarClassLoaderFactory.create(z80ClassPath, this.getClass().getClassLoader());
 
-      logInfo("Target formats : " + this.formats);
-      logInfo("Target final name : " + this.project.getBuild().getFinalName());
-      logInfo("Z80 Class loader path: " + z80ClassPath);
+      this.logInfo("Target formats: " + this.formats);
+      this.logInfo("Target artifact name: " + this.project.getBuild().getFinalName());
+      this.logInfo("Z80 classpath: " + z80ClassPath);
 
       final OptimizationLevel optimizationLevel =
           this.optimization == null ? OptimizationLevel.NONE : this.optimization;
@@ -182,15 +209,17 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
       if (this.logAsmText) {
         int lineIndex = 1;
         for (final String s : translatedAsmText) {
-          logInfo("ASM: " + lineIndex + ": " + s);
+          this.logInfo("ASM: " + lineIndex + ": " + s);
           lineIndex++;
         }
       }
 
       if (this.formats.contains(Format.A80)) {
         final Path pathA80 = this.makeTargetFilePath("a80");
-        this.logInfo("Writing A80 assembler file: " + pathA80);
-        Files.write(pathA80, translatedAsmText, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+        this.logInfo("Writing A80 assembly file: " + pathA80);
+        Files.write(pathA80, translatedAsmText, StandardCharsets.UTF_8,
+            StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+            StandardOpenOption.WRITE);
       }
 
       final Z80Asm targetA80 = new Z80Asm(translatedAsmText);
@@ -198,23 +227,27 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
 
       if (this.formats.contains(Format.BIN)) {
         final Path pathBin = this.makeTargetFilePath("bin");
-        this.getLog().info("Writing BIN file: " + pathBin);
-        Files.write(pathBin, translatedBin);
+        this.getLog().info("Writing BIN output file: " + pathBin);
+        Files.write(pathBin, translatedBin, StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
       }
 
       if (this.formats.contains(Format.SNA)) {
         final Path pathSna = this.makeTargetFilePath("sna");
-        this.getLog().info("Writing SNA48 file: " + pathSna);
+        this.getLog().info("Writing SNA48 output file: " + pathSna);
         final byte[] sna48 =
             new Sna48Writer(this.startAddress, this.stackTop, translatedBin).writeSna();
-        Files.write(pathSna, sna48);
+        Files.write(pathSna, sna48, StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
       }
-    } catch (Exception ex) {
+    } catch (final MojoExecutionException ex) {
+      throw ex;
+    } catch (final Exception ex) {
       throw new MojoExecutionException("Error during processing: " + ex.getMessage(), ex);
     }
   }
 
-  private List<Path> getDependencyFilePaths() {
+  private List<Path> getDependencyFilePaths() throws MojoExecutionException {
     final List<Path> foundFiles = new ArrayList<>();
     for (final Artifact artifact : this.project.getArtifacts()) {
       if ("z80".equalsIgnoreCase(artifact.getClassifier())) {
@@ -224,9 +257,10 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
                   artifact);
           final File file = art.getArtifact().getFile();
           foundFiles.add(file.toPath());
-        } catch (ArtifactResolverException ex) {
-          this.logError("Can't resolve Z80 dependency artifact: " + artifact);
-          throw new RuntimeException(ex);
+        } catch (final ArtifactResolverException ex) {
+          this.logError("Could not resolve Z80 dependency artifact: " + artifact);
+          throw new MojoExecutionException(
+              "Unable to resolve Z80 dependency artifact: " + artifact, ex);
         }
       }
     }
@@ -235,7 +269,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
   }
 
   private Path makeTargetFilePath(final String extension) {
-    return Path.of(this.project.getBuild().getDirectory() + File.separator +
+    return Path.of(this.project.getBuild().getDirectory(),
         this.project.getBuild().getFinalName() + '.' + extension);
   }
 
