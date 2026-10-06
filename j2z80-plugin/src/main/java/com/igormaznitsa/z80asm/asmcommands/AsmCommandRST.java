@@ -16,7 +16,8 @@
 
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.meta.common.utils.Assertions;
+import static java.util.Objects.requireNonNull;
+
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -57,9 +58,7 @@ public class AsmCommandRST extends AbstractAsmCommand {
       default:
         break;
     }
-
-    Assertions.assertNotNull("Wrong RST argument [" + asm.getArgs()[0] + ']', result);
-
+    requireNonNull(result, () -> "Wrong RST argument [" + asm.getArgs()[0] + ']');
     return result;
   }
 

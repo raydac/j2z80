@@ -16,9 +16,9 @@
 
 package com.igormaznitsa.z80asm;
 
-import com.igormaznitsa.meta.common.utils.Assertions;
-import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
+import static java.util.Objects.requireNonNull;
 
+import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,14 +33,14 @@ public class EquDirectiveContainer {
   private final Map<String, EquDirectiveRecord> directiveContainer = new LinkedHashMap<>();
 
   public EquDirectiveRecord findRecordForLabel(final String associatedLabel) {
-    Assertions.assertNotNull("Must not be null", associatedLabel);
-    return directiveContainer.get(associatedLabel);
+    return directiveContainer.get(requireNonNull(associatedLabel, "Label is null"));
   }
 
   public EquDirectiveRecord addRecord(final String associatedLabel, final ParsedAsmLine parsedAsmLine, final int pcCounter) {
-    Assertions.assertNotNull("Label Must not be null", associatedLabel);
-    Assertions.assertNotNull("Line must not be null", parsedAsmLine);
-    return directiveContainer.put(associatedLabel, new EquDirectiveRecord(associatedLabel, parsedAsmLine, pcCounter));
+    requireNonNull(associatedLabel, "Label Must not be null");
+    requireNonNull(parsedAsmLine, "Line must not be null");
+    return this.directiveContainer.put(associatedLabel,
+        new EquDirectiveRecord(associatedLabel, parsedAsmLine, pcCounter));
   }
 
   public List<EquDirectiveRecord> getValuesAsList() {
@@ -48,7 +48,7 @@ public class EquDirectiveContainer {
   }
 
   public void clear() {
-    directiveContainer.clear();
+    this.directiveContainer.clear();
   }
 
   public static class EquDirectiveRecord {

@@ -16,8 +16,9 @@
 
 package com.igormaznitsa.z80asm.asmcommands;
 
+import static java.util.Objects.requireNonNull;
+
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -27,8 +28,7 @@ public class AsmCommandEQU extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    Assertions.assertNotNull("EQU must have a label", asm.getLabel());
-
+    requireNonNull(asm.getLabel(), "EQU must have a label");
     final int address = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
     AsmAssertions.assertAddress(address);
 

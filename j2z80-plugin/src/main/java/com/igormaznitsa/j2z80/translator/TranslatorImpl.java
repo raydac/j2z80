@@ -25,9 +25,9 @@ import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.makeLabelForClassS
 import static com.igormaznitsa.j2z80.utils.Utils.byteArrayToAsm;
 import static com.igormaznitsa.j2z80.utils.Utils.concatStringArrays;
 import static com.igormaznitsa.j2z80.utils.Utils.intToString;
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Objects.requireNonNull;
 
 import com.igormaznitsa.j2z80.ClassContext;
 import com.igormaznitsa.j2z80.MethodContext;
@@ -607,7 +607,7 @@ public class TranslatorImpl implements TranslatorContext {
 
   @Override
   public String registerStaticByteArrayTemplate(final byte[] data) {
-    assertNotNull("Static byte[] template must not be null", data);
+    requireNonNull(data, "Static byte[] template must not be null");
     final String label = "STATIC_BARRAY_TPL_" + this.staticByteArrayTemplateCounter++;
     this.staticByteArrayTemplates.put(label, data.clone());
     return label;
@@ -615,8 +615,7 @@ public class TranslatorImpl implements TranslatorContext {
 
   @Override
   public void registerCalledBootClassProcesser(final AbstractBootstrapClass bootClass) {
-    assertNotNull("A bootstrap class must not be null", bootClass);
-    this.bootstrapClasses.add(bootClass);
+    this.bootstrapClasses.add(requireNonNull(bootClass, "Bootstrap class must not be null"));
   }
 
   @Override

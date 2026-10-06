@@ -16,7 +16,6 @@
 package com.igormaznitsa.z80asm.asmcommands;
 
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -58,7 +57,9 @@ public class AsmCommandCALL extends AbstractAsmCommand {
 
       }
 
-      Assertions.assertFalse("Unsupported flag for CALL command [" + flag + ']', command == 0);
+      if (command == 0) {
+        throw new IllegalArgumentException("Unsupported flag for CALL command [" + flag + ']');
+      }
 
       return new byte[] {command, (byte) address, (byte) (address >>> 8)};
     }

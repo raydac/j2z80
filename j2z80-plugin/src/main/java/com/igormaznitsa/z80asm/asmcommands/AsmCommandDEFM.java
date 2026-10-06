@@ -16,7 +16,8 @@
 
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.meta.common.utils.Assertions;
+import static java.util.Objects.requireNonNull;
+
 import com.igormaznitsa.z80asm.AsmTranslator;
 
 public class AsmCommandDEFM extends AbstractAsmCommand {
@@ -26,8 +27,14 @@ public class AsmCommandDEFM extends AbstractAsmCommand {
       return str;
     }
 
-    Assertions.assertTrue("DEFM takes a string as argument [" + str + ']', str.startsWith("\""));
-    Assertions.assertTrue("String must be closed [" + str + ']', str.endsWith("\""));
+    requireNonNull(str, "String must not be null");
+    if (!str.startsWith("\"")) {
+      throw new IllegalArgumentException("DEFM takes a string as argument [" + str + ']');
+    }
+    if (!str.endsWith("\"")) {
+      throw new IllegalArgumentException("String must be closed [" + str + ']');
+    }
+
     return str.substring(1, str.length() - 1);
   }
 

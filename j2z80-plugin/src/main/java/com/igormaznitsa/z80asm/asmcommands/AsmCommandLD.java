@@ -16,8 +16,9 @@
 
 package com.igormaznitsa.z80asm.asmcommands;
 
+import static java.util.Objects.requireNonNull;
+
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -138,11 +139,15 @@ public class AsmCommandLD extends AbstractAsmCommand {
   }
 
   private byte[] nonregisterAtBothPart(final AsmTranslator context, final ParsedAsmLine asm, final String leftPart, final String rightPart) {
-    Assertions.assertTrue("Unsupported LD arguments", isIndexRegisterReference(leftPart));
+    if (!isIndexRegisterReference(leftPart)) {
+      throw new IllegalArgumentException("Unsupported LD arguments: " + leftPart);
+    }
     final int offset = new LightExpression(context, this, asm, extractCalculatedPart(leftPart)).calculate();
     AsmAssertions.assertSignedByte(offset);
 
-    Assertions.assertFalse("Wrong pointer usage in the right part", isInBrakes(rightPart));
+    if (isInBrakes(rightPart)) {
+      throw new IllegalArgumentException("Wrong pointer usage in the right part: " + rightPart);
+    }
 
     final int data = new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
     AsmAssertions.assertUnsignedByte(data);
@@ -176,7 +181,9 @@ public class AsmCommandLD extends AbstractAsmCommand {
         result = new byte[] {prefix, (byte) 0x6E, (byte) offset};
       }
 
-      Assertions.assertNotNull("The left part must be A,B,C,D,E,H or L [" + leftPart + ']', result);
+      if (result == null) {
+        throw new IllegalArgumentException("The left part must be A,B,C,D,E,H or L: " + leftPart);
+      }
     } else if (isRegister16Name(leftPart) || ("A".equals(leftPart) && isInBrakes(rightPart))) {
       final int address = new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
 
@@ -203,7 +210,11 @@ public class AsmCommandLD extends AbstractAsmCommand {
         } else if ("SP".equals(leftPart)) {
           result = new byte[] {(byte) 0xED, (byte) 0x7B, lowByte, highByte};
         }
-        Assertions.assertNotNull("The left part must be A,BC,DE,HL,IX,IY,(HL) or SP [" + leftPart + ']', result);
+
+        if (result == null) {
+          throw new IllegalArgumentException(
+              "The left part must be A,BC,DE,HL,IX,IY,(HL) or SP: " + leftPart);
+        }
       } else {
         if (address < 0) {
           AsmAssertions.assertSignedShort(address);
@@ -225,7 +236,10 @@ public class AsmCommandLD extends AbstractAsmCommand {
           result = new byte[] {(byte) 0x31, lowByte, highByte};
         }
 
-        Assertions.assertNotNull("The left part must be BC,DE,HL,IX,IY or SP [" + leftPart + ']', result);
+        if (result == null) {
+          throw new IllegalArgumentException(
+              "The left part must be BC,DE,HL,IX,IY or SP: " + leftPart);
+        }
       }
     } else {
       final int value = new LightExpression(context, this, asm, extractCalculatedPart(rightPart)).calculate();
@@ -249,8 +263,10 @@ public class AsmCommandLD extends AbstractAsmCommand {
         result = new byte[] {(byte) 0x3E, valueByte};
       }
 
-      Assertions.assertNotNull("The left part must be A,(HL),B,C,D,E,H or L [" + leftPart + ']',
-          result);
+      if (result == null) {
+        throw new IllegalArgumentException(
+            "The left part must be A,(HL),B,C,D,E,H or L: " + leftPart);
+      }
     }
     return result;
   }
@@ -258,7 +274,10 @@ public class AsmCommandLD extends AbstractAsmCommand {
   private byte[] getMachineCodeWhenRightRegister(final AsmTranslator context, final ParsedAsmLine asm, final String leftPart, final String rightPart) {
     byte[] result = null;
 
-    Assertions.assertTrue("The left operand must be in brakes [" + leftPart + ']', isInBrakes(leftPart));
+    if (!isInBrakes(leftPart)) {
+      throw new IllegalArgumentException("The left operand must be in brakes: " + leftPart);
+    }
+
     if (isIndexRegisterReference(leftPart)) {
       final int offset = new LightExpression(context, this, asm, extractCalculatedPart(leftPart)).calculate();
       AsmAssertions.assertSignedByte(offset);
@@ -280,7 +299,7 @@ public class AsmCommandLD extends AbstractAsmCommand {
         result = new byte[] {prefix, (byte) 0x75, (byte) offset};
       }
 
-      Assertions.assertNotNull("The right part must be A,B,C,D,E,H or L [" + rightPart + ']', result);
+      requireNonNull(result, () -> "The right part must be A,B,C,D,E,H or L: " + rightPart);
     } else {
       final int address = new LightExpression(context, this, asm, extractCalculatedPart(leftPart)).calculate();
       AsmAssertions.assertAddress(address);
@@ -302,7 +321,7 @@ public class AsmCommandLD extends AbstractAsmCommand {
       } else if ("SP".equals(rightPart)) {
         result = new byte[] {(byte) 0xED, (byte) 0x73, lowByte, highByte};
       }
-      Assertions.assertNotNull("The right part must be A,HL,SP,BC,DE,IX or IY [" + rightPart + '[', result);
+      requireNonNull(result, () -> "The right part must be A,HL,SP,BC,DE,IX or IY: " + rightPart);
     }
     return result;
   }

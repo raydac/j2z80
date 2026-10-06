@@ -17,7 +17,6 @@
 package com.igormaznitsa.z80asm.asmcommands;
 
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -41,8 +40,12 @@ public class AsmCommandOUT extends AbstractAsmCommand {
       return getPatternCase(asm.getSignature());
     } else {
       final String rightPart = asm.getArgs()[1];
-      Assertions.assertTrue("Port value must be in brakes [" + port + ']', isInBrakes(port));
-      Assertions.assertTrue("The right operand must be A [" + rightPart + ']', "A".equals(rightPart));
+      if (!isInBrakes(port)) {
+        throw new IllegalArgumentException("Port value must be in brakes [" + port + ']');
+      }
+      if (!"A".equals(rightPart)) {
+        throw new IllegalArgumentException("The right operand must be A [" + rightPart + ']');
+      }
       final int number = new LightExpression(context, this, asm, extractCalculatedPart(port)).calculate();
       AsmAssertions.assertUnsignedByte(number);
       return new byte[] {(byte) 0xD3, (byte) number};

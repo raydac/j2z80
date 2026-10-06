@@ -16,11 +16,10 @@
 
 package com.igormaznitsa.z80asm;
 
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import static java.util.Objects.requireNonNull;
 
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
 import com.igormaznitsa.j2z80.utils.Utils;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.asmcommands.AbstractAsmCommand;
 import com.igormaznitsa.z80asm.asmcommands.AsmCommandEND;
 import com.igormaznitsa.z80asm.asmcommands.AsmCommandEQU;
@@ -53,10 +52,10 @@ public class Z80Asm implements AsmTranslator {
   private final LabelAddressContainer localLabelMap = new LabelAddressContainer(true);
   private final Map<String, List<LocalLabelExpectant>> localLabelExpectants = new HashMap<>();
   private final EquDirectiveContainer equContainer = new EquDirectiveContainer();
+  private final String[] sources;
   private int programCounter;
   private int entryPoint;
   private boolean firstPassFlag;
-  private final String[] sources;
 
   public Z80Asm(final File file) throws IOException {
     this(Arrays.asList(Utils.readTextFileAsStringArray(file, StandardCharsets.UTF_8)));
@@ -67,7 +66,7 @@ public class Z80Asm implements AsmTranslator {
   }
 
   public Z80Asm(final List<String> sourceToBeCompiled) {
-    assertNotNull("Source array must not be null", (Object) sourceToBeCompiled);
+    requireNonNull((Object) sourceToBeCompiled, "Source array must not be null");
     this.sources = sourceToBeCompiled.stream()
         .flatMap(x -> Stream.of(Utils.breakToLines(x))).toArray(String[]::new);
   }
@@ -124,16 +123,19 @@ public class Z80Asm implements AsmTranslator {
     localLabelMap.clear();
   }
 
-  private void throwExceptionForAsmErrorString(final String srcString, final int stringNumber, final Throwable cause) {
+  private void throwExceptionForAsmErrorString(final String srcString, final int stringNumber,
+                                               final Throwable cause) {
     throw new AsmTranslationException("Error ASM string detected", srcString, stringNumber, cause);
   }
 
   private void firstPass() {
-    resetInsideTables();
-    firstPassFlag = true;
-    processSources();
-    Assertions.assertTrue("After the first pass, the code buffer must be empty", codeBuffer.size() == 0);
-    processEquCommands();
+    this.resetInsideTables();
+    this.firstPassFlag = true;
+    this.processSources();
+    if (this.codeBuffer.size() != 0) {
+      throw new IllegalStateException("After the first pass, the code buffer must be empty");
+    }
+    this.processEquCommands();
   }
 
   private void secondPass() {
@@ -145,9 +147,9 @@ public class Z80Asm implements AsmTranslator {
   private void processSources() {
     for (int strIndex = 0; strIndex < sources.length; strIndex++) {
       final String line = sources[strIndex];
-      assertNotNull("Line at " + (strIndex + 1) + " is null", line);
+      requireNonNull(line);
       try {
-        if (processOneLine(line, strIndex + 1)) {
+        if (this.processOneLine(line, strIndex + 1)) {
           break;
         }
       } catch (Exception ex) {
@@ -165,7 +167,10 @@ public class Z80Asm implements AsmTranslator {
       }
     }
 
-    Assertions.assertTrue("Not-found some local labels " + Arrays.toString(localLabelExpectants.keySet().toArray()), localLabelExpectants.isEmpty());
+    if (!this.localLabelExpectants.isEmpty()) {
+      throw new IllegalArgumentException("Not-found some local labels " +
+          Arrays.toString(localLabelExpectants.keySet().toArray()));
+    }
   }
 
   // return true if you need to interrupt processing, otherwise false
@@ -178,11 +183,15 @@ public class Z80Asm implements AsmTranslator {
       if (parsed.hasOnlyLabel()) {
         nonAssignedLabels.add(parsed.getLabel());
       } else {
-        final AbstractAsmCommand command = AbstractAsmCommand.findCommandForName(parsed.getCommand());
+        final AbstractAsmCommand command =
+            AbstractAsmCommand.findCommandForName(parsed.getCommand());
 
-        assertNotNull("Unsupported command detected [" + parsed.getCommand() + ']', command);
-        Assertions.assertTrue("The command must be compatible in its argument number and their types [" + asmString + ']', command.getAllowedArgumentsNumber().check(parsed.getArgs()));
-
+        requireNonNull(command, "Unsupported command detected: " + parsed.getCommand());
+        if (!command.getAllowedArgumentsNumber().check(parsed.getArgs())) {
+          throw new IllegalArgumentException(
+              "The command must be compatible in its argument number and their types: " +
+                  asmString);
+        }
         final String currentLabel = parsed.getLabel();
 
         if (currentLabel != null) {
@@ -235,10 +244,14 @@ public class Z80Asm implements AsmTranslator {
     return result == null ? new String[0] : result.toArray(new String[0]);
   }
 
-  private boolean processSpecialDirective(final AbstractAsmCommand asmCommand, final String rawString, final int strIndex, final ParsedAsmLine parsed) {
+  private boolean processSpecialDirective(final AbstractAsmCommand asmCommand,
+                                          final String rawString, final int strIndex,
+                                          final ParsedAsmLine parsed) {
     if (asmCommand instanceof AsmCommandEQU) {
       if (firstPassFlag) {
-        Assertions.assertFalse("Each EQU directive must be labeled [" + rawString + ']', nonAssignedLabels.isEmpty());
+        if (this.nonAssignedLabels.isEmpty()) {
+          throw new IllegalStateException("Each EQU directive must be labeled: " + rawString);
+        }
         final int address = getPC();
         for (final String lbl : registerNonAssignedLabels()) {
           equContainer.addRecord(lbl, parsed, address);
@@ -271,7 +284,7 @@ public class Z80Asm implements AsmTranslator {
 
   @Override
   public void registerGlobalLabelAddress(final String label, final int address) {
-    assertNotNull("Label must not be null", label);
+    requireNonNull(label, "Label must not be null");
     AsmAssertions.assertGlobalLabelName(label);
 
     AsmAssertions.assertAddress(address);
@@ -281,7 +294,7 @@ public class Z80Asm implements AsmTranslator {
 
   @Override
   public void registerLocalLabelAddress(final String label, final int address) {
-    assertNotNull("Label name must not be null", label);
+    requireNonNull(label, "Label name must not be null");
     AsmAssertions.assertLocalLabelName(label);
     AsmAssertions.assertAddress(address);
 
@@ -298,11 +311,12 @@ public class Z80Asm implements AsmTranslator {
 
   @Override
   public void registerLocalLabelExpectant(final String label, final LocalLabelExpectant expectant) {
-    assertNotNull("Label name must not contain null", label);
-    assertNotNull("Expectant must not be null", expectant);
+    requireNonNull(label, "Label name must not contain null");
+    requireNonNull(expectant, "Expectant must not be null");
     AsmAssertions.assertLocalLabelName(label);
 
-    List<LocalLabelExpectant> listeners = localLabelExpectants.computeIfAbsent(label, k -> new ArrayList<>());
+    List<LocalLabelExpectant> listeners =
+        localLabelExpectants.computeIfAbsent(label, k -> new ArrayList<>());
     listeners.add(expectant);
   }
 
@@ -353,12 +367,15 @@ public class Z80Asm implements AsmTranslator {
 
   @Override
   public int getDataOffset() {
-    return codeBuffer.getDataStartOffset();
+    return this.codeBuffer.getDataStartOffset();
   }
 
   @Override
   public void clearLocalLabels() {
-    Assertions.assertTrue("There must not be any waiting expectant for local label " + Arrays.toString(localLabelExpectants.keySet().toArray()), localLabelExpectants.isEmpty());
-    localLabelMap.clear();
+    if (!this.localLabelExpectants.isEmpty()) {
+      throw new IllegalStateException("There must not be any waiting expectant for local label " +
+          Arrays.toString(localLabelExpectants.keySet().toArray()));
+    }
+    this.localLabelMap.clear();
   }
 }

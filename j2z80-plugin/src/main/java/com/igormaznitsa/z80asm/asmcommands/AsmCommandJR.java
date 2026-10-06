@@ -16,7 +16,6 @@
 
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -45,7 +44,9 @@ public class AsmCommandJR extends AbstractAsmCommand {
         command = (byte) 0x38;
       }
 
-      Assertions.assertFalse("Unsupported flag for JR command [" + flag + ']', command == 0);
+      if (command == 0) {
+        throw new IllegalArgumentException("Unsupported flag for JR command: " + flag);
+      }
 
       return new byte[] {command, (byte) offset};
     }

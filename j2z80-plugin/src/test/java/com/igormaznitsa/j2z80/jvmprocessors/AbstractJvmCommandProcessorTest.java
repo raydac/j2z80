@@ -189,22 +189,22 @@ public abstract class AbstractJvmCommandProcessorTest extends Z80 {
     }
 
     final Z80Asm z80asm = new Z80Asm(Arrays.asList(asmArray));
-    final byte[] bindata = z80asm.process();
+    final byte[] binData = z80asm.process();
     endAddress = z80asm.findLabelAddress(END_LABEL).intValue();
 
     if (!breakpointAddresses.isEmpty()) {
       // fill breakpoint addresses
-      final Map<String, Integer> result = new HashMap<String, Integer>();
+      final Map<String, Integer> result = new HashMap<>();
       for (final String labelName : breakpointAddresses.keySet()) {
         final Integer address = z80asm.findLabelAddress(labelName);
         assertNotNull("Breakpoint label " + labelName + "is not found", address);
-        result.put(labelName, Integer.valueOf(address.intValue()));
+        result.put(labelName, address);
       }
       breakpointAddresses.clear();
       breakpointAddresses.putAll(result);
     }
 
-    System.arraycopy(bindata, 0, memory, z80asm.getDataOffset(), bindata.length);
+    System.arraycopy(binData, 0, memory, z80asm.getDataOffset(), binData.length);
     PC = z80asm.getDataOffset();
 
     endAddressMet = false;

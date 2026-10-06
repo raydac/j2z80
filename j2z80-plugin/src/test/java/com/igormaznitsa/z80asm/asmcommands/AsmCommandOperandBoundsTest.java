@@ -51,7 +51,7 @@ public class AsmCommandOperandBoundsTest {
     assertArrayEquals(new byte[] {(byte) 0xFD, (byte) 0xE9}, encode("JP", "jp (iy)"));
   }
 
-  @Test(expected = AssertionError.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testLdImmediateToStackPointerIsRejected() {
     encode("LD", "ld (sp),1");
   }

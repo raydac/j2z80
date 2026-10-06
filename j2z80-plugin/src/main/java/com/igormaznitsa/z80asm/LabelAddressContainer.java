@@ -16,8 +16,9 @@
 
 package com.igormaznitsa.z80asm;
 
+import static java.util.Objects.requireNonNull;
+
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
-import com.igormaznitsa.meta.common.utils.Assertions;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,19 +51,16 @@ public class LabelAddressContainer {
   }
 
   public boolean hasLabel(final String labelName) {
-    return labelMap.containsKey(labelName);
+    return this.labelMap.containsKey(labelName);
   }
 
   public int getLabelAddress(final String labelName) {
-    Assertions.assertNotNull("Name must not be null", labelName);
-    final Integer address = labelMap.get(labelName);
-    Assertions.assertNotNull("Only exist label must be requested", address);
-
-    return address;
+    return requireNonNull(this.labelMap.get(requireNonNull(labelName, "Name must not be null")),
+        "Only exist label must be requested");
   }
 
   public void clear() {
-    labelMap.clear();
+    this.labelMap.clear();
   }
 
   public Set<Entry<String, Integer>> getSetOfRecords() {
@@ -74,16 +72,16 @@ public class LabelAddressContainer {
   }
 
   public void registerLabel(final String labelName, final int address) {
-    Assertions.assertNotNull("Must not be null", labelName);
+    requireNonNull(labelName, "Must not be null");
     AsmAssertions.assertAddress(address);
-
     final Integer addressAsInteger = address;
-
-    if (flagAllowReplace) {
-      labelMap.put(labelName, addressAsInteger);
+    if (this.flagAllowReplace) {
+      this.labelMap.put(labelName, addressAsInteger);
     } else {
-      Assertions.assertFalse("Label must not be defined already [" + labelName + ']', labelMap.containsKey(labelName));
-      labelMap.put(labelName, addressAsInteger);
+      if (this.labelMap.containsKey(labelName)) {
+        throw new IllegalArgumentException("Label must not be defined already [" + labelName + ']');
+      }
+      this.labelMap.put(labelName, addressAsInteger);
     }
   }
 }

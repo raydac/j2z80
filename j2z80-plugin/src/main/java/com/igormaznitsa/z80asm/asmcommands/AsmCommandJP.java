@@ -16,8 +16,9 @@
 
 package com.igormaznitsa.z80asm.asmcommands;
 
+import static java.util.Objects.requireNonNull;
+
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -39,7 +40,7 @@ public class AsmCommandJP extends AbstractAsmCommand {
           result = new byte[] {(byte) 0xFD, (byte) 0xE9};
         }
 
-        Assertions.assertNotNull("Wrong register usage for JP command [" + arg + ']', result);
+        requireNonNull(result, "Wrong register usage for JP command [" + arg + ']');
 
         return result;
       } else {
@@ -71,7 +72,9 @@ public class AsmCommandJP extends AbstractAsmCommand {
         command = (byte) 0xFA;
       }
 
-      Assertions.assertFalse("Unsupported flag for JP command [" + flag + ']', command == 0);
+      if (command == 0) {
+        throw new IllegalArgumentException("Unsupported flag for JP command [" + flag + ']');
+      }
 
       return new byte[] {command, (byte) address, (byte) (address >>> 8)};
     }

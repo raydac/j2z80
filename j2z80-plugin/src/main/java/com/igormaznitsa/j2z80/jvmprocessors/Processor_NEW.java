@@ -16,12 +16,13 @@
 
 package com.igormaznitsa.j2z80.jvmprocessors;
 
+import static java.util.Objects.requireNonNull;
+
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.ids.ClassID;
 import com.igormaznitsa.j2z80.translator.CheckedExceptionSupport;
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import java.io.IOException;
 import java.io.Writer;
 import org.apache.bcel.generic.Instruction;
@@ -57,7 +58,7 @@ public class Processor_NEW extends AbstractJvmCommandProcessor implements NeedsM
 
     final Integer classID = methodTranslator.getTranslatorContext().getClassContext().findClassUID(new ClassID(className));
 
-    Assertions.assertNotNull("Class ID must not be null [" + className + ']', classID);
+    requireNonNull(classID, () -> "Class ID must not be null [" + className + ']');
 
     final String classInfoLabel = LabelAndFrameUtils.makeLabelForClassSizeInfo(type);
 

@@ -17,8 +17,7 @@
 package com.igormaznitsa.j2z80.ids;
 
 import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.makeLabelNameForClass;
-import static com.igormaznitsa.meta.common.utils.Assertions.assertFalse;
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
+import static java.util.Objects.requireNonNull;
 
 import org.apache.bcel.generic.ClassGen;
 
@@ -35,8 +34,10 @@ public class ClassID {
    * @param className the full canonical class path name, must not be null
    */
   public ClassID(final String className) {
-    assertNotNull("Class name must not be null", className);
-    assertFalse("Class name must not be empty", className.isEmpty());
+    requireNonNull(className, "Class name must not be null");
+    if (className.isBlank()) {
+      throw new IllegalArgumentException("Class name must not be blank");
+    }
     this.className = className;
   }
 
@@ -46,7 +47,7 @@ public class ClassID {
    * @param classGen the object to be used for creation, must not be null
    */
   public ClassID(final ClassGen classGen) {
-    assertNotNull("Argument must not be null", classGen);
+    requireNonNull(classGen, "Argument must not be null");
     this.className = classGen.getClassName();
   }
 

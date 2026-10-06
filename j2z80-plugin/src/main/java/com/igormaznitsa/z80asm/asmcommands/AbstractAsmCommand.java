@@ -16,8 +16,9 @@
 
 package com.igormaznitsa.z80asm.asmcommands;
 
+import static java.util.Objects.requireNonNull;
+
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 
 import java.util.Arrays;
@@ -138,7 +139,9 @@ public abstract class AbstractAsmCommand {
   }
 
   protected static String extractCalculatedPart(final String arg) {
-    Assertions.assertFalse("Argument must not be empty", arg.isEmpty());
+    if (arg.isBlank()) {
+      throw new IllegalArgumentException("Argument must not be blank");
+    }
 
     String result;
 
@@ -146,10 +149,14 @@ public abstract class AbstractAsmCommand {
       result = arg.substring(3, arg.length() - 1);
     } else {
       if (arg.charAt(0) == '(') {
-        Assertions.assertTrue("Each bracket must be closed [" + arg + ']', arg.endsWith(")"));
+        if (!arg.endsWith(")")) {
+          throw new IllegalArgumentException("Each bracket must be closed [" + arg + ']');
+        }
         result = arg.substring(1, arg.length() - 1);
       } else {
-        Assertions.assertFalse("Each bracket must be opened [" + arg + ']', arg.endsWith(")"));
+        if (arg.endsWith(")")) {
+          throw new IllegalArgumentException("Each bracket must be opened [" + arg + ']');
+        }
         result = arg;
       }
     }
@@ -190,7 +197,10 @@ public abstract class AbstractAsmCommand {
     try {
       final Class<? extends AbstractAsmCommand> commandClass = Class.forName(className).asSubclass(AbstractAsmCommand.class);
       final AbstractAsmCommand command = commandClass.getDeclaredConstructor().newInstance();
-      Assertions.assertTrue("A Command must have the same name as its class name [" + name + ']', command.getName().equals(name));
+      if (!command.getName().equals(name)) {
+        throw new IllegalArgumentException(
+            "A Command must have the same name as its class name [" + name + ']');
+      }
       COMMAND_MAP.put(command.getName(), command);
     } catch (ClassNotFoundException ex) {
       throw new IllegalArgumentException("Can't find any class for the '" + name + "' command", ex);
@@ -204,18 +214,20 @@ public abstract class AbstractAsmCommand {
   }
 
   protected void addCase(final String signature, final byte... codes) {
-    Assertions.assertNotNull("Signature must not be null", signature);
-    Assertions.assertNotNull("Code block must not be null", codes);
-    Assertions.assertFalse("Code block must not be empty", codes.length == 0);
-
-    Assertions.assertFalse("Signature must be unique", PATTERN_CASES.containsKey(signature));
-
+    requireNonNull(signature, "Signature must not be null");
+    requireNonNull(codes, "Code block must not be null");
+    if (codes.length == 0) {
+      throw new IllegalArgumentException("Code block must not be empty");
+    }
+    if (PATTERN_CASES.containsKey(signature)) {
+      throw new IllegalArgumentException("Duplicate signature: " + signature);
+    }
     PATTERN_CASES.put(signature, codes);
   }
 
   protected byte[] getPatternCase(final String pattern) {
     final byte[] result = PATTERN_CASES.get(pattern);
-    Assertions.assertNotNull("A Case must be declared [" + pattern + ']', result);
+    requireNonNull(result, "A Case must be declared [" + pattern + ']');
     return result.clone();
   }
 
@@ -223,7 +235,7 @@ public abstract class AbstractAsmCommand {
     int result = 6;
     if (!isIndexRegisterReference(register)) {
       final Integer order = REGISTER_ORDER.get(register);
-      Assertions.assertNotNull("Register name must be known [" + register + ']', order);
+      requireNonNull(order, "Register name must be known [" + register + ']');
       result = order;
     }
     return result;
@@ -253,26 +265,16 @@ public abstract class AbstractAsmCommand {
     ONE_OR_MORE;
 
     public boolean check(final String[] args) {
-      switch (this) {
-        case NONE:
-          return args.length == 0;
-        case NONE_OR_ONE:
-          return args.length == 0 || args.length == 1;
-        case ZERO_ONE_OR_TWO:
-          return args.length == 0 || args.length == 1 || args.length == 2;
-        case ANY:
-          return args != null;
-        case ONE:
-          return args.length == 1;
-        case ONE_OR_MORE:
-          return args.length >= 1;
-        case ONE_OR_TWO:
-          return args.length == 1 || args.length == 2;
-        case TWO:
-          return args.length == 2;
-        default:
-          throw new IllegalArgumentException("Unsupported argument value");
-      }
+      return switch (this) {
+        case NONE -> args.length == 0;
+        case NONE_OR_ONE -> args.length == 0 || args.length == 1;
+        case ZERO_ONE_OR_TWO -> args.length == 0 || args.length == 1 || args.length == 2;
+        case ANY -> args != null;
+        case ONE -> args.length == 1;
+        case ONE_OR_MORE -> args.length >= 1;
+        case ONE_OR_TWO -> args.length == 1 || args.length == 2;
+        case TWO -> args.length == 2;
+      };
     }
   }
 }

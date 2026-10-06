@@ -16,10 +16,10 @@
 
 package com.igormaznitsa.z80asm.expression;
 
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.asmcommands.AbstractAsmCommand;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
+import java.util.Objects;
 
 /**
  * It is a small easy expression parser. It allows to use '-' and '+' operators,
@@ -151,14 +151,20 @@ public class LightExpression {
   }
 
   private int operandToNumber(final String str) {
-    Assertions.assertFalse("Operand must not be an empty string", str.isEmpty());
+    if (str.isEmpty()) {
+      throw new IllegalArgumentException("Operand must not be an empty string");
+    }
 
     switch (str.charAt(0)) {
       case '\"': {
         // string
-        Assertions.assertTrue("String must be closed [" + str + ']', str.endsWith("\""));
+        if (!str.endsWith("\"")) {
+          throw new IllegalArgumentException("Not closed string: " + str);
+        }
         final String work = str.substring(1, str.length() - 1);
-        Assertions.assertTrue("String operand must not be empty [" + str + ']', str.length() > 2);
+        if (str.length() <= 2) {
+          throw new IllegalArgumentException("String operand must be longer: " + str);
+        }
         int result = 0;
         for (final char chr : work.toCharArray()) {
           result = (result << 8) | (chr & 0xFF);
@@ -216,7 +222,9 @@ public class LightExpression {
 
       if ("+".equals(token) || "-".equals(token)) {
         // operation
-        Assertions.assertNull("Every operation must have operands [" + expression + ']', lastOperation);
+        if (lastOperation != null) {
+          throw new IllegalStateException("Every operation must have operands:" + this.expression);
+        }
         lastOperation = token;
       } else {
         // operand
@@ -233,7 +241,8 @@ public class LightExpression {
             lastOperandStack = operand;
           }
         } else {
-          Assertions.assertNotNull("There must be an operand in between of two operands [" + expression + ']', lastOperation);
+          Objects.requireNonNull(lastOperandStack,
+              () -> "There must be an operand in between of two operands: " + this.expression);
           if ("+".equals(lastOperation)) {
             lastOperandStack = lastOperandStack + operand;
           } else if ("-".equals(lastOperation)) {
@@ -246,9 +255,10 @@ public class LightExpression {
       }
     }
 
-    Assertions.assertNull("Every operation must have operands [" + expression + ']', lastOperation);
-    Assertions.assertNotNull("Expression must not be empty one", lastOperandStack);
-
-    return lastOperandStack;
+    if (lastOperation != null) {
+      throw new IllegalStateException(
+          "Every operation must have operands [" + this.expression + ']');
+    }
+    return Objects.requireNonNull(lastOperandStack, "Expression must not be empty");
   }
 }

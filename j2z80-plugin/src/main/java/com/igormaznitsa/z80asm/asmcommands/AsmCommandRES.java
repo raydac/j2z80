@@ -17,7 +17,6 @@
 package com.igormaznitsa.z80asm.asmcommands;
 
 import com.igormaznitsa.j2z80.translator.utils.AsmAssertions;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -27,19 +26,20 @@ public class AsmCommandRES extends AbstractAsmCommand {
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
     final int number = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
 
-    Assertions.assertTrue("Bit number is outbound [" + number + ']', (number & ~0x7) == 0);
+    if ((number & ~0x7) != 0) {
+      throw new IllegalArgumentException("Bit number is outbound [" + number + ']');
+    }
 
     final String register = asm.getArgs()[1];
-
-    final int basecode = 0x80 + (number << 3);
+    final int baseCode = 0x80 + (number << 3);
     if (isIndexRegisterReference(register)) {
       final int offset = new LightExpression(context, this, asm, extractCalculatedPart(register)).calculate();
       AsmAssertions.assertSignedByte(offset);
       final byte prefix = register.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
-      return new byte[] {prefix, (byte) 0xCB, (byte) offset, (byte) (basecode + 6)};
+      return new byte[] {prefix, (byte) 0xCB, (byte) offset, (byte) (baseCode + 6)};
     } else {
       final int registerIndex = getRegisterOrder(register);
-      return new byte[] {(byte) 0xCB, (byte) (basecode + registerIndex)};
+      return new byte[] {(byte) 0xCB, (byte) (baseCode + registerIndex)};
     }
   }
 

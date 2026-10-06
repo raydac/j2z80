@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012-2026 Igor Maznitsa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.igormaznitsa.j2z80.ids;
 
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
 import static java.util.Arrays.deepEquals;
+import static java.util.Objects.requireNonNull;
 
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
 import org.apache.bcel.classfile.Method;
@@ -76,13 +77,16 @@ public class MethodID {
    * @param returnType the return type signature for the method, must not be null
    * @param argTypes   the argument type signatures for the method, must not be null
    */
-  public MethodID(final String className, final String methodName, final Type returnType, final Type[] argTypes) {
-    assertNotNull("ClassName must not contain null", className);
-    assertNotNull("Method name must not be null", methodName);
-    assertNotNull("ReturnType must not be null", returnType);
-    assertNotNull("ArgTypes must not be null", argTypes);
-    this.methodId = className + '.' + methodName + '.' + Type.getMethodSignature(returnType, argTypes);
-    this.methodLabel = LabelAndFrameUtils.makeLabelNameForMethod(className, methodName, returnType, argTypes);
+  public MethodID(final String className, final String methodName, final Type returnType,
+                  final Type[] argTypes) {
+    requireNonNull(className, "ClassName must not be null");
+    requireNonNull(methodName, "Method name must not be null");
+    requireNonNull(returnType, "ReturnType must not be null");
+    requireNonNull(argTypes, "ArgTypes must not be null");
+    this.methodId =
+        className + '.' + methodName + '.' + Type.getMethodSignature(returnType, argTypes);
+    this.methodLabel =
+        LabelAndFrameUtils.makeLabelNameForMethod(className, methodName, returnType, argTypes);
     this.className = className;
     this.methodName = methodName;
     this.returnType = returnType;
@@ -178,7 +182,7 @@ public class MethodID {
    * @return a found compatible method if it is found or null if not found
    */
   public Method findCompatibleMethod(final ClassGen cgen) {
-    assertNotNull("Class must not be null", cgen);
+    requireNonNull(cgen, "Class must not be null");
     for (final Method m : cgen.getMethods()) {
       if (
           this.methodName.equals(m.getName())

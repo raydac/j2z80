@@ -16,7 +16,6 @@
 
 package com.igormaznitsa.z80asm.asmcommands;
 
-import com.igormaznitsa.meta.common.utils.Assertions;
 import com.igormaznitsa.z80asm.AsmTranslator;
 import com.igormaznitsa.z80asm.expression.LightExpression;
 
@@ -39,7 +38,9 @@ public class AsmCommandIM extends AbstractAsmCommand {
       default:
         break;
     }
-    Assertions.assertNotNull("IM mode must be 0,1 or 2 [" + number + ']', result);
+    if (result == null) {
+      throw new IllegalArgumentException("IM mode must be 0,1 or 2: " + number);
+    }
     return result;
   }
 

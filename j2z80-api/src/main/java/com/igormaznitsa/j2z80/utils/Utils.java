@@ -16,8 +16,6 @@
 
 package com.igormaznitsa.j2z80.utils;
 
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -33,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import org.apache.commons.io.IOUtils;
 
@@ -158,7 +157,7 @@ public final class Utils {
    * @return a string array contains all content of arrays as the arguments
    */
   public static String[] concatStringArrays(final String[]... arrays) {
-    assertNotNull("Concatenated arrays must not contain null", (Object[]) arrays);
+    Objects.requireNonNull((Object[]) arrays, "Concatenated arrays must not contain null");
     final List<String> result = new ArrayList<>();
     for (final String[] arg : arrays) {
       result.addAll(Arrays.asList(arg));

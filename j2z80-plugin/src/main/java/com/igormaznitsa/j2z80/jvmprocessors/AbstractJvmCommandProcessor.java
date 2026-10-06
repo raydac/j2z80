@@ -17,7 +17,6 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
 import com.igormaznitsa.j2z80.utils.Utils;
-import com.igormaznitsa.meta.common.utils.Assertions;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +25,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.MethodGen;
@@ -77,6 +77,7 @@ public abstract class AbstractJvmCommandProcessor {
    * The macros name to be used to replace a record address address
    */
   public static final String MACROS_RECORDADDR = "%recordaddress%";
+  public static final int MAX_LOCAL_VARIABLES = 64;
   // the map contains all processors for allowed jvm commands
   private static final Map<Class<? extends Instruction>, AbstractJvmCommandProcessor> PROCESSORS = new HashMap<>();
 
@@ -85,7 +86,8 @@ public abstract class AbstractJvmCommandProcessor {
       // read the file containing all jvm commands, search processors and map them
       final String PROCESSOR_LIST_FILE = "processorlist.txt";
       final InputStream file = AbstractJvmCommandProcessor.class.getResourceAsStream(PROCESSOR_LIST_FILE);
-      Assertions.assertNotNull("There must be " + PROCESSOR_LIST_FILE + " in the same directory", file);
+      Objects.requireNonNull(file,
+          "Can't find expected " + PROCESSOR_LIST_FILE + " in the same directory");
       final BufferedReader reader = new BufferedReader(new InputStreamReader(file, StandardCharsets.UTF_8));
       try {
         while (true) {
@@ -145,9 +147,11 @@ public abstract class AbstractJvmCommandProcessor {
   public static void assertLocalVariablesNumber(final MethodGen method) {
     if (!method.isInterface()) {
       final String label = method.getClassName() + '#' + method.getName() + " " + method.getSignature();
-      final int MAX_VARIABLES = 64;
       final int locals = method.getMaxLocals();
-      Assertions.assertTrue("Max locals number for a method must be less than " + MAX_VARIABLES + " [" + locals + "] at " + label, locals < MAX_VARIABLES);
+      if (locals >= MAX_LOCAL_VARIABLES) {
+        throw new IllegalStateException("Max locals number for a method must be less than " +
+            MAX_LOCAL_VARIABLES + " [" + locals + "] at " + label);
+      }
     }
   }
 
