@@ -43,7 +43,8 @@ public class Processor_JSR_W extends AbstractJvmCommandProcessor {
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final JSR_W jsrw = (JSR_W) instruction;
-    final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), ((BranchHandle) handle).getTarget().getPosition());
+    final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.method(),
+        ((BranchHandle) handle).getTarget().getPosition());
     out.write(template.replace(MACROS_ADDRESS, label));
     out.write(NEXT_LINE);
   }

@@ -20,17 +20,14 @@ import com.igormaznitsa.j2z80.translator.optimizator.base.ReplacePatterns;
 
 public class OptimizationChainFactory {
 
-  public static AsmOptimizerChain getOptimizators(final TranslatorContext context, final OptimizationLevel level) {
+  public static AsmOptimizerChain getOptimizations(final TranslatorContext context,
+                                                   final OptimizationLevel level) {
     if (level == null) {
       return new AsmOptimizerChain(context);
     }
-    switch (level) {
-      case NONE:
-        return new AsmOptimizerChain(context);
-      case BASIC:
-        return new AsmOptimizerChain(context, new ReplacePatterns());
-      default:
-        throw new IllegalArgumentException("Unsupported optimization level " + level);
-    }
+    return switch (level) {
+      case NONE -> new AsmOptimizerChain(context);
+      case BASIC -> new AsmOptimizerChain(context, new ReplacePatterns());
+    };
   }
 }

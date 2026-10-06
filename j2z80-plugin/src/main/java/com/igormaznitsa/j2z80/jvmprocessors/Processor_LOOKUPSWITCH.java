@@ -50,7 +50,9 @@ public class Processor_LOOKUPSWITCH extends AbstractJvmCommandProcessor {
     final InstructionHandle[] targets = lookupswitch.getTargets();
 
     final InstructionHandle defaultTarget = lookupswitch.getTarget();
-    final String defaultJump = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), defaultTarget.getPosition());
+    final String defaultJump =
+        LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.method(),
+            defaultTarget.getPosition());
 
     out.write(template
         .replace(MACROS_ADDRESS, defaultJump)
@@ -61,7 +63,9 @@ public class Processor_LOOKUPSWITCH extends AbstractJvmCommandProcessor {
       for (int branchIndex = 0; branchIndex < matchs.length; branchIndex++) {
         final int match = matchs[branchIndex];
         final InstructionHandle target = targets[branchIndex];
-        final String jumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), target.getPosition());
+        final String jumpLabel =
+            LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.method(),
+                target.getPosition());
 
         out.write("DEFW #" + Integer.toHexString(match & 0xFFFF).toUpperCase(Locale.ENGLISH) + "\n");
         out.write("DEFW " + jumpLabel + "\n");

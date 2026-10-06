@@ -54,7 +54,7 @@ public class Processor_CHECKCAST extends AbstractJvmCommandProcessor implements 
 
     final ClassID castingClassId = new ClassID(type.getClassName());
 
-    methodTranslator.getTranslatorContext().registerClassForCastCheck(castingClassId);
+    methodTranslator.translatorContext().registerClassForCastCheck(castingClassId);
 
     out.write(template.replace(MACROS_ID, LabelAndFrameUtils.makeLabelForClassID(castingClassId)));
     out.write(NEXT_LINE);

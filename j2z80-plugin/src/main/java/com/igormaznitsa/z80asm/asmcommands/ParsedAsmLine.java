@@ -195,7 +195,7 @@ public class ParsedAsmLine {
         break;
       }
       if (Character.isSpaceChar(chr)) {
-        if (buffer.length() == 0) {
+        if (buffer.isEmpty()) {
           continue;
         } else if (!atString) {
           continue;
@@ -232,7 +232,7 @@ public class ParsedAsmLine {
         break;
       }
     }
-    if (buffer.length() > 0) {
+    if (!buffer.isEmpty()) {
       resultList.add(buffer.toString());
     }
 
@@ -259,7 +259,7 @@ public class ParsedAsmLine {
   private static String makeSignatureFromNormalizedArgs(final String[] arguments) {
     final StringBuilder buffer = new StringBuilder();
     for (final String arg : arguments) {
-      if (buffer.length() > 0) {
+      if (!buffer.isEmpty()) {
         buffer.append(',');
       }
       buffer.append(arg);
@@ -390,9 +390,7 @@ public class ParsedAsmLine {
       return true;
     }
 
-    if (obj instanceof ParsedAsmLine) {
-      final ParsedAsmLine that = (ParsedAsmLine) obj;
-
+    if (obj instanceof ParsedAsmLine that) {
       return safeEquals(this.label, that.label)
           && safeEquals(this.command, that.command)
           && Arrays.equals(this.arguments, that.arguments);

@@ -40,7 +40,8 @@ public class Processor_MONITORENTER extends AbstractJvmCommandProcessor {
   public void process(final MethodTranslator methodTranslator, final Instruction instruction,
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
-    methodTranslator.getTranslatorContext().getLogger().logWarning("A MONITORENTER instruction has been met");
+    methodTranslator.translatorContext().getLogger()
+        .logWarning("A MONITORENTER instruction has been met");
     final MONITORENTER monitorenter = (MONITORENTER) instruction;
     out.write(template);
     out.write(NEXT_LINE);

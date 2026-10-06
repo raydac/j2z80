@@ -41,7 +41,7 @@ public class Processor_DRETURN extends AbstractJvmCommandProcessor {
                       final InstructionHandle handle,
                       final ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     out.write(
-        CheckedExceptionSupport.clearPendingOnReturn(methodTranslator.getMethod().getMethodGen()));
+        CheckedExceptionSupport.clearPendingOnReturn(methodTranslator.method().getMethodGen()));
     out.write(this.template);
     out.write(NEXT_LINE);
   }

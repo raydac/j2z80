@@ -52,7 +52,9 @@ public class Processor_TABLESWITCH extends AbstractJvmCommandProcessor {
     final InstructionHandle[] targets = tableswitch.getTargets();
 
     final InstructionHandle defaultTarget = tableswitch.getTarget();
-    final String defaultJump = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), defaultTarget.getPosition());
+    final String defaultJump =
+        LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.method(),
+            defaultTarget.getPosition());
 
     final int lowIndex = matchs[0];
     final int highIndex = matchs[matchs.length - 1];
@@ -65,7 +67,9 @@ public class Processor_TABLESWITCH extends AbstractJvmCommandProcessor {
 
     for (int branchIndex = 0; branchIndex < matchs.length; branchIndex++) {
       final InstructionHandle target = targets[branchIndex];
-      final String jumpLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), target.getPosition());
+      final String jumpLabel =
+          LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.method(),
+              target.getPosition());
 
       out.write("DEFW " + jumpLabel + "\n");
     }

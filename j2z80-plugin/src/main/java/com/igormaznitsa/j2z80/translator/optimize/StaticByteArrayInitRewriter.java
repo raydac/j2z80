@@ -77,7 +77,7 @@ public final class StaticByteArrayInitRewriter {
           tryMatchAt(handles, index, constantPool, branchTargets, exceptionBoundaries);
       if (match.isPresent()) {
         matches.add(match.get());
-        index = indexOfHandle(handles, match.get().getEndHandle()) + 1;
+        index = indexOfHandle(handles, match.get().endHandle()) + 1;
       } else {
         index++;
       }
@@ -109,10 +109,9 @@ public final class StaticByteArrayInitRewriter {
     if (isBlockedInterior(newArrayHandle, branchTargets, exceptionBoundaries)) {
       return Optional.empty();
     }
-    if (!(newArrayHandle.getInstruction() instanceof NEWARRAY)) {
+    if (!(newArrayHandle.getInstruction() instanceof NEWARRAY newArray)) {
       return Optional.empty();
     }
-    final NEWARRAY newArray = (NEWARRAY) newArrayHandle.getInstruction();
     if (newArray.getTypecode() != Const.T_BYTE) {
       return Optional.empty();
     }
@@ -164,20 +163,18 @@ public final class StaticByteArrayInitRewriter {
     if (isBlockedInterior(putStaticHandle, branchTargets, exceptionBoundaries)) {
       return Optional.empty();
     }
-    if (!(putStaticHandle.getInstruction() instanceof PUTSTATIC)) {
+    if (!(putStaticHandle.getInstruction() instanceof PUTSTATIC putStatic)) {
       return Optional.empty();
     }
 
-    final PUTSTATIC putStatic = (PUTSTATIC) putStaticHandle.getInstruction();
     final Type fieldType = putStatic.getFieldType(constantPool);
     if (!isByteArrayType(fieldType)) {
       return Optional.empty();
     }
-    if (!(putStatic.getReferenceType(constantPool) instanceof ObjectType)) {
+    if (!(putStatic.getReferenceType(constantPool) instanceof ObjectType owner)) {
       return Optional.empty();
     }
 
-    final ObjectType owner = (ObjectType) putStatic.getReferenceType(constantPool);
     return Optional.of(new StaticByteArrayInitMatch(
         lengthHandle,
         putStaticHandle,

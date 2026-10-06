@@ -52,8 +52,7 @@ public class Processor_LDC extends AbstractJvmCommandProcessor {
     final Constant cpConstant = methodTranslator.getConstantPool().getConstant(index);
 
     final String stringValue;
-    if (cpConstant instanceof ConstantInteger) {
-      final ConstantInteger constInt = (ConstantInteger) cpConstant;
+    if (cpConstant instanceof ConstantInteger constInt) {
       final int value = constInt.getBytes();
       stringValue = Integer.toString(value);
     } else if (cpConstant instanceof ConstantFloat) {
@@ -61,7 +60,7 @@ public class Processor_LDC extends AbstractJvmCommandProcessor {
     } else if (cpConstant instanceof ConstantUtf8 || cpConstant instanceof ConstantString) {
       stringValue = methodTranslator.registerUsedConstantPoolItem(index);
     } else {
-      methodTranslator.getTranslatorContext().getLogger()
+      methodTranslator.translatorContext().getLogger()
           .logError("Unsupported constant pool element has been detected: " + cpConstant);
       throw new IllegalArgumentException(
           "Unsupported constant pool item found in a LDC instruction: " + cpConstant);

@@ -16,14 +16,11 @@
 
 package com.igormaznitsa.j2z80.utils;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -31,9 +28,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.StringTokenizer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * It is an Auxiliary class contains some useful methods.
@@ -97,36 +95,22 @@ public final class Utils {
    *
    * @param file    the file to be read, must not be null
    * @param charSet the charset to be used to decode strings, must not be null
-   * @return a string array contains each text line as an element
+   * @return file content as list of strings
    * @throws IOException it will be thrown if there is any transport problem
    */
-  public static String[] readTextFileAsStringArray(final File file, final Charset charSet)
+  public static List<String> readTextFileAsStringArray(final File file, final Charset charSet)
       throws IOException {
-    final BufferedReader reader =
-        new BufferedReader(new InputStreamReader(new FileInputStream(file), charSet));
-    final List<String> readString = new ArrayList<>(256);
-    try {
-      while (true) {
-        final String line = reader.readLine();
-        if (line == null) {
-          break;
-        }
-        readString.add(line);
-      }
-    } finally {
-      silentlyClose(reader);
-    }
-    return readString.toArray(new String[0]);
+    return FileUtils.readLines(file, charSet);
   }
 
   /**
-   * Break a sold string to lines
+   * Break a string as string line array.
    *
    * @param text a sold string to be broken, must not be null
    * @return a string array where each line as an array element
    */
   public static String[] breakToLines(final String text) {
-    return text.split("\\n");
+    return StringUtils.split(text, '\n');
   }
 
   /**
@@ -157,7 +141,6 @@ public final class Utils {
    * @return a string array contains all content of arrays as the arguments
    */
   public static String[] concatStringArrays(final String[]... arrays) {
-    Objects.requireNonNull((Object[]) arrays, "Concatenated arrays must not contain null");
     final List<String> result = new ArrayList<>();
     for (final String[] arg : arrays) {
       result.addAll(Arrays.asList(arg));
@@ -218,19 +201,26 @@ public final class Utils {
   /**
    * Convert a byte array into asm compatible representation (DEFB) with limit for values per line
    *
-   * @param firstLine           the first line for the result text block, it can be null
-   * @param array               a byte array to be converted, must not be null
-   * @param maxNumbersPerString the number of values allowed per a line, if -1 then it will be default value
+   * @param firstLine            the first line for the result text block, it can be null
+   * @param array                a byte array to be converted, must not be null
+   * @param maxValueItemsPerLine the number of values allowed per a line, if -1 then it will be default value
    * @return asm string lines representing converted array data
    */
-  public static String[] byteArrayToAsm(final String firstLine, final byte[] array,
-                                        final int maxNumbersPerString) {
-
+  public static String[] byteArrayToAsm(
+      final String firstLine,
+      final byte[] array,
+      final int maxValueItemsPerLine
+  ) {
     final StringBuilder buffer = new StringBuilder(firstLine == null ? "" : firstLine);
-    if (firstLine != null) {
-      buffer.append("\n");
+
+    if (firstLine != null
+        && !buffer.isEmpty()
+        && buffer.charAt(buffer.length() - 1) != '\n'
+    ) {
+      buffer.append('\n');
     }
-    final int maxPerString = maxNumbersPerString <= 0 ? 32 : maxNumbersPerString;
+
+    final int maxPerString = maxValueItemsPerLine <= 0 ? 32 : maxValueItemsPerLine;
     int len = array.length;
     int index = 0;
     while (len > 0) {

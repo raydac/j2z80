@@ -16,7 +16,7 @@
 
 package com.igormaznitsa.j2z80.translator;
 
-import static com.igormaznitsa.j2z80.translator.optimizator.OptimizationChainFactory.getOptimizators;
+import static com.igormaznitsa.j2z80.translator.optimizator.OptimizationChainFactory.getOptimizations;
 import static com.igormaznitsa.j2z80.translator.utils.AsmAssertions.assertAddress;
 import static com.igormaznitsa.j2z80.translator.utils.ClassUtils.calculateInstanceSize;
 import static com.igormaznitsa.j2z80.translator.utils.MethodUtils.isStaticInitializer;
@@ -65,7 +65,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantInteger;
 import org.apache.bcel.classfile.ConstantUtf8;
@@ -108,7 +107,7 @@ public class TranslatorImpl implements TranslatorContext {
     this.messageLogger = logger == null ? new DefaultTranslatorLogger() : logger;
 
     this.workingClassPath = new ZClassPath(this,
-        jarArchives.stream().map(ZParsedJar::new).collect(Collectors.toList()));
+        jarArchives.stream().map(ZParsedJar::new).toList());
 
     if (this.workingClassPath.getAllClasses().isEmpty()) {
       throw new IllegalStateException(
@@ -251,7 +250,7 @@ public class TranslatorImpl implements TranslatorContext {
           "Optimization level: " + this.optimizationLevel);
 
       final List<ParsedAsmLine> asmLines = asParsedLines(result);
-      final AsmOptimizerChain chain = getOptimizators(this, optimizationLevel);
+      final AsmOptimizerChain chain = getOptimizations(this, optimizationLevel);
       final List<String> optimizedAsString = asStringLines(chain.processSources(asmLines));
 
       optimizedAsString.addFirst(

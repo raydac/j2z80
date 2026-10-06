@@ -44,7 +44,8 @@ public class Processor_IFNULL extends AbstractJvmCommandProcessor {
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final IFNULL ifnull = (IFNULL) instruction;
-    final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(classProcessor.getMethod(), ((BranchHandle) handle).getTarget().getPosition());
+    final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(classProcessor.method(),
+        ((BranchHandle) handle).getTarget().getPosition());
     out.write(template.replace(MACROS_ADDRESS, label));
     out.write(NEXT_LINE);
   }

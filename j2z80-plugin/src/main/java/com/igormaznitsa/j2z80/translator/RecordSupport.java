@@ -372,7 +372,7 @@ public final class RecordSupport {
     if (!(type instanceof ObjectType)) {
       return false;
     }
-    return this.isRecordClass(this.classes.get(((ObjectType) type).getClassName()));
+    return this.isRecordClass(this.classes.get(type.getClassName()));
   }
 
   private boolean isOneWord(final Type type) {

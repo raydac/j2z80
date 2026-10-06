@@ -50,7 +50,7 @@ public class Processor_INSTANCEOF extends AbstractJvmCommandProcessor implements
     final ObjectType objectType = instof.getLoadClassType(methodTranslator.getConstantPool());
     final ClassID targetClassID = new ClassID(objectType.getClassName());
 
-    methodTranslator.getTranslatorContext().registerClassForCastCheck(targetClassID);
+    methodTranslator.translatorContext().registerClassForCastCheck(targetClassID);
 
     out.write(template.replace(MACROS_ID, LabelAndFrameUtils.makeLabelForClassID(targetClassID)));
     out.write(NEXT_LINE);

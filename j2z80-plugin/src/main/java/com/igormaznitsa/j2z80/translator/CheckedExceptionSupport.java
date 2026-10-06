@@ -129,9 +129,9 @@ public enum CheckedExceptionSupport {
       return "";
     }
 
-    methodTranslator.getTranslatorContext().registerAdditionsUsedByClass(Processor_ATHROW.class);
+    methodTranslator.translatorContext().registerAdditionsUsedByClass(Processor_ATHROW.class);
 
-    final ClassMethodInfo caller = methodTranslator.getMethod();
+    final ClassMethodInfo caller = methodTranslator.method();
     final int position = invokeHandle.getPosition();
     final String okLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(caller, position) + "_EXOK";
 
@@ -149,7 +149,7 @@ public enum CheckedExceptionSupport {
       final MethodTranslator methodTranslator,
       final InstructionHandle athrowHandle
   ) {
-    methodTranslator.getTranslatorContext().registerAdditionsUsedByClass(Processor_ATHROW.class);
+    methodTranslator.translatorContext().registerAdditionsUsedByClass(Processor_ATHROW.class);
 
     return "POP BC" + NEXT_LINE
         + dispatchExceptionInBc(methodTranslator, athrowHandle);
@@ -163,7 +163,7 @@ public enum CheckedExceptionSupport {
       final MethodTranslator methodTranslator,
       final InstructionHandle throwSite
   ) {
-    final MethodGen method = methodTranslator.getMethod().getMethodGen();
+    final MethodGen method = methodTranslator.method().getMethodGen();
     final StringBuilder assembly = new StringBuilder();
     final CodeExceptionGen[] handlers = method.getExceptionHandlers();
 
@@ -186,7 +186,7 @@ public enum CheckedExceptionSupport {
       final InstructionHandle throwSite
   ) {
     final String handlerLabel = LabelAndFrameUtils.makeClassMethodJumpLabel(
-        methodTranslator.getMethod(), handler.getHandlerPC().getPosition());
+        methodTranslator.method(), handler.getHandlerPC().getPosition());
     final ObjectType catchType = handler.getCatchType();
 
     if (catchType == null) {
@@ -195,11 +195,11 @@ public enum CheckedExceptionSupport {
           + "JP " + handlerLabel + NEXT_LINE;
     }
 
-    rejectUncheckedType(methodTranslator.getTranslatorContext(), catchType.getClassName(),
+    rejectUncheckedType(methodTranslator.translatorContext(), catchType.getClassName(),
         "catch handler");
 
     final ClassID catchClass = new ClassID(catchType.getClassName());
-    methodTranslator.getTranslatorContext().registerClassForCastCheck(catchClass);
+    methodTranslator.translatorContext().registerClassForCastCheck(catchClass);
     final String typeLabel = LabelAndFrameUtils.makeLabelForClassID(catchClass);
     final String nextLabel = handlerLabel + "_EXN"
         + throwSite.getPosition() + '_'

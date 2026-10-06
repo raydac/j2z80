@@ -52,7 +52,8 @@ public class Processor_INVOKEINTERFACE extends AbstractInvokeProcessor implement
     if (!isBootstrapCall(methodTranslator, inv, bootstrapClassLoader, out)) {
       assertMethodIsNotNull(invokedMethod, methodTranslator, inv);
       final MethodID interfaceMethodId = new MethodID(invokedMethod);
-      methodTranslator.getTranslatorContext().registerInterfaceMethodForINVOKEINTERFACE(interfaceMethodId);
+      methodTranslator.translatorContext()
+          .registerInterfaceMethodForINVOKEINTERFACE(interfaceMethodId);
 
       final String interfaceMethdodId = LabelAndFrameUtils.makeLabelForMethodID(interfaceMethodId);
 

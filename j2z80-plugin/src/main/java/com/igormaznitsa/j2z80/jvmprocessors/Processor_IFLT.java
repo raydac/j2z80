@@ -43,7 +43,8 @@ public class Processor_IFLT extends AbstractJvmCommandProcessor {
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final IFLT nop = (IFLT) instruction;
-    final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(classProcessor.getMethod(), ((BranchHandle) handle).getTarget().getPosition());
+    final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(classProcessor.method(),
+        ((BranchHandle) handle).getTarget().getPosition());
     out.write(template.replace(MACROS_ADDRESS, label));
     out.write(NEXT_LINE);
   }

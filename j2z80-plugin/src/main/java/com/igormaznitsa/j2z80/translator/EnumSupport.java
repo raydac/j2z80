@@ -101,7 +101,7 @@ public final class EnumSupport {
       return;
     }
     final String message = "Enum." + name + " is not supported because String is not supported";
-    methodTranslator.getTranslatorContext().getLogger().logError(message);
+    methodTranslator.translatorContext().getLogger().logError(message);
     throw new IllegalArgumentException(message);
   }
 
@@ -125,7 +125,7 @@ public final class EnumSupport {
     if (ENUM_CLASS.equals(className)) {
       return true;
     }
-    ClassGen current = methodTranslator.getTranslatorContext().getClassContext()
+    ClassGen current = methodTranslator.translatorContext().getClassContext()
         .findClassForID(new ClassID(className));
     while (current != null) {
       if (current.isEnum() && ENUM_CLASS.equals(current.getSuperclassName())) {
@@ -135,7 +135,7 @@ public final class EnumSupport {
       if (superName == null || isJ2Z80ObjectClass(superName)) {
         return false;
       }
-      current = methodTranslator.getTranslatorContext().getClassContext()
+      current = methodTranslator.translatorContext().getClassContext()
           .findClassForID(new ClassID(superName));
     }
     return false;

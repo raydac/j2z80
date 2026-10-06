@@ -54,9 +54,10 @@ public class Processor_NEW extends AbstractJvmCommandProcessor implements NeedsM
     final String className = type.getClassName();
 
     CheckedExceptionSupport.rejectUncheckedType(
-        methodTranslator.getTranslatorContext(), className, "NEW");
+        methodTranslator.translatorContext(), className, "NEW");
 
-    final Integer classID = methodTranslator.getTranslatorContext().getClassContext().findClassUID(new ClassID(className));
+    final Integer classID =
+        methodTranslator.translatorContext().getClassContext().findClassUID(new ClassID(className));
 
     requireNonNull(classID, () -> "Class ID must not be null [" + className + ']');
 

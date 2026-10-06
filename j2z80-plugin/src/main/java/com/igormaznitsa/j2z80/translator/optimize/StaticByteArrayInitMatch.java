@@ -24,14 +24,9 @@ import org.apache.bcel.generic.Type;
 /**
  * A contiguous {@code byte[]} fill in {@code <clinit>} that can be emitted as a ROM template.
  */
-public final class StaticByteArrayInitMatch {
-
-  private final InstructionHandle startHandle;
-  private final InstructionHandle endHandle;
-  private final byte[] payload;
-  private final String className;
-  private final String fieldName;
-  private final Type fieldType;
+public record StaticByteArrayInitMatch(InstructionHandle startHandle, InstructionHandle endHandle,
+                                       byte[] payload, String className, String fieldName,
+                                       Type fieldType) {
 
   public StaticByteArrayInitMatch(
       final InstructionHandle startHandle,
@@ -48,31 +43,12 @@ public final class StaticByteArrayInitMatch {
     this.fieldType = requireNonNull(fieldType, "fieldType");
   }
 
-  public InstructionHandle getStartHandle() {
-    return this.startHandle;
-  }
-
-  public InstructionHandle getEndHandle() {
-    return this.endHandle;
-  }
-
-  public byte[] getPayload() {
+  @Override
+  public byte[] payload() {
     return this.payload.clone();
   }
 
   public int getLength() {
     return this.payload.length;
-  }
-
-  public String getClassName() {
-    return this.className;
-  }
-
-  public String getFieldName() {
-    return this.fieldName;
-  }
-
-  public Type getFieldType() {
-    return this.fieldType;
   }
 }

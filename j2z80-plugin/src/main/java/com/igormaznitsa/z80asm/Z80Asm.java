@@ -58,16 +58,16 @@ public class Z80Asm implements AsmTranslator {
   private boolean firstPassFlag;
 
   public Z80Asm(final File file) throws IOException {
-    this(Arrays.asList(Utils.readTextFileAsStringArray(file, StandardCharsets.UTF_8)));
+    this(Utils.readTextFileAsStringArray(file, StandardCharsets.UTF_8));
   }
 
   public Z80Asm(final File file, final Charset charSet) throws IOException {
-    this(Arrays.asList(Utils.readTextFileAsStringArray(file, charSet)));
+    this(Utils.readTextFileAsStringArray(file, charSet));
   }
 
-  public Z80Asm(final List<String> sourceToBeCompiled) {
-    requireNonNull((Object) sourceToBeCompiled, "Source array must not be null");
-    this.sources = sourceToBeCompiled.stream()
+  public Z80Asm(final List<String> sourcesToCompile) {
+    requireNonNull((Object) sourcesToCompile, "Source array must not be null");
+    this.sources = sourcesToCompile.stream()
         .flatMap(x -> Stream.of(Utils.breakToLines(x))).toArray(String[]::new);
   }
 

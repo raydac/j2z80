@@ -55,7 +55,7 @@ public class LightExpression {
         case '+': {
           if (insideString) {
             result.append(chr);
-          } else if (result.length() == 0) {
+          } else if (result.isEmpty()) {
             result.append(chr);
             atWorking = false;
           } else {
@@ -69,7 +69,7 @@ public class LightExpression {
             result.append('\"');
             atWorking = false;
           } else {
-            if (result.length() == 0) {
+            if (result.isEmpty()) {
               result.append("\"");
               insideString = true;
             } else {
@@ -83,7 +83,7 @@ public class LightExpression {
           if (insideString) {
             result.append('$');
           } else {
-            if (result.length() == 0) {
+            if (result.isEmpty()) {
               result.append(context.getPC());
             } else {
               position--;
@@ -105,7 +105,7 @@ public class LightExpression {
         break;
         default: {
           if (!insideString && Character.isWhitespace(chr)) {
-            if (result.length() > 0) {
+            if (!result.isEmpty()) {
               atWorking = false;
             }
           } else {
@@ -162,7 +162,7 @@ public class LightExpression {
           throw new IllegalArgumentException("Not closed string: " + str);
         }
         final String work = str.substring(1, str.length() - 1);
-        if (str.length() <= 2) {
+        if (str.length() == 2) {
           throw new IllegalArgumentException("String operand must be longer: " + str);
         }
         int result = 0;

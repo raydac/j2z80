@@ -211,7 +211,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
     final Type[] methodArgs = instruction.getArgumentTypes(constantPool);
     final Type methodResult = instruction.getReturnType(constantPool);
 
-    final MethodGen methodGen = methodTranslator.getTranslatorContext().getMethodContext()
+    final MethodGen methodGen = methodTranslator.translatorContext().getMethodContext()
         .findMethod(new MethodID(objType.getClassName(), methodName, methodResult, methodArgs));
 
     if (methodGen != null) {
@@ -233,7 +233,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
       String prefix = "";
       String postfix = "";
 
-      if (processor.doesInvokeNeedFrame(methodTranslator.getTranslatorContext(), methodName,
+      if (processor.doesInvokeNeedFrame(methodTranslator.translatorContext(), methodName,
           methodArgs, methodResult)) {
         prefix = orientWideArguments(methodArgs) + generateFramePrefix(argAreaSize, totalFrameSize);
         postfix = generateFramePostfix(argAreaSize, totalFrameSize);
@@ -241,7 +241,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
 
       out.write(prefix);
       out.write(NEXT_LINE);
-      for (final String s : processor.generateInvocation(methodTranslator.getTranslatorContext(),
+      for (final String s : processor.generateInvocation(methodTranslator.translatorContext(),
           methodName, methodArgs, methodResult)) {
         out.write(s);
         if (!s.endsWith("\n")) {
@@ -252,7 +252,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
       out.write(postfix);
       out.write(NEXT_LINE);
 
-      methodTranslator.getTranslatorContext().registerCalledBootClassProcesser(processor);
+      methodTranslator.translatorContext().registerCalledBootClassProcesser(processor);
 
       result = true;
     }
@@ -277,7 +277,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
     String className = objType.getClassName();
     final String methodName = instruction.getMethodName(constantPool);
 
-    return methodTranslator.getTranslatorContext()
+    return methodTranslator.translatorContext()
         .getMethodContext().findMethod(
             new MethodID(className, methodName,
                 instruction.getReturnType(constantPool),
@@ -328,7 +328,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
       final String message =
           "Can't find method " + className + '.' + instruction.getMethodName(constantPool) + " " +
               instruction.getSignature(constantPool);
-      methodTranslator.getTranslatorContext().getLogger().logError(message);
+      methodTranslator.translatorContext().getLogger().logError(message);
       throw new NullPointerException(message);
     }
   }

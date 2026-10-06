@@ -36,7 +36,7 @@ public class Sna48Writer {
     this.data = data;
   }
 
-  public byte[] writeSna() throws IOException {
+  public byte[] writeSna() {
     final byte[] result = Arrays.copyOf(ZX48_SNA_TEMPLATE, ZX48_SNA_TEMPLATE.length);
 
     result[0x17] = (byte) (this.stackTopAddress - 2);

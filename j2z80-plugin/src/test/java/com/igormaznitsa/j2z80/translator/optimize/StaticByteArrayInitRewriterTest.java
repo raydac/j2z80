@@ -47,9 +47,9 @@ public class StaticByteArrayInitRewriterTest {
     final List<StaticByteArrayInitMatch> matches = StaticByteArrayInitRewriter.findMatches(clinit);
 
     assertEquals(1, matches.size());
-    assertEquals("demo.Data", matches.get(0).getClassName());
-    assertEquals("DATA", matches.get(0).getFieldName());
-    assertArrayEquals(payload, matches.get(0).getPayload());
+    assertEquals("demo.Data", matches.get(0).className());
+    assertEquals("DATA", matches.get(0).fieldName());
+    assertArrayEquals(payload, matches.get(0).payload());
   }
 
   @Test

@@ -41,7 +41,7 @@ public class Processor_BREAKPOINT extends AbstractJvmCommandProcessor implements
   public void process(final MethodTranslator classProcessor, final Instruction instruction,
                       final InstructionHandle handle,
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
-    classProcessor.getTranslatorContext().getLogger().logWarning("a BREAKPOINT has been met");
+    classProcessor.translatorContext().getLogger().logWarning("a BREAKPOINT has been met");
     final BREAKPOINT breakpoint = (BREAKPOINT) instruction;
     out.write(template);
     out.write(NEXT_LINE);

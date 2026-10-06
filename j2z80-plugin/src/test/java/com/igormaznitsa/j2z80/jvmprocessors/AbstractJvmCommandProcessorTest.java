@@ -104,7 +104,7 @@ public abstract class AbstractJvmCommandProcessorTest extends Z80 {
     when(CLASS_GEN_MOCK.getClassName()).thenReturn(MOCK_CLASS_NAME);
     when(CLASS_GEN_MOCK.getJavaClass()).thenReturn(JCLASS_GEN_MOCK);
 
-    when(CLASS_PROCESSOR_MOCK.getTranslatorContext()).thenReturn(TRANSLATOR_MOCK);
+    when(CLASS_PROCESSOR_MOCK.translatorContext()).thenReturn(TRANSLATOR_MOCK);
 
     when(TRANSLATOR_MOCK.getClassContext()).thenReturn(CLASSCONTEXT_MOCK);
     when(TRANSLATOR_MOCK.getMethodContext()).thenReturn(METHODCONTEXT_MOCK);
@@ -161,9 +161,9 @@ public abstract class AbstractJvmCommandProcessorTest extends Z80 {
 
     CLASSMETHOD_INFO = new ClassMethodInfo(CLASS_GEN_MOCK, mockupOfInvokedMethod.getMethod(), mockupOfInvokedMethod);
 
-    when(CLASS_PROCESSOR_MOCK.getMethod()).thenReturn(CLASSMETHOD_INFO);
+    when(CLASS_PROCESSOR_MOCK.method()).thenReturn(CLASSMETHOD_INFO);
     when(CLASS_PROCESSOR_MOCK.getConstantPool()).thenReturn(CP_GEN_MOCK);
-    when(CLASS_PROCESSOR_MOCK.getTranslatorContext()).thenReturn(TRANSLATOR_MOCK);
+    when(CLASS_PROCESSOR_MOCK.translatorContext()).thenReturn(TRANSLATOR_MOCK);
   }
 
   protected MethodGen makeMethodMockup() {

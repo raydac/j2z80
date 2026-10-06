@@ -49,19 +49,7 @@ import org.apache.bcel.generic.MethodGen;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-public class MethodTranslator {
-
-  private final TranslatorContext translatorContext;
-  private final ClassMethodInfo method;
-
-  public MethodTranslator(final TranslatorContext context, final ClassMethodInfo method) {
-    this.translatorContext = context;
-    this.method = method;
-  }
-
-  public TranslatorContext getTranslatorContext() {
-    return this.translatorContext;
-  }
+public record MethodTranslator(TranslatorContext translatorContext, ClassMethodInfo method) {
 
   public String[] translate(final ClassLoader bootstrapClassLoader) throws IOException {
     final List<String> asm = this.method2asm(bootstrapClassLoader);
@@ -71,10 +59,6 @@ public class MethodTranslator {
     }
 
     return result.toArray(new String[0]);
-  }
-
-  public ClassMethodInfo getMethod() {
-    return this.method;
   }
 
   private List<String> method2asm(final ClassLoader bootstrapClassLoader) throws IOException {
@@ -121,13 +105,13 @@ public class MethodTranslator {
             "J2Z80 doesn't support JVM instruction: " + instruction.getName());
       }
 
-      this.getTranslatorContext().registerAdditionsUsedByClass(processor.getClass());
+      this.translatorContext().registerAdditionsUsedByClass(processor.getClass());
 
       final StringWriter writer = new StringWriter(256);
       try {
         processor.process(this, instruction, handler, bootstrapClassLoader, writer);
       } catch (IllegalArgumentException ex) {
-        this.getTranslatorContext().getLogger()
+        this.translatorContext().getLogger()
             .logError(this.method + " [" + ex.getMessage() + ']');
         throw ex;
       }
@@ -153,17 +137,17 @@ public class MethodTranslator {
 
     for (final StaticByteArrayInitMatch match : matches) {
       final String templateLabel =
-          this.translatorContext.registerStaticByteArrayTemplate(match.getPayload());
+          this.translatorContext.registerStaticByteArrayTemplate(match.payload());
       this.translatorContext.getLogger().logInfo(
-          "Compacted static byte[] " + match.getClassName() + '#' + match.getFieldName()
+          "Compacted static byte[] " + match.className() + '#' + match.fieldName()
               + " (" + match.getLength() + " elements, ROM-resident)");
 
-      starts.put(match.getStartHandle(), new CompactedInit(match, templateLabel));
+      starts.put(match.startHandle(), new CompactedInit(match, templateLabel));
 
-      InstructionHandle cursor = match.getStartHandle().getNext();
+      InstructionHandle cursor = match.startHandle().getNext();
       while (cursor != null) {
         skipHandles.add(cursor);
-        if (cursor == match.getEndHandle()) {
+        if (cursor == match.endHandle()) {
           break;
         }
         cursor = cursor.getNext();
@@ -176,7 +160,7 @@ public class MethodTranslator {
   private String emitCompactedByteArrayInit(final CompactedInit compacted) {
     final StaticByteArrayInitMatch match = compacted.match;
     final String fieldLabel = LabelAndFrameUtils.makeLabelNameForField(
-        match.getClassName(), match.getFieldName(), match.getFieldType());
+        match.className(), match.fieldName(), match.fieldType());
 
     return "    LD BC," + compacted.templateLabel + AbstractJvmCommandProcessor.NEXT_LINE
         + "    LD (" + fieldLabel + "),BC" + AbstractJvmCommandProcessor.NEXT_LINE;
@@ -218,38 +202,24 @@ public class MethodTranslator {
           (ConstantUtf8) getConstantPool().getConstant(((ConstantString) item).getStringIndex());
       result = LabelAndFrameUtils.makeLabelForConstantPoolItem(this.method.getClassInfo(),
           ((ConstantString) item).getStringIndex());
-      getTranslatorContext().registerConstantPoolItem(result, utfConst);
+      translatorContext().registerConstantPoolItem(result, utfConst);
     } else {
       result =
           LabelAndFrameUtils.makeLabelForConstantPoolItem(this.method.getClassInfo(), itemIndex);
-      getTranslatorContext().registerConstantPoolItem(result, item);
+      translatorContext().registerConstantPoolItem(result, item);
     }
     return result;
   }
 
-  private static final class CompactedInits {
-    private final Map<InstructionHandle, CompactedInit> starts;
-    private final Set<InstructionHandle> skipHandles;
-
-    private CompactedInits(final Map<InstructionHandle, CompactedInit> starts,
-                           final Set<InstructionHandle> skipHandles) {
-      this.starts = starts;
-      this.skipHandles = skipHandles;
-    }
+  private record CompactedInits(Map<InstructionHandle, CompactedInit> starts,
+                                Set<InstructionHandle> skipHandles) {
 
     private static CompactedInits empty() {
       return new CompactedInits(Map.of(), Set.of());
     }
   }
 
-  private static final class CompactedInit {
-    private final StaticByteArrayInitMatch match;
-    private final String templateLabel;
-
-    private CompactedInit(final StaticByteArrayInitMatch match, final String templateLabel) {
-      this.match = match;
-      this.templateLabel = templateLabel;
-    }
+  private record CompactedInit(StaticByteArrayInitMatch match, String templateLabel) {
   }
 
 }

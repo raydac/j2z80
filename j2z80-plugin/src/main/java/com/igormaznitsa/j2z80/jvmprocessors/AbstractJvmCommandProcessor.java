@@ -74,7 +74,7 @@ public abstract class AbstractJvmCommandProcessor {
    */
   public static final String MACROS_ARGAREALEN = "%argumentarealen%";
   /**
-   * The macros name to be used to replace a record address address
+   * The macros name to be used to replace a record address
    */
   public static final String MACROS_RECORDADDR = "%recordaddress%";
   public static final int MAX_LOCAL_VARIABLES = 64;
@@ -162,9 +162,9 @@ public abstract class AbstractJvmCommandProcessor {
    * @return read resource as String
    * @throws IllegalArgumentException it will be thrown if the resource is not found or can't be read
    */
-  protected String loadResourceFileAsString(final String path) {
+  protected static String loadResourceFileAsString(final String path) {
     try {
-      return Utils.readTextResource(this.getClass(), path);
+      return Utils.readTextResource(AbstractJvmCommandProcessor.class, path);
     } catch (IOException ex) {
       throw new IllegalArgumentException("Can't read resource " + path, ex);
     }

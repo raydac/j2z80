@@ -43,7 +43,7 @@ public class Processor_IRETURN extends AbstractJvmCommandProcessor {
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final IRETURN ireturn = (IRETURN) instruction;
     out.write(
-        CheckedExceptionSupport.clearPendingOnReturn(methodTranslator.getMethod().getMethodGen()));
+        CheckedExceptionSupport.clearPendingOnReturn(methodTranslator.method().getMethodGen()));
     out.write(template);
     out.write(NEXT_LINE);
   }

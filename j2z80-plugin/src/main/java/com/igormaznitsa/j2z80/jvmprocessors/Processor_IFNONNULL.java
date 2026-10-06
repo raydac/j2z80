@@ -44,7 +44,8 @@ public class Processor_IFNONNULL extends AbstractJvmCommandProcessor {
                       ClassLoader bootstrapClassLoader, final Writer out) throws IOException {
     final IFNONNULL ifnonnul = (IFNONNULL) instruction;
     final BranchHandle branchHandler = (BranchHandle) handle;
-    final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.getMethod(), branchHandler.getTarget().getPosition());
+    final String label = LabelAndFrameUtils.makeClassMethodJumpLabel(methodTranslator.method(),
+        branchHandler.getTarget().getPosition());
     out.write(template.replace(MACROS_ADDRESS, label));
     out.write(NEXT_LINE);
   }

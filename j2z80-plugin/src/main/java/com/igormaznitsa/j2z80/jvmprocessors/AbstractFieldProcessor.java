@@ -60,7 +60,8 @@ public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor
     final String fieldName = instruction.getFieldName(constantPool);
     final Type fieldType = instruction.getFieldType(constantPool);
 
-    final Integer classGen = methodTranslator.getTranslatorContext().getClassContext().findClassUID(new ClassID(className));
+    final Integer classGen =
+        methodTranslator.translatorContext().getClassContext().findClassUID(new ClassID(className));
 
     if (classGen != null) {
       return false;
@@ -73,14 +74,16 @@ public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor
       final boolean isStaticCall = (instruction instanceof PUTSTATIC) || (instruction instanceof GETSTATIC);
 
       if (instruction instanceof PUTSTATIC || instruction instanceof PUTFIELD) {
-        for (final String s : processor.generateFieldSetter(methodTranslator.getTranslatorContext(), fieldName, fieldType, isStaticCall)) {
+        for (final String s : processor.generateFieldSetter(methodTranslator.translatorContext(),
+            fieldName, fieldType, isStaticCall)) {
           out.write(s);
           if (!s.endsWith("\n")) {
             out.write(NEXT_LINE);
           }
         }
       } else if (instruction instanceof GETSTATIC || instruction instanceof GETFIELD) {
-        for (final String s : processor.generateFieldGetter(methodTranslator.getTranslatorContext(), fieldName, fieldType, isStaticCall)) {
+        for (final String s : processor.generateFieldGetter(methodTranslator.translatorContext(),
+            fieldName, fieldType, isStaticCall)) {
           out.write(s);
           if (!s.endsWith("\n")) {
             out.write(NEXT_LINE);
@@ -92,7 +95,7 @@ public abstract class AbstractFieldProcessor extends AbstractJvmCommandProcessor
       }
       out.write(NEXT_LINE);
 
-      methodTranslator.getTranslatorContext().registerCalledBootClassProcesser(processor);
+      methodTranslator.translatorContext().registerCalledBootClassProcesser(processor);
       return true;
     }
     return false;
