@@ -17,7 +17,15 @@
 package com.igormaznitsa.j2z80.translator.optimizator;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
+import com.igormaznitsa.j2z80.translator.optimizator.base.FallThroughJumpOptimizer;
+import com.igormaznitsa.j2z80.translator.optimizator.base.ImmediateWordLoadOptimizer;
+import com.igormaznitsa.j2z80.translator.optimizator.base.NegationOptimizer;
+import com.igormaznitsa.j2z80.translator.optimizator.base.RedundantAccumulatorOptimizer;
+import com.igormaznitsa.j2z80.translator.optimizator.base.RedundantCompareOptimizer;
+import com.igormaznitsa.j2z80.translator.optimizator.base.RepeatedWordLoadOptimizer;
 import com.igormaznitsa.j2z80.translator.optimizator.base.ReplacePatterns;
+import com.igormaznitsa.j2z80.translator.optimizator.base.WordShiftOptimizer;
+import com.igormaznitsa.j2z80.translator.optimizator.base.ZeroLoadOptimizer;
 
 public class OptimizationChainFactory {
 
@@ -29,6 +37,11 @@ public class OptimizationChainFactory {
     return switch (level) {
       case NONE -> new AsmOptimizerChain(context);
       case BASIC -> new AsmOptimizerChain(context, new ReplacePatterns());
+      case COMPACT ->
+          new AsmOptimizerChain(context, new ReplacePatterns(), new FallThroughJumpOptimizer(),
+              new ZeroLoadOptimizer(), new RedundantCompareOptimizer(), new NegationOptimizer(),
+              new WordShiftOptimizer(), new ImmediateWordLoadOptimizer(),
+              new RedundantAccumulatorOptimizer(), new RepeatedWordLoadOptimizer());
     };
   }
 }

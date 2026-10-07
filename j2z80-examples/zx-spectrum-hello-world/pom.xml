@@ -62,7 +62,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <optimization>BASIC</optimization>
+                    <optimization>COMPACT</optimization>
                     <excludeResources>
                         <value>/**/*.xml</value>
                         <value>/**/*.properties</value>

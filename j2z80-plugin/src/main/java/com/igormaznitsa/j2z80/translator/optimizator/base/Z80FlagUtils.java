@@ -14,29 +14,22 @@
  * limitations under the License.
  */
 
-package com.igormaznitsa.j2z80.translator.optimizator;
+package com.igormaznitsa.j2z80.translator.optimizator.base;
 
-/**
- * List of allowed optimization levels
- *
- * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
- */
-public enum OptimizationLevel {
-  /**
-   * Don't make any optimization
-   */
-  NONE,
+import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 
-  /**
-   * Make low optimization, mainly remove meaningless command pairs
-   */
-  BASIC,
+final class Z80FlagUtils {
 
-  /**
-   * Remove redundant stack pairs, fall-through jumps, and flag-safe zero loads
-   */
-  COMPACT;
+  private Z80FlagUtils() {
+  }
 
-  OptimizationLevel() {
+  static boolean overwritesAllFlags(final ParsedAsmLine line) {
+    final String command = line.getCommand();
+    final String[] arguments = line.getArgs();
+    if (arguments.length == 1) {
+      return "AND".equals(command) || "OR".equals(command) || "XOR".equals(command)
+          || "CP".equals(command) || "SUB".equals(command);
+    }
+    return arguments.length == 2 && "ADD".equals(command) && "A".equals(arguments[0]);
   }
 }

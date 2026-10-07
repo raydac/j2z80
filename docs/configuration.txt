@@ -46,8 +46,15 @@ Resource patterns to exclude from embedding into the result.
 
 7. <optimization>...</optimization>
 Optimization level:
- - NONE (default) — no stack-pair cleanup
+ - NONE (default) — no assembly peephole optimization
  - BASIC — removes unnecessary stack command pairs such as PUSH HL / POP HL
+ - COMPACT — includes BASIC and applies local size optimizations: removes jumps to the next label, replaces LD A,0
+   with XOR A only before a full flag writer, removes CP 0 before a full flag writer, and replaces LD A,r / NEG with
+   XOR A / SUB r when r is not A and NEG has no label; replaces groups of eight ADD HL,HL with LD H,L / LD L,0
+   combines adjacent immediate loads into standard register pairs, removes duplicate idempotent accumulator ops, and
+   removes repeated identical word-register loads between pushes of that same pair
+
+Each optimization profile repeats its optimizer chain until a full pass leaves the source unchanged.
 
 Independently of <optimization>, the translator always compacts large static byte[]
 initializers in <clinit>. A contiguous fill of 16 or more elements (NEWARRAY byte,
