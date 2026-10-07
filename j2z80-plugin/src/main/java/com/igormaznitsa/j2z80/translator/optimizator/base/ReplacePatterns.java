@@ -20,7 +20,7 @@ import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.translator.optimizator.AsmOptimizer;
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReplacePatterns implements AsmOptimizer {
@@ -28,13 +28,13 @@ public class ReplacePatterns implements AsmOptimizer {
   @Override
   public List<ParsedAsmLine> optimizeAsmText(final TranslatorContext context,
                                              final List<ParsedAsmLine> lines) {
-    final List<ParsedAsmLine> result = new LinkedList<>(lines);
+    final List<ParsedAsmLine> result = new ArrayList<>(lines);
 
     boolean loop = true;
 
-    while (loop && !Thread.currentThread().isInterrupted()) {
+    while (loop) {
       loop = false;
-      for (final OptimizationState optCase : OptimizationState.values()) {
+      for (final OptimizationState optCase : OptimizationState.VALUES) {
         if (optCase.process(result)) {
           loop = true;
           break;

@@ -41,6 +41,8 @@ public enum OptimizationState implements OptimizationConst {
   private final List<ParsedAsmLine> theCase = new ArrayList<>();
   private final List<ParsedAsmLine> replacement = new ArrayList<>();
 
+  public static final List<OptimizationState> VALUES = List.of(OptimizationState.values());
+
   OptimizationState(final List<String> theCase, final List<String> replacement) {
     theCase.stream().map(ParsedAsmLine::new).forEach(this.theCase::add);
     replacement.stream().map(ParsedAsmLine::new).forEach(this.replacement::add);

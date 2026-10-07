@@ -23,7 +23,7 @@
     - fixed array sizing, free memory, cleared new objects and arrays, and empty multi-array dimensions
     - fixed stack frame size for method calls so local variables (e.g. nested loops) are reserved
     - added SNA as a target format
-    - added COMPACT optimization profile for redundant branches and flag-safe Z80 instruction substitutions, including repeated word loads between pushes; optimizer passes repeat until stable and remove newly exposed duplicates
+    - added COMPACT optimization profile for redundant branches and flag-safe Z80 instruction substitutions, including repeated word loads between pushes and shared repeated BC-negation code; optimizer passes repeat until stable and remove newly exposed duplicates
     - adaptation for JDK 11 and Maven 3.8+
     - updated dependencies
     - minor fix

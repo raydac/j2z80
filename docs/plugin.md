@@ -191,7 +191,8 @@ This translates the configured jar and emits the selected output formats.
   consecutive `ADD HL,HL` instructions is replaced with `LD H,L` / `LD L,0`, saving five bytes. Adjacent immediate
   loads into `B`/`C`, `D`/`E`, or `H`/`L` are combined into a single 16-bit load when both values are constants;
   redundant duplicate accumulator clears/tests are removed; repeated identical loads into `BC`, `DE`, `HL`, `IX`, or
-  `IY` are removed when they only separate pushes of that same pair.
+  `IY` are removed when they only separate pushes of that same pair. Three or more copies of the same `BC`
+  two's-complement sequence are replaced with calls to one shared helper.
 - The configured optimizers are rerun in order until a full pass makes no further changes.
 
 ## Output format notes

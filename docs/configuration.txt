@@ -52,7 +52,8 @@ Optimization level:
    with XOR A only before a full flag writer, removes CP 0 before a full flag writer, and replaces LD A,r / NEG with
    XOR A / SUB r when r is not A and NEG has no label; replaces groups of eight ADD HL,HL with LD H,L / LD L,0
    combines adjacent immediate loads into standard register pairs, removes duplicate idempotent accumulator ops, and
-   removes repeated identical word-register loads between pushes of that same pair
+   removes repeated identical word-register loads between pushes of that same pair; with three or more occurrences,
+   extracts the repeated BC negation sequence into a shared subroutine
 
 Each optimization profile repeats its optimizer chain until a full pass leaves the source unchanged.
 
