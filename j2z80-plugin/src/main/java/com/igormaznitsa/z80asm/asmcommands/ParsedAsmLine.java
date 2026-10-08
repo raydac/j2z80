@@ -18,26 +18,23 @@ package com.igormaznitsa.z80asm.asmcommands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 /**
- * The class allows to parse an assemler command line and split it to three parts: label, command and arguments.
+ * Parses an assembler command line into a label, command, and ordered argument list.
  */
 public class ParsedAsmLine {
 
-  private static final String[] SPEC_ARGS = new String[] {
+  private static final Set<String> SPECIAL_ARG_SET = Set.of(
       "A", "B", "C", "D", "E", "H", "L", "I", "R",
       "AF", "AF'", "BC", "DE", "HL",
-      "NZ", "Z", "NC", "C", "PO", "PE", "M", "P",
+      "NZ", "Z", "NC", "PO", "PE", "M", "P",
       "SP", "(SP)", "IX", "IY", "(BC)", "(DE)", "(C)", "(HL)", "(IX)", "(IY)"
-  };
-  private static final Set<String> SPECIAL_ARG_SET = new HashSet<>(Arrays.asList(SPEC_ARGS));
-  private static final String[] EMPTY_ARRAY = new String[0];
+  );
   private final String command;
-  private final String[] arguments;
+  private final List<String> arguments;
   private final String signature;
   private String label;
 
@@ -50,12 +47,11 @@ public class ParsedAsmLine {
     }
 
     if (args == null || args.length == 0) {
-      this.arguments = EMPTY_ARRAY;
+      this.arguments = List.of();
     } else {
-      this.arguments = args.clone();
-      for (int index = 0; index < this.arguments.length; index++) {
-        this.arguments[index] = this.arguments[index].trim().toUpperCase(Locale.ENGLISH);
-      }
+      this.arguments = Arrays.stream(args)
+          .map(argument -> argument.trim().toUpperCase(Locale.ENGLISH))
+          .toList();
     }
     this.signature = makeSignatureFromNormalizedArgs(this.arguments);
   }
@@ -65,25 +61,25 @@ public class ParsedAsmLine {
     if (trimmed.isEmpty() || trimmed.charAt(0) == ';') {
       command = "";
       label = null;
-      arguments = EMPTY_ARRAY;
+      arguments = List.of();
       signature = makeSignatureFromNormalizedArgs(arguments);
       return;
     }
 
-    final String[] splitted = splitToParts(asmString);
+    final ParsedParts splitted = splitToParts(asmString);
 
-    if (splitted[0] == null) {
+    if (splitted.label() == null) {
       label = null;
     } else {
-      label = checkLabel(splitted[0]);
+      label = checkLabel(splitted.label());
     }
 
-    command = splitted[1];
+    command = splitted.command();
 
-    if (splitted[2].isEmpty()) {
-      arguments = EMPTY_ARRAY;
+    if (splitted.arguments().isEmpty()) {
+      arguments = List.of();
     } else {
-      arguments = splitArguments(splitted[2]);
+      arguments = splitArguments(splitted.arguments());
     }
 
     signature = makeSignatureFromNormalizedArgs(arguments);
@@ -162,30 +158,31 @@ public class ParsedAsmLine {
     return result.toString();
   }
 
-  private static String[] splitToParts(final String line) {
-    final String[] result = new String[3];
+  private static ParsedParts splitToParts(final String line) {
+    String label = null;
+    String command;
+    String arguments;
     String str = line;
     final int labelPos = findLabelPosition(line);
 
     if (labelPos >= 0) {
-      result[0] = normalizeString(str.substring(0, labelPos), false);
+      label = normalizeString(str.substring(0, labelPos), false);
       str = str.substring(labelPos + 1);
     }
 
     final int commandSpacePos = findFirstSpaceAfterCommand(str);
     if (commandSpacePos < 0) {
-      result[1] = normalizeString(removeComment(str), true);
-      result[2] = "";
+      command = normalizeString(removeComment(str), true);
+      arguments = "";
     } else {
-      result[1] = normalizeString(str.substring(0, commandSpacePos), true);
-      result[2] = normalizeString(removeComment(str.substring(commandSpacePos)), false);
-
+      command = normalizeString(str.substring(0, commandSpacePos), true);
+      arguments = normalizeString(removeComment(str.substring(commandSpacePos)), false);
     }
 
-    return result;
+    return new ParsedParts(label, command, arguments);
   }
 
-  private static String[] splitArguments(final String normalArguments) {
+  private static List<String> splitArguments(final String normalArguments) {
     final List<String> resultList = new ArrayList<>();
     final StringBuilder buffer = new StringBuilder();
 
@@ -248,7 +245,7 @@ public class ParsedAsmLine {
       }
     }
 
-    return resultList.toArray(new String[0]);
+    return List.copyOf(resultList);
   }
 
   private static boolean isIndexDisplacement(final String upperCased) {
@@ -257,7 +254,7 @@ public class ParsedAsmLine {
         && (upperCased.charAt(3) == '+' || upperCased.charAt(3) == '-');
   }
 
-  private static String makeSignatureFromNormalizedArgs(final String[] arguments) {
+  private static String makeSignatureFromNormalizedArgs(final List<String> arguments) {
     final StringBuilder buffer = new StringBuilder();
     for (final String arg : arguments) {
       if (!buffer.isEmpty()) {
@@ -266,6 +263,15 @@ public class ParsedAsmLine {
       buffer.append(arg);
     }
     return buffer.toString();
+  }
+
+  /**
+   * Returns parsed operands in their source order.
+   *
+   * @return an immutable list of parsed operands
+   */
+  public List<String> getArgs() {
+    return arguments;
   }
 
   private static String normalizeString(final String value, final boolean makeUpperCased) {
@@ -368,20 +374,16 @@ public class ParsedAsmLine {
     return command;
   }
 
-  public String[] getArgs() {
-    return arguments;
+  public boolean hasOnlyLabel() {
+    return label != null && command.isEmpty() && arguments.isEmpty();
   }
 
   public String getSignature() {
     return signature;
   }
 
-  public boolean hasOnlyLabel() {
-    return label != null && command.isEmpty() && arguments.length == 0;
-  }
-
   public boolean isEmpty() {
-    return label == null && command.isEmpty() && arguments.length == 0;
+    return label == null && command.isEmpty() && arguments.isEmpty();
   }
 
   @Override
@@ -396,7 +398,7 @@ public class ParsedAsmLine {
     if (obj instanceof ParsedAsmLine that) {
       return safeEquals(this.label, that.label)
           && safeEquals(this.command, that.command)
-          && Arrays.equals(this.arguments, that.arguments);
+          && this.arguments.equals(that.arguments);
     } else {
       return false;
     }
@@ -406,7 +408,7 @@ public class ParsedAsmLine {
   public int hashCode() {
     int result = this.label == null ? 0 : this.label.hashCode();
     result = 31 * result + this.command.hashCode();
-    result = 31 * result + Arrays.hashCode(this.arguments);
+    result = 31 * result + this.arguments.hashCode();
     return result;
   }
 
@@ -422,13 +424,11 @@ public class ParsedAsmLine {
       result.append(command).append(" ");
     }
 
-    for (int index = 0; index < arguments.length; index++) {
-      if (index > 0) {
-        result.append(',');
-      }
-      result.append(arguments[index]);
-    }
+    result.append(String.join(",", arguments));
 
     return result.toString();
+  }
+
+  private record ParsedParts(String label, String command, String arguments) {
   }
 }

@@ -18,22 +18,31 @@ package com.igormaznitsa.j2z80.bootstrap;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.bcel.generic.Type;
 
 /**
- * The class is the parent for all bootstrap classes used by the translator, it automates their search and processing.
+ * Base class for all bootstrap definitions that emulate a Java runtime type during translation.
+ * Bootstrap processors are responsible for translating calls and field access to a limited subset
+ * of JVM semantics into the Z80 assembly fragments needed by the generated program.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public abstract class AbstractBootstrapClass {
   public static final String J2Z80_BOOTSTRAP_PACKAGE_PREFIX = "j2z80.bootstrap";
 
-  private static final String[] EMPTY_STRING_ARRAY = new String[0];
   private static final Map<String, AbstractBootstrapClass> internalCache =
       new ConcurrentHashMap<>();
 
+  /**
+   * Finds or creates a bootstrap processor for a Java class name.
+   *
+   * @param className   the Java class name to resolve, must not be {@code null}
+   * @param classLoader the class loader used to load bootstrap implementations, must not be {@code null}
+   * @return the processor instance for the class, or {@code null} if none is registered
+   */
   public static AbstractBootstrapClass findProcessor(final String className,
                                                      final ClassLoader classLoader) {
     AbstractBootstrapClass result = internalCache.get(className);
@@ -61,9 +70,9 @@ public abstract class AbstractBootstrapClass {
   }
 
   /**
-   * Extract the emulated class name of the class
+   * Extracts the Java class name represented by this bootstrap implementation.
    *
-   * @return the class name part of the emulated bootstrap class
+   * @return the emulated Java class name without the shared bootstrap package prefix
    */
   protected String extractEmulatedJavaClassName() {
     return this.getClass().getCanonicalName().substring(
@@ -71,11 +80,11 @@ public abstract class AbstractBootstrapClass {
   }
 
   /**
-   * An Auxiliary method to throw a boot class exception for a method
+   * Throws a standardized exception for an unsupported method request.
    *
-   * @param methodName the method name, must not be null
-   * @param result     the method result signature, must not be null
-   * @param args       the method argument signatures, must not be null
+   * @param methodName the method name, must not be {@code null}
+   * @param result the result type descriptor, must not be {@code null}
+   * @param args the argument type descriptors, must not be {@code null}
    */
   public void throwBootClassExceptionForMethod(final String methodName, final Type result,
                                                final Type[] args) {
@@ -87,10 +96,10 @@ public abstract class AbstractBootstrapClass {
   }
 
   /**
-   * An Auxiliary method to throw a boot class exception for a field
+   * Throws a standardized exception for an unsupported field request.
    *
-   * @param fieldName the field name, must not be null
-   * @param type      the field type signature, must not be null
+   * @param fieldName the field name, must not be {@code null}
+   * @param type the field type descriptor, must not be {@code null}
    */
   public void throwBootClassExceptionForField(final String fieldName, final Type type) {
     final String className = extractEmulatedJavaClassName();
@@ -100,59 +109,61 @@ public abstract class AbstractBootstrapClass {
   }
 
   /**
-   * It allows to figure out that a method needs a stack frame when it is invoked
+   * Determines whether the given method invocation requires a dedicated stack frame.
    *
-   * @param context         the translator context, must not be null
-   * @param methodName      the method name, must not be null
-   * @param methodArguments the method argument signatures, must not be null
-   * @param resultType      the method result type signature, must not be null
-   * @return it returns true if the method needs a stack frame for its work
+   * @param context the translator context in which the invocation takes place, must not be {@code null}
+   * @param methodName the method name, must not be {@code null}
+   * @param methodArguments the argument type descriptors, must not be {@code null}
+   * @param resultType the return type descriptor, must not be {@code null}
+   * @return {@code true} if the invocation needs frame setup before execution, otherwise {@code false}
    */
   public abstract boolean doesInvokeNeedFrame(TranslatorContext context, String methodName,
                                               Type[] methodArguments, Type resultType);
 
   /**
-   * Generate method invocation code
+   * Generates the assembly instructions needed to execute a method call represented by this
+   * bootstrap class.
    *
-   * @param context         the translator context, must not be null
-   * @param methodName      the method name, must not be null
-   * @param methodArguments the method argument signatures, must not be null
-   * @param resultType      the method result signature, must not be null
-   * @return a string array contains assembler commands to invoke the method
+   * @param context the translator context in which the invocation is generated, must not be {@code null}
+   * @param methodName the method name, must not be {@code null}
+   * @param methodArguments the argument type descriptors, must not be {@code null}
+   * @param resultType the return type descriptor, must not be {@code null}
+   * @return a list of Z80 assembly instructions that implement the method call
    */
-  public abstract String[] generateInvocation(TranslatorContext context, String methodName,
-                                              Type[] methodArguments, Type resultType);
+  public abstract List<String> generateInvocation(TranslatorContext context, String methodName,
+                                                  Type[] methodArguments, Type resultType);
 
   /**
-   * Generate a field getter
+   * Generates assembly instructions that read a field value from this bootstrap type.
    *
-   * @param context   the translator context, must not be null
-   * @param fieldName the field name, must not be null
-   * @param fieldType the field type signature, must not be null
-   * @param isStatic  the flag shows that the field is static if the flag is true
-   * @return a string array contains assembler commands to read the field
+   * @param context the translator context in which the field access is generated, must not be {@code null}
+   * @param fieldName the field name, must not be {@code null}
+   * @param fieldType the field type descriptor, must not be {@code null}
+   * @param isStatic {@code true} when the field is static
+   * @return the generated field-get assembly instructions
    */
-  public abstract String[] generateFieldGetter(TranslatorContext context, String fieldName,
+  public abstract List<String> generateFieldGetter(TranslatorContext context, String fieldName,
                                                Type fieldType, boolean isStatic);
 
   /**
-   * Generate a field setter
+   * Generates assembly instructions that write a field value for this bootstrap type.
    *
-   * @param context   the translator context, must not be null
-   * @param fieldName the field name, must not be null
-   * @param fieldType the field type signature, must not be null
-   * @param isStatic  the flag shows that the field is a static one if the flag is true
-   * @return a string array contains assembler commands to set the field
+   * @param context the translator context in which the field assignment is generated, must not be {@code null}
+   * @param fieldName the field name, must not be {@code null}
+   * @param fieldType the field type descriptor, must not be {@code null}
+   * @param isStatic {@code true} when the field is static
+   * @return the generated field-set assembly instructions
    */
-  public abstract String[] generateFieldSetter(TranslatorContext context, String fieldName,
+  public abstract List<String> generateFieldSetter(TranslatorContext context, String fieldName,
                                                Type fieldType, boolean isStatic);
 
   /**
-   * The method is called once after translation and a boot class can add some assembler text in the special section if it needs
+   * Allows a bootstrap implementation to append additional assembly fragments after the normal
+   * translation has completed.
    *
-   * @return an array contains assembler text
+   * @return the additional assembly lines to append, or an empty list when no fragments are needed
    */
-  public String[] getAdditionalText() {
-    return EMPTY_STRING_ARRAY;
+  public List<String> getAdditionalText() {
+    return List.of();
   }
 }

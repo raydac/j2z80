@@ -17,7 +17,9 @@
 package com.igormaznitsa.j2z80.bootstrap;
 
 /**
- * An Exception to be thrown for problems during boot class processing problems
+ * Signals that a bootstrap class does not implement a Java API method or field in a way that the
+ * translator can emit as Z80 assembly. This runtime exception is raised when a native or synthetic
+ * bootstrap type is asked to generate code for an unsupported operation.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  * @see AbstractBootstrapClass
@@ -30,12 +32,12 @@ public class BootClassException extends RuntimeException {
   private final String signature;
 
   /**
-   * The Constructor
+   * Creates a new bootstrap exception with the exact unsupported operation details.
    *
-   * @param message           the message for the exception
-   * @param className         the boot class name
-   * @param methodOrFieldName the source method or field
-   * @param signature         the method or field signature
+   * @param message the human-readable exception message
+   * @param className the bootstrap class that triggered the failure
+   * @param methodOrFieldName the method or field name that was not supported
+   * @param signature the JVM method or field signature that caused the failure
    */
   public BootClassException(final String message, final String className,
                             final String methodOrFieldName, final String signature) {
@@ -46,27 +48,27 @@ public class BootClassException extends RuntimeException {
   }
 
   /**
-   * Get the exception source class name
+   * Returns the bootstrap class name that generated the failure.
    *
-   * @return the exception source class name
+   * @return the class name associated with the unsupported operation
    */
   public String getClassName() {
     return this.className;
   }
 
   /**
-   * Get the exception source method or field name
+   * Returns the method or field name that triggered the unsupported operation.
    *
-   * @return the source method or field name
+   * @return the operation source name
    */
   public String getMethodOrFieldName() {
     return this.methodOrFieldName;
   }
 
   /**
-   * Get the exception source method or field signature
+   * Returns the JVM signature of the unsupported method or field.
    *
-   * @return the source method or field signature
+   * @return the Java signature string
    */
   public String getSignature() {
     return this.signature;

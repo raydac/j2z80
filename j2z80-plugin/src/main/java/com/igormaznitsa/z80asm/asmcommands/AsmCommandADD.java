@@ -47,8 +47,8 @@ public class AsmCommandADD extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, ParsedAsmLine asm) {
-    final String arg0 = asm.getArgs()[0];
-    final String arg1 = asm.getArgs()[1];
+    final String arg0 = asm.getArgs().get(0);
+    final String arg1 = asm.getArgs().get(1);
 
     if ("A".equals(arg0)) {
       if (doesNeedCalculation(arg1)) {

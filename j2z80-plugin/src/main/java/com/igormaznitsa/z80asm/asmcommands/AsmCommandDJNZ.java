@@ -23,7 +23,7 @@ public class AsmCommandDJNZ extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    final int address = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
+    final int address = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
     final int offset = calculateAddressOffset(address, context.getPC());
     return new byte[] {0x10, (byte) offset};
   }

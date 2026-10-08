@@ -17,6 +17,7 @@
 package com.igormaznitsa.j2z80.translator.optimizator.base;
 
 import com.igormaznitsa.z80asm.asmcommands.ParsedAsmLine;
+import java.util.List;
 
 final class Z80FlagUtils {
 
@@ -25,11 +26,11 @@ final class Z80FlagUtils {
 
   static boolean overwritesAllFlags(final ParsedAsmLine line) {
     final String command = line.getCommand();
-    final String[] arguments = line.getArgs();
-    if (arguments.length == 1) {
+    final List<String> arguments = line.getArgs();
+    if (arguments.size() == 1) {
       return "AND".equals(command) || "OR".equals(command) || "XOR".equals(command)
           || "CP".equals(command) || "SUB".equals(command);
     }
-    return arguments.length == 2 && "ADD".equals(command) && "A".equals(arguments[0]);
+    return arguments.size() == 2 && "ADD".equals(command) && "A".equals(arguments.get(0));
   }
 }

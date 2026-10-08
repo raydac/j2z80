@@ -26,7 +26,13 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.Type;
 
 /**
- * The Class describes an identifier for a method
+ * Immutable identity for a Java method that is being processed by the translator. A method ID
+ * combines the owning class, method name, argument signature, and return type to form a stable
+ * key that can be used across the translator's class registry, runtime dispatch tables, and
+ * generated assembly labels.
+ *
+ * <p>Method comparisons are based on the full JVM signature, so overloaded methods are treated as
+ * distinct identities.</p>
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
@@ -40,9 +46,9 @@ public class MethodID {
   private final ClassID classId;
 
   /**
-   * A Constructor
+   * Creates a method identity from a BCEL method definition.
    *
-   * @param methodGen a MethodGen object, must not be null
+   * @param methodGen the method definition to wrap, must not be {@code null}
    */
   public MethodID(final MethodGen methodGen) {
     this(methodGen.getClassName(), methodGen.getName(), methodGen.getReturnType(),
@@ -50,32 +56,32 @@ public class MethodID {
   }
 
   /**
-   * A Constructor
+   * Creates a method identity from a class and method definition pair.
    *
-   * @param c the ClassGen owns the method, must not be null
-   * @param m the method, must not be null
+   * @param c the class that owns the method, must not be {@code null}
+   * @param m the method definition, must not be {@code null}
    */
   public MethodID(final ClassGen c, final Method m) {
     this(c.getClassName(), m);
   }
 
   /**
-   * A Constructor
+   * Creates a method identity from a class name and a BCEL method definition.
    *
-   * @param className the class name, must not be null
-   * @param method    the method, must not be null
+   * @param className the owning class name, must not be {@code null}
+   * @param method the method definition, must not be {@code null}
    */
   public MethodID(final String className, final Method method) {
     this(className, method.getName(), method.getReturnType(), method.getArgumentTypes());
   }
 
   /**
-   * A Constructor
+   * Creates a method identity from explicit method metadata.
    *
-   * @param className  the class name, must not be null
-   * @param methodName the method name, must not be null
-   * @param returnType the return type signature for the method, must not be null
-   * @param argTypes   the argument type signatures for the method, must not be null
+   * @param className the owning class name, must not be {@code null}
+   * @param methodName the method name, must not be {@code null}
+   * @param returnType the return type descriptor, must not be {@code null}
+   * @param argTypes the argument type descriptors, must not be {@code null}
    */
   public MethodID(final String className, final String methodName, final Type returnType,
                   final Type[] argTypes) {
@@ -95,25 +101,25 @@ public class MethodID {
   }
 
   /**
-   * Get the class id for the class owns the method
+   * Returns the class identity for the owner of this method.
    *
-   * @return the class id object
+   * @return the owning class identity
    */
   public ClassID getClassID() {
     return this.classId;
   }
 
   /**
-   * Get the class name of the class owns the menthod
+   * Returns the canonical class name that owns the method.
    *
-   * @return the class name
+   * @return the owning class name
    */
   public String getClassName() {
     return this.className;
   }
 
   /**
-   * Get the method name
+   * Returns the method name.
    *
    * @return the method name
    */
@@ -122,18 +128,18 @@ public class MethodID {
   }
 
   /**
-   * Get the return type signature for the method
+   * Returns the method return type.
    *
-   * @return the return type
+   * @return the method return descriptor
    */
   public Type getReturnType() {
     return this.returnType;
   }
 
   /**
-   * Get the argument type signatures for the method
+   * Returns the argument type list for this method.
    *
-   * @return the argument types for the method
+   * @return the method argument descriptors in declaration order
    */
   public Type[] getArgs() {
     return this.argTypes;
@@ -154,17 +160,16 @@ public class MethodID {
       return true;
     }
 
-    if (obj instanceof MethodID) {
-      final MethodID that = (MethodID) obj;
+    if (obj instanceof MethodID that) {
       return this.methodId.equals(that.methodId);
     }
     return false;
   }
 
   /**
-   * Get the method label
+   * Returns the generated assembly label used for this method in the final output.
    *
-   * @return the method label as String
+   * @return the generated method label
    */
   public String getMethodLabel() {
     return this.methodLabel;
@@ -176,10 +181,10 @@ public class MethodID {
   }
 
   /**
-   * Find compatible method inside a class
+   * Looks for a method with the same signature in the supplied class definition.
    *
-   * @param cgen a class object where the compatible method will be looked for
-   * @return a found compatible method if it is found or null if not found
+   * @param cgen the class definition to search, must not be {@code null}
+   * @return the matching BCEL method, or {@code null} if no compatible method exists
    */
   public Method findCompatibleMethod(final ClassGen cgen) {
     requireNonNull(cgen, "Class must not be null");

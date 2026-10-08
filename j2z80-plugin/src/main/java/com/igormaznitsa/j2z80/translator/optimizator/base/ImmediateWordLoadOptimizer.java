@@ -59,7 +59,8 @@ public class ImmediateWordLoadOptimizer implements AsmOptimizer {
       final ParsedAsmLine highByteLoad = lines.get(index);
       final ParsedAsmLine lowByteLoad = lines.get(index + 1);
       final String registerPair =
-          WORD_REGISTER_BY_BYTES.get(highByteLoad.getArgs()[0] + ',' + lowByteLoad.getArgs()[0]);
+          WORD_REGISTER_BY_BYTES.get(
+              highByteLoad.getArgs().get(0) + ',' + lowByteLoad.getArgs().get(0));
       result.add(new ParsedAsmLine(highByteLoad.getLabel(), "LD", registerPair,
           String.format(Locale.ROOT, "#%04X", wordValue)));
       index += 2;
@@ -74,16 +75,16 @@ public class ImmediateWordLoadOptimizer implements AsmOptimizer {
 
     final ParsedAsmLine highByteLoad = lines.get(index);
     final ParsedAsmLine lowByteLoad = lines.get(index + 1);
-    final String[] highArguments = highByteLoad.getArgs();
-    final String[] lowArguments = lowByteLoad.getArgs();
+    final List<String> highArguments = highByteLoad.getArgs();
+    final List<String> lowArguments = lowByteLoad.getArgs();
     if (!"LD".equals(highByteLoad.getCommand()) || !"LD".equals(lowByteLoad.getCommand())
-        || lowByteLoad.getLabel() != null || highArguments.length != 2 || lowArguments.length != 2
-        || !WORD_REGISTER_BY_BYTES.containsKey(highArguments[0] + ',' + lowArguments[0])) {
+        || lowByteLoad.getLabel() != null || highArguments.size() != 2 || lowArguments.size() != 2
+        || !WORD_REGISTER_BY_BYTES.containsKey(highArguments.get(0) + ',' + lowArguments.get(0))) {
       return -1;
     }
 
-    final OptionalInt highByte = parseByteImmediate(highArguments[1]);
-    final OptionalInt lowByte = parseByteImmediate(lowArguments[1]);
+    final OptionalInt highByte = parseByteImmediate(highArguments.get(1));
+    final OptionalInt lowByte = parseByteImmediate(lowArguments.get(1));
     if (highByte.isEmpty() || lowByte.isEmpty()) {
       return -1;
     }

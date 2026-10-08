@@ -23,7 +23,7 @@ public class AsmCommandIM extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, ParsedAsmLine asm) {
-    final int number = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
+    final int number = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
     byte[] result = null;
     switch (number) {
       case 0:

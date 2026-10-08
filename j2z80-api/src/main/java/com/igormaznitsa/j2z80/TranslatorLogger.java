@@ -17,36 +17,44 @@
 package com.igormaznitsa.j2z80;
 
 /**
- * The interface describes a logger to be used inbound of the translator.
+ * Receiver for translator diagnostics emitted while a Java class is being compiled into
+ * Z80 assembly. Integrators can implement this interface to log information, warnings,
+ * debugging output, or recoverable and fatal translation errors produced by the translator.
+ *
+ * <p>The logger is intentionally small and side-effect free apart from the consumer's own
+ * output sink. Implementations are expected to write every message to a destination that is
+ * appropriate for the calling environment, such as a console, build log, or IDE diagnostics
+ * panel.</p>
  *
  * @author Igor Maznutsa (igor.maznitsa@igormaznitsa.com)
  */
 public interface TranslatorLogger {
   /**
-   * Print an information message
+   * Logs a normal informational message generated during translation.
    *
-   * @param s an information message, it can be null
+   * @param s the message text, or {@code null} if the translator provides no details
    */
   void logInfo(String s);
 
   /**
-   * Print a warning message
+   * Logs a non-fatal condition that indicates a potential problem in the generated output or
+   * source code mapping.
    *
-   * @param s a warning message, it can be null
+   * @param s the warning text, or {@code null} if no warning text is available
    */
   void logWarning(String s);
 
   /**
-   * Print debug message
+   * Logs diagnostic output intended for debugging a translation issue.
    *
-   * @param s a debug message, it can be null
+   * @param s the debug text, or {@code null} if no debug text is available
    */
   void logDebug(String s);
 
   /**
-   * Print an error message
+   * Logs a translation or assembly error that may prevent the generated code from being used.
    *
-   * @param s an error message, it can be null
+   * @param s the error text, or {@code null} if no error text is available
    */
   void logError(String s);
 }

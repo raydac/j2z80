@@ -104,7 +104,7 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
    * Resource patterns to exclude from translation.
    */
   @Parameter(property = "j2z80.excludeResources")
-  private String[] excludeResources = new String[0];
+  private List<String> excludeResources = List.of();
 
   /**
    * Optimization level applied to the translated output.
@@ -155,11 +155,11 @@ public class TranslatorMojo extends AbstractMojo implements TranslatorLogger {
     this.logAsmText = logAsmText;
   }
 
-  public String[] getExcludeResources() {
+  public List<String> getExcludeResources() {
     return this.excludeResources;
   }
 
-  public void setExcludeResources(final String[] excludeResources) {
+  public void setExcludeResources(final List<String> excludeResources) {
     this.excludeResources = excludeResources;
   }
 

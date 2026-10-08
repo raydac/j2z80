@@ -1,17 +1,19 @@
 package j2z80.bootstrap.java.lang;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
+import java.util.List;
 import org.apache.bcel.generic.Type;
 
 public class System extends Object {
 
-  private static final String[] OUT_STREAM = new String[] {"LD BC,#2", "PUSH BC"};
-  private static final String[] ERR_STREAM = new String[] {"LD BC,#1", "PUSH BC"};
+  private static final List<String> OUT_STREAM = List.of("LD BC,#2", "PUSH BC");
+  private static final List<String> ERR_STREAM = List.of("LD BC,#1", "PUSH BC");
 
   @Override
-  public String[] generateFieldGetter(final TranslatorContext translator, final String fieldName,
+  public List<String> generateFieldGetter(final TranslatorContext translator,
+                                          final String fieldName,
                                       final Type fieldType, final boolean isStatic) {
-    String[] data = null;
+    final List<String> data;
     if (isStatic) {
       if ("out".equals(fieldName)) {
         data = OUT_STREAM;
@@ -19,25 +21,29 @@ public class System extends Object {
         data = ERR_STREAM;
       } else {
         this.throwBootClassExceptionForField(fieldName, fieldType);
+        data = List.of();
       }
     } else {
       this.throwBootClassExceptionForField(fieldName, fieldType);
+      data = List.of();
     }
     return data;
   }
 
   @Override
-  public String[] generateInvocation(final TranslatorContext translator, final String methodName,
-                                     final Type[] methodArguments, final Type resultType) {
+  public List<String> generateInvocation(final TranslatorContext translator,
+                                         final String methodName,
+                                         final Type[] methodArguments, final Type resultType) {
     this.throwBootClassExceptionForMethod(methodName, resultType, methodArguments);
-    return null;
+    return List.of();
   }
 
   @Override
-  public String[] generateFieldSetter(final TranslatorContext translator, final String fieldName,
+  public List<String> generateFieldSetter(final TranslatorContext translator,
+                                          final String fieldName,
                                       final Type methodSignature, final boolean isStatic) {
     this.throwBootClassExceptionForField(fieldName, methodSignature);
-    return null;
+    return List.of();
   }
 
   @Override

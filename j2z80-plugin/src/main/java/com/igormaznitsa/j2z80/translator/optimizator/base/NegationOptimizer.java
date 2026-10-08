@@ -34,7 +34,7 @@ public class NegationOptimizer implements AsmOptimizer {
     for (int index = 0; index < lines.size(); index++) {
       if (this.isLoadThenNegate(index, lines)) {
         final ParsedAsmLine load = lines.get(index);
-        final String sourceRegister = load.getArgs()[1];
+        final String sourceRegister = load.getArgs().get(1);
         result.add(new ParsedAsmLine(load.getLabel(), "XOR", "A"));
         result.add(new ParsedAsmLine("SUB " + sourceRegister));
         index++;
@@ -57,8 +57,8 @@ public class NegationOptimizer implements AsmOptimizer {
       return false;
     }
 
-    final String[] arguments = load.getArgs();
-    return arguments.length == 2 && "A".equals(arguments[0])
-        && SOURCE_REGISTERS.contains(arguments[1]);
+    final List<String> arguments = load.getArgs();
+    return arguments.size() == 2 && "A".equals(arguments.get(0))
+        && SOURCE_REGISTERS.contains(arguments.get(1));
   }
 }

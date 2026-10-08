@@ -36,7 +36,7 @@ public class AsmCommandASSERT extends AbstractAsmCommand {
         info.append(value).append(' ');
       }
     }
-    if (asm.getArgs().length > 0) {
+    if (!asm.getArgs().isEmpty()) {
       context.printText(info.toString());
     }
     return EMPTY_ARRAY;

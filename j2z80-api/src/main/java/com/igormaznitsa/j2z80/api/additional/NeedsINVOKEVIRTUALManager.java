@@ -17,15 +17,16 @@
 package com.igormaznitsa.j2z80.api.additional;
 
 /**
- * The addition shows that an implementing class needs to include the INVOKEVIRTUAL manager.
- * The manager allows to invoke virtual methods of classes.
+ * Declares that a translated class depends on the runtime support used for Java virtual dispatch.
+ * The manager resolves the correct method implementation based on the receiver's class and the
+ * selected method signature.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 @J2Z80AdditionPath("INVOKEVIRTUAL_MANAGER.a80")
 public interface NeedsINVOKEVIRTUALManager extends J2ZAdditionalBlock {
   /**
-   * The macros name which should be replaced by either label or address of an invoke virtual table
+   * Macro placeholder replaced with the generated virtual dispatch table label.
    */
   String MACROS_INVOKEVIRTUAL_TABLE = "%invokevirtualtable%";
 }

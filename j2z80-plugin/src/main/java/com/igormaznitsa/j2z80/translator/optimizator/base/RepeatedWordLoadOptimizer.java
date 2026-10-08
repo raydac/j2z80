@@ -43,7 +43,7 @@ public class RepeatedWordLoadOptimizer implements AsmOptimizer {
                                                       final List<ParsedAsmLine> lines,
                                                       final int index) {
     if (load.getLabel() != null || !isLoad(load, register)
-        || !loadedValue.equals(load.getArgs()[1]) || index + 1 >= lines.size()) {
+        || !loadedValue.equals(load.getArgs().get(1)) || index + 1 >= lines.size()) {
       return false;
     }
     final ParsedAsmLine followingPush = lines.get(index + 1);
@@ -51,8 +51,8 @@ public class RepeatedWordLoadOptimizer implements AsmOptimizer {
   }
 
   private static boolean isLoad(final ParsedAsmLine line, final String register) {
-    return "LD".equals(line.getCommand()) && line.getArgs().length == 2
-        && register.equals(line.getArgs()[0]);
+    return "LD".equals(line.getCommand()) && line.getArgs().size() == 2
+        && register.equals(line.getArgs().get(0));
   }
 
   private static boolean isPush(final ParsedAsmLine line, final String register) {
@@ -70,8 +70,8 @@ public class RepeatedWordLoadOptimizer implements AsmOptimizer {
         continue;
       }
 
-      final String[] loadArguments = lines.get(index + 1).getArgs();
-      final String loadedValue = loadArguments[1];
+      final List<String> loadArguments = lines.get(index + 1).getArgs();
+      final String loadedValue = loadArguments.get(1);
       result.add(lines.get(index++));
       result.add(lines.get(index++));
       result.add(lines.get(index++));

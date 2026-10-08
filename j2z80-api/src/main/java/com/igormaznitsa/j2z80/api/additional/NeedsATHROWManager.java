@@ -17,19 +17,21 @@
 package com.igormaznitsa.j2z80.api.additional;
 
 /**
- * The addition shows that an implementing class needs to include the ATHROW manager.
+ * Declares that a translated class depends on the checked-exception runtime support in
+ * {@code ATHROW_MANAGER.a80}. This manager handles the pending-exception state and the dispatch
+ * path used when a Java method throws a checked exception.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 @J2Z80AdditionPath("ATHROW_MANAGER.a80")
 public interface NeedsATHROWManager extends J2ZAdditionalBlock {
   /**
-   * The label name of the memory cells (two cells) where the exception processing procedure address should be placed
+   * Address slot that stores the active checked-exception handler routine.
    */
   String ATHROW_PROCESSING_ADDRESS = "___ATHROW_PROCESSING_CODE_ADDRESS";
 
   /**
-   * Hidden result cell for methods that declare checked exceptions (0 = none).
+   * Hidden result slot used by methods that declare checked exceptions; zero means "no pending exception".
    */
   String PENDING_EXCEPTION = "___PENDING_EXCEPTION";
 }

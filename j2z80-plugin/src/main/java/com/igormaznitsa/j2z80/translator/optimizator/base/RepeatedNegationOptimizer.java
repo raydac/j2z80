@@ -27,12 +27,12 @@ public class RepeatedNegationOptimizer implements AsmOptimizer {
   private static final String HELPER_LABEL = "___COMPACT_NEGATE_BC";
   private static final int SEQUENCE_LENGTH = 7;
   private static final int MINIMUM_OCCURRENCES = 3;
-  private static final String[] COMMANDS = {
+  private static final List<String> COMMANDS = List.of(
       "LD", "CPL", "LD", "LD", "CPL", "LD", "INC"
-  };
-  private static final String[] SIGNATURES = {
+  );
+  private static final List<String> SIGNATURES = List.of(
       "A,B", "", "B,A", "A,C", "", "C,A", "BC"
-  };
+  );
 
   private static boolean containsHelper(final List<ParsedAsmLine> lines) {
     return lines.stream().anyMatch(line -> HELPER_LABEL.equals(line.getLabel()));
@@ -57,8 +57,8 @@ public class RepeatedNegationOptimizer implements AsmOptimizer {
       if (offset > 0 && line.getLabel() != null) {
         return false;
       }
-      if (!COMMANDS[offset].equals(line.getCommand())
-          || !SIGNATURES[offset].equals(line.getSignature())) {
+      if (!COMMANDS.get(offset).equals(line.getCommand())
+          || !SIGNATURES.get(offset).equals(line.getSignature())) {
         return false;
       }
     }

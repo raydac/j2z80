@@ -22,16 +22,22 @@ import static java.util.Objects.requireNonNull;
 import org.apache.bcel.generic.ClassGen;
 
 /**
- * CLASS ID which is being used by the translator to identify a java class during processing.
+ * Immutable identity for a Java class as it is known to the translator. The value is the
+ * canonical class name and is used to compare classes, generate stable labels, and map runtime
+ * metadata such as cast checks and virtual dispatch tables.
+ *
+ * <p>Two {@code ClassID} instances are equal when they describe the same canonical class name,
+ * regardless of where they were created.</p>
  */
 public class ClassID {
   // inside storage of the full class name
   private final String className;
 
   /**
-   * The Constructor creates the new instance based on the full class path name
+   * Creates a new class identity from the canonical Java class name.
    *
-   * @param className the full canonical class path name, must not be null
+   * @param className the fully qualified class name, for example {@code java.lang.String},
+   *                  must not be {@code null} or blank
    */
   public ClassID(final String className) {
     requireNonNull(className, "Class name must not be null");
@@ -42,9 +48,9 @@ public class ClassID {
   }
 
   /**
-   * The Constructor create the new instance based on a ClassGet object
+   * Creates a new class identity from a BCEL class definition.
    *
-   * @param classGen the object to be used for creation, must not be null
+   * @param classGen the class metadata to wrap, must not be {@code null}
    */
   public ClassID(final ClassGen classGen) {
     requireNonNull(classGen, "Argument must not be null");
@@ -71,18 +77,18 @@ public class ClassID {
   }
 
   /**
-   * Get the full class name
+   * Returns the canonical class name represented by this identity.
    *
-   * @return the full class name as String
+   * @return the fully qualified Java class name
    */
   public String getClassName() {
     return this.className;
   }
 
   /**
-   * Make the label for the class
+   * Generates the internal assembly label that corresponds to this class.
    *
-   * @return a String contains the label for the class name
+   * @return a normalized Z80 label name for the represented class
    */
   public String makeClassLabel() {
     return makeLabelNameForClass(this.className);

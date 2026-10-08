@@ -17,80 +17,80 @@
 package com.igormaznitsa.j2z80.api.additional;
 
 /**
- * The addition shows that an implementing class needs to include the memory
- * manager. The manager implements all memory operations.
+ * Declares that a translated class depends on the memory-management runtime support shipped in
+ * {@code MEMORY_MANAGER.a80}. This block provides the heap allocation, array sizing, stack-frame
+ * preparation, and object-release routines used by generated Java code.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 @J2Z80AdditionPath("MEMORY_MANAGER.a80")
 public interface NeedsMemoryManager extends J2ZAdditionalBlock {
   /**
-   * The label of the memory cells which is the start point for the memory heap
+   * Starts of the heap region managed by the memory manager.
    */
   String MEMORY_HEAP_START_AREA_LABEL = "___MEMORY_HEAP_START_AREA";
   /**
-   * The label of the memory cell contains the first memory heap free address
+   * Current bump-pointer for the managed heap.
    */
   String VAR_MANAGER_TOP_POINTER = "___MEMORY_MANAGER_TOP_POINTER";
   /**
-   * The label of the subroutine to allocate a word array (a word is two bytes) in the heap
+   * Allocates a two-byte word array in the heap.
    */
   String SUB_ALLOCATE_WORDARRAY = "___MEMORY_ALLOCATE_WORDARRAY";
   /**
-   * The label of the subroutine to allocate a 4-byte-element array in the heap.
+   * Allocates a four-byte element array in the heap.
    */
   String SUB_ALLOCATE_DWORDARRAY = "___MEMORY_ALLOCATE_DWORDARRAY";
   /**
-   * The label of the subroutine to allocate a byte array in the heap
+   * Allocates a byte array in the heap.
    */
   String SUB_ALLOCATE_BYTEARRAY = "___MEMORY_ALLOCATE_BYTEARRAY";
   /**
-   * The label of the subroutine to get number of elements in an array
+   * Returns the length of an array stored in the heap.
    */
   String SUB_GET_ARRAY_LENGTH = "___MEMORY_GET_ARRAY_LENGTH";
   /**
-   * The label of the subroutine to get the size in bytes of an array
+   * Returns the total size of an array payload in bytes.
    */
   String SUB_GET_ARRAY_SIZE = "___MEMORY_GET_ARRAY_SIZE";
 
   /**
-   * The label of the subroutine to make a multi dimension array in the heap
+   * Creates a multi-dimensional array from the heap manager runtime.
    */
   String SUB_ALLOCATE_AMULTIARRAY = "___MEMORY_MAKE_WORD_MULTIARRAY";
 
   /**
-   * The label of the subroutine to make a new class instance in the heap
+   * Allocates a new object instance in the heap.
    */
   String SUB_ALLOCATE_OBJECT = "___MEMORY_ALLOCATE_OBJECT";
 
   /**
-   * The label of the subroutine that rewinds the heap top to an instance header.
-   * The instance and everything allocated after it are forgotten.
+   * Rewinds the heap top back to the header of the supplied instance.
    */
   String SUB_FORGET_OBJECT = "___MEMORY_FORGET_OBJECT";
 
   /**
-   * The label of the subroutine to get the class UID of an object in the heap
+   * Returns the class identifier stored for an object.
    */
   String SUB_GET_OBJ_CLASS_ID = "___GET_OBJECT_CLASS_ID";
 
   /**
-   * The label of the subroutine to get the size of an object in bytes
+   * Returns the in-memory size of an object.
    */
   String SUB_GET_OBJECT_SIZE = "___GET_OBJECT_SIZE";
 
   /**
-   * The label of the subroutine to process stack state after an invoke operation
+   * Finalizes stack state immediately after a method invocation.
    */
   String SUB_AFTER_INVOKE = "___AFTER_INVOKE";
 
   /**
-   * The label of the subroutine to process stack and prepare it for an invoke operation
+   * Prepares stack state before a method invocation.
    */
   String SUB_BEFORE_INVOKE = "___BEFORE_INVOKE";
 
   /**
-   * The label of the subroutine to get the free memory size in bytes (SP  - the current heap top address)
+   * Returns the number of free bytes remaining between the stack pointer and the heap top.
    */
   String SUB_GETFREEMEMORY = "___MEMORY_GET_FREE_MEMORY";
 }

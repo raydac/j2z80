@@ -24,13 +24,13 @@ public class AsmCommandCALL extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, ParsedAsmLine asm) {
-    if (asm.getArgs().length == 1) {
-      final int address = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
+    if (asm.getArgs().size() == 1) {
+      final int address = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
       AsmAssertions.assertAddress(address);
       return new byte[] {(byte) 0xCD, (byte) address, (byte) (address >>> 8)};
     } else {
-      final String flag = asm.getArgs()[0];
-      final int address = new LightExpression(context, this, asm, asm.getArgs()[1]).calculate();
+      final String flag = asm.getArgs().get(0);
+      final int address = new LightExpression(context, this, asm, asm.getArgs().get(1)).calculate();
       AsmAssertions.assertAddress(address);
       byte command = 0;
 

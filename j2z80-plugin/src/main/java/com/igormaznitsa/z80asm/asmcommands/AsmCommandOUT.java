@@ -35,11 +35,11 @@ public class AsmCommandOUT extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, ParsedAsmLine asm) {
-    final String port = asm.getArgs()[0];
+    final String port = asm.getArgs().get(0);
     if ("(C)".equals(port)) {
       return getPatternCase(asm.getSignature());
     } else {
-      final String rightPart = asm.getArgs()[1];
+      final String rightPart = asm.getArgs().get(1);
       if (!isInBrakes(port)) {
         throw new IllegalArgumentException("Port value must be in brakes [" + port + ']');
       }

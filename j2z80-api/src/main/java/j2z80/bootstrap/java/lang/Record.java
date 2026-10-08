@@ -18,8 +18,14 @@ package j2z80.bootstrap.java.lang;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootstrapClass;
+import java.util.List;
 import org.apache.bcel.generic.Type;
 
+/**
+ * Bootstrap emulator for {@link java.lang.Record}. It provides the minimal constructor behavior
+ * needed by the translator to handle record classes and their generated accessors without a full
+ * Java runtime implementation.
+ */
 public class Record extends AbstractBootstrapClass {
 
   @Override
@@ -29,28 +35,29 @@ public class Record extends AbstractBootstrapClass {
   }
 
   @Override
-  public String[] generateInvocation(final TranslatorContext translator, final String methodName,
-                                     final Type[] methodArguments, final Type resultType) {
+  public List<String> generateInvocation(final TranslatorContext translator,
+                                         final String methodName,
+                                         final Type[] methodArguments, final Type resultType) {
     if (methodArguments.length == 0
         && resultType.getType() == Type.VOID.getType()
         && "<init>".equals(methodName)) {
-      return new String[] {"POP BC ; call of Record.<init>, just drop the reference"};
+      return List.of("POP BC ; call of Record.<init>, just drop the reference");
     }
     this.throwBootClassExceptionForMethod(methodName, resultType, methodArguments);
-    return null;
+    return List.of();
   }
 
   @Override
-  public String[] generateFieldGetter(final TranslatorContext context, final String fieldName,
+  public List<String> generateFieldGetter(final TranslatorContext context, final String fieldName,
                                       final Type fieldType, final boolean isStatic) {
     this.throwBootClassExceptionForField(fieldName, fieldType);
-    return null;
+    return List.of();
   }
 
   @Override
-  public String[] generateFieldSetter(final TranslatorContext context, final String fieldName,
+  public List<String> generateFieldSetter(final TranslatorContext context, final String fieldName,
                                       final Type fieldType, final boolean isStatic) {
     this.throwBootClassExceptionForField(fieldName, fieldType);
-    return null;
+    return List.of();
   }
 }

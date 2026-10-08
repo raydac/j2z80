@@ -17,19 +17,20 @@
 package com.igormaznitsa.j2z80.api.additional;
 
 /**
- * The addition shows that an implementing class needs to include the INVOKEINTERFACE
- * manager allows to invoke interface declared methods.
+ * Declares that a translated class depends on the runtime support used for Java
+ * {@code invokeinterface} dispatch. The manager resolves interface method tables and executes the
+ * selected dispatch target for the current object instance.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 @J2Z80AdditionPath("INVOKEINTERFACE_MANAGER.a80")
 public interface NeedsINVOKEINTERFACEManager extends J2ZAdditionalBlock {
   /**
-   * The label of the subroutine processing invoke interface calls.
+   * Dispatch routine for a dynamic interface call.
    */
   String SUB_INVOKE_INTERFACE = "___INVOKEINTERFACE";
   /**
-   * The name of the macros which should be replaced by the invoke address table label
+   * Macro placeholder that is replaced with the generated interface dispatch table label.
    */
   String MACROS_INVOKEINTERFACE_TABLE = "%invokeinterfacetable%";
 }

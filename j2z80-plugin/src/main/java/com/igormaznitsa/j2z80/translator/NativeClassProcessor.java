@@ -24,7 +24,6 @@ import com.igormaznitsa.j2z80.utils.Utils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,23 +44,22 @@ public class NativeClassProcessor {
     this.theTranslator = translator;
   }
 
-  private static String[] insertFirstStringIntoArray(final String str, final String[] array) {
-    final String[] result = new String[array.length + 1];
-    System.arraycopy(array, 0, result, 1, array.length);
-    result[0] = str;
+  private static List<String> addFirstString(final String str, final List<String> lines) {
+    final List<String> result = new ArrayList<>(lines);
+    result.addFirst(str);
     return result;
   }
 
-  public String[] findNativeSources(final ClassMethodInfo classInfo) throws IOException {
+  public List<String> findNativeSources(final ClassMethodInfo classInfo) throws IOException {
     final String packageName = classInfo.getPackageName();
     final String onlyClassName = classInfo.getOnlyClassName();
     final String path = packageName.replace('.', '/');
 
     // find the whole class
-    final String[] jniWholeClass = readNativeResource(path, onlyClassName);
+    final List<String> jniWholeClass = readNativeResource(path, onlyClassName);
 
     // find resources for each native method
-    final Map<Method, String[]> jniMethodBodies = new HashMap<>();
+    final Map<Method, List<String>> jniMethodBodies = new HashMap<>();
     final Set<String> jniMethodNames = new HashSet<>();
     for (final Method method : classInfo.getClassInfo().getMethods()) {
       if (!method.isNative()) {
@@ -71,7 +69,7 @@ public class NativeClassProcessor {
 
       final String resourceName = onlyClassName + '#' + methodName;
 
-      final String[] methodBody = readNativeResource(path, resourceName);
+      final List<String> methodBody = readNativeResource(path, resourceName);
       if (methodBody != null) {
         if (jniMethodNames.contains(methodName)) {
           final String errorMessage =
@@ -92,12 +90,12 @@ public class NativeClassProcessor {
     result.add("");
     result.add("; -------- [JNI] START OF " + classInfo.getCanonicalClassName() + " --------");
     if (jniWholeClass != null) {
-      result.addAll(Arrays.asList(jniWholeClass));
+      result.addAll(jniWholeClass);
     }
 
     // next we add all found method bodies and generate labels for them
     if (!jniMethodBodies.isEmpty()) {
-      for (final Map.Entry<Method, String[]> methodEntry : jniMethodBodies.entrySet()) {
+      for (final Map.Entry<Method, List<String>> methodEntry : jniMethodBodies.entrySet()) {
         final Method method = methodEntry.getKey();
         final String methodLabel =
             LabelAndFrameUtils.makeLabelNameForMethod(classInfo.getClassInfo().getClassName(),
@@ -105,15 +103,15 @@ public class NativeClassProcessor {
 
         result.add(methodLabel + ':');
 
-        result.addAll(Arrays.asList(methodEntry.getValue()));
+        result.addAll(methodEntry.getValue());
       }
     }
     result.add("; -------- [JNI] END OF " + classInfo.getCanonicalClassName() + " --------");
     result.add("");
-    return result.toArray(new String[0]);
+    return result;
   }
 
-  private String[] readNativeResource(final String path, final String resourceName)
+  private List<String> readNativeResource(final String path, final String resourceName)
       throws IOException {
     byte[] result = null;
     final String filePath = path + '/' + resourceName;
@@ -130,7 +128,7 @@ public class NativeClassProcessor {
     }
 
     if (result != null) {
-      return insertFirstStringIntoArray("; file " + readResourcePath,
+      return addFirstString("; file " + readResourcePath,
           Utils.breakToLines(new String(result, StandardCharsets.UTF_8)));
     }
 

@@ -53,7 +53,7 @@ public class AsmOptimizerChain {
    * Process assembler sources by the chain
    *
    * @param lines a list contains parsed assembler lines, also it doesn't contain empty strings, must not be null
-   * @return an optimized list of assembler strings
+   * @return an optimized list of parsed assembler lines
    */
   public List<ParsedAsmLine> processSources(final List<ParsedAsmLine> lines) {
     List<ParsedAsmLine> processing = new ArrayList<>(lines);

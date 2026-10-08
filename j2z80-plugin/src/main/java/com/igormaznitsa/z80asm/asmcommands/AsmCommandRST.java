@@ -26,7 +26,7 @@ public class AsmCommandRST extends AbstractAsmCommand {
   @Override
   public byte[] makeMachineCode(AsmTranslator context, final ParsedAsmLine asm) {
 
-    final int number = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
+    final int number = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
 
     byte[] result = null;
 
@@ -58,7 +58,7 @@ public class AsmCommandRST extends AbstractAsmCommand {
       default:
         break;
     }
-    requireNonNull(result, () -> "Wrong RST argument [" + asm.getArgs()[0] + ']');
+    requireNonNull(result, () -> "Wrong RST argument [" + asm.getArgs().get(0) + ']');
     return result;
   }
 

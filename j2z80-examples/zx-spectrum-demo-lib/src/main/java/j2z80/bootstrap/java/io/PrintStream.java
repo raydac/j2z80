@@ -4,20 +4,21 @@ import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.utils.Utils;
 import j2z80.bootstrap.java.lang.Object;
 import java.io.IOException;
+import java.util.List;
 import org.apache.bcel.generic.Type;
 
 @SuppressWarnings("unused")
 public class PrintStream extends Object {
 
   @Override
-  public String[] generateInvocation(
+  public List<String> generateInvocation(
       final TranslatorContext translator,
       final String methodName,
       final Type[] methodArguments,
       final Type resultType
   ) {
     if (methodName.equals("println")) {
-      return new String[] {"CALL JAVA.LANG.SYSTEN.PRINTLN"};
+      return List.of("CALL JAVA.LANG.SYSTEN.PRINTLN");
     } else {
       this.throwBootClassExceptionForMethod(methodName, resultType, methodArguments);
       return null;
@@ -31,21 +32,23 @@ public class PrintStream extends Object {
   }
 
   @Override
-  public String[] generateFieldSetter(final TranslatorContext translator, final String fieldName,
+  public List<String> generateFieldSetter(final TranslatorContext translator,
+                                          final String fieldName,
                                       final Type fieldType, final boolean isStatic) {
     this.throwBootClassExceptionForField(fieldName, fieldType);
-    return null;
+    return List.of();
   }
 
   @Override
-  public String[] generateFieldGetter(final TranslatorContext translator, final String fieldName,
+  public List<String> generateFieldGetter(final TranslatorContext translator,
+                                          final String fieldName,
                                       final Type fieldType, final boolean isStatic) {
     this.throwBootClassExceptionForField(fieldName, fieldType);
-    return null;
+    return List.of();
   }
 
   @Override
-  public String[] getAdditionalText() {
+  public List<String> getAdditionalText() {
     final String fileName = this.getClass().getSimpleName() + ".a80";
     try {
       return Utils.breakToLines(Utils.readTextResource(this.getClass(), fileName));

@@ -22,39 +22,42 @@ import java.util.Map;
 import org.apache.bcel.generic.MethodGen;
 
 /**
- * The interface describes a method context to work with class methods.
+ * Tracks the Java methods that have already been analyzed or registered within the current
+ * translation session. This registry allows generated code and runtime support code to resolve a
+ * method signature back to its owning class, metadata, and unique runtime identifier.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public interface MethodContext {
   /**
-   * Find a method for its method id
+   * Finds a method definition by its unique method identity.
    *
-   * @param methodId the method id, must not be null
-   * @return null if the method is not found or found MethodGen object
+   * @param methodId the method identity to look up, must not be {@code null}
+   * @return the matching method definition as a BCEL {@link MethodGen}, or {@code null} if the
+   *         method is not registered
    */
   MethodGen findMethod(MethodID methodId);
 
   /**
-   * Find the method info for the method id
+   * Finds the metadata object associated with a method identity.
    *
-   * @param methodID the method id, must not be null
-   * @return null if the info is not found or a method info object if it is found
+   * @param methodID the method identity to look up, must not be {@code null}
+   * @return the method metadata, or {@code null} if the method is not known to the translator
    */
   ClassMethodInfo findMethodInfo(MethodID methodID);
 
   /**
-   * Get all registered methods.
+   * Returns all registered methods in the current translation context.
    *
-   * @return map of registered methods.
+   * @return an immutable view or snapshot of the method registry, keyed by method identity
    */
   Map<MethodID, ClassMethodInfo> getMethods();
 
   /**
-   * Find the method uid
+   * Resolves the runtime identifier assigned to a method.
    *
-   * @param methodId the method id to be used for search
-   * @return the method uid as Integer if it is found or null
+   * @param methodId the method identity to inspect, must not be {@code null}
+   * @return the numeric method ID, or {@code null} if the method has not been registered
    */
   Integer findMethodUID(MethodID methodId);
 }

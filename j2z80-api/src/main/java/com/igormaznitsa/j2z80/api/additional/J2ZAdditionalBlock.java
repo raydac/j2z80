@@ -17,7 +17,13 @@
 package com.igormaznitsa.j2z80.api.additional;
 
 /**
- * The flag interface shows that the class declaring it is an addition for J2Z80 translator.
+ * Marker interface for runtime support blocks that a translated Java class can declare to signal
+ * that additional Z80 assembly fragments must be linked into the final program image.
+ *
+ * <p>Implementations are typically small marker interfaces such as
+ * {@link NeedsMemoryManager} or {@link NeedsATHROWManager}. When the translator sees a class
+ * implements one of these markers, it loads the corresponding assembly resource and binds the
+ * runtime labels expected by the generated code.</p>
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */

@@ -57,12 +57,12 @@ public class RedundantAccumulatorOptimizer implements AsmOptimizer {
       return false;
     }
 
-    final String[] firstArguments = first.getArgs();
-    final String[] secondArguments = second.getArgs();
-    return firstArguments.length == 2 && "A".equals(firstArguments[0])
-        && "0".equals(firstArguments[1])
+    final List<String> firstArguments = first.getArgs();
+    final List<String> secondArguments = second.getArgs();
+    return firstArguments.size() == 2 && "A".equals(firstArguments.get(0))
+        && "0".equals(firstArguments.get(1))
         && (isAccumulatorOperation(second, "XOR") || isAccumulatorOperation(second, "OR"))
-        && secondArguments.length == 1;
+        && secondArguments.size() == 1;
   }
 
   private boolean isDuplicateIdempotentOperation(final ParsedAsmLine first,

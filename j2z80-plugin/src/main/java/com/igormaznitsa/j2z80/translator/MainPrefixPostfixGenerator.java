@@ -18,6 +18,7 @@ package com.igormaznitsa.j2z80.translator;
 
 import com.igormaznitsa.j2z80.ids.ClassMethodInfo;
 import com.igormaznitsa.j2z80.utils.Utils;
+import java.util.List;
 
 /**
  * The class generates both the prefix and the postfix code for the main method
@@ -46,9 +47,9 @@ public class MainPrefixPostfixGenerator {
   /**
    * Generate assembler prefix for the main method.
    *
-   * @return array of assembler lines to be used as the prefix for the main method
+   * @return list of assembler lines to be used as the prefix for the main method
    */
-  public String[] generatePrefix() {
+  public List<String> generatePrefix() {
     final StringBuilder result = new StringBuilder();
 
     final int maxLocalsForMainMethod = method.getMethodGen().getMaxLocals();
@@ -66,9 +67,9 @@ public class MainPrefixPostfixGenerator {
   /**
    * Generate the postfix for the main method.
    *
-   * @return array of assembler lines to be used as the postfix for the main method
+   * @return list of assembler lines to be used as the postfix for the main method
    */
-  public String[] generatePostfix() {
+  public List<String> generatePostfix() {
     return Utils.breakToLines("___MAINLOOP___: JP ___MAINLOOP___");
   }
 

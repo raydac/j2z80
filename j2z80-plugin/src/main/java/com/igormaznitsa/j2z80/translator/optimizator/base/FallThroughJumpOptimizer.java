@@ -51,12 +51,12 @@ public class FallThroughJumpOptimizer implements AsmOptimizer {
       return false;
     }
 
-    final String[] arguments = line.getArgs();
-    if (arguments.length == 1) {
-      return arguments[0].equals(nextLine.getLabel());
+    final List<String> arguments = line.getArgs();
+    if (arguments.size() == 1) {
+      return arguments.get(0).equals(nextLine.getLabel());
     }
-    if (arguments.length == 2) {
-      return arguments[1].equals(nextLine.getLabel());
+    if (arguments.size() == 2) {
+      return arguments.get(1).equals(nextLine.getLabel());
     }
     return false;
   }

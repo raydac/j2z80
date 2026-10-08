@@ -50,8 +50,10 @@ public enum CheckedExceptionSupport {
   }
 
   public static boolean declaresCheckedExceptions(final MethodGen method) {
-    final String[] declared = method.getExceptions();
-    return declared != null && declared.length > 0;
+    return Stream.ofNullable(method.getExceptions())
+        .flatMap(Arrays::stream)
+        .findAny()
+        .isPresent();
   }
 
   public static void rejectUncheckedType(
@@ -68,11 +70,9 @@ public enum CheckedExceptionSupport {
 
   public static void validateMethodExceptions(final TranslatorContext translator,
                                               final MethodGen method) {
-    final String[] declared = method.getExceptions();
-    if (declared != null) {
-      Arrays.stream(declared)
-          .forEach(type -> rejectUncheckedType(translator, type, "throws of " + method.getName()));
-    }
+    Stream.ofNullable(method.getExceptions())
+        .flatMap(Arrays::stream)
+        .forEach(type -> rejectUncheckedType(translator, type, "throws of " + method.getName()));
     final CodeExceptionGen[] handlers = method.getExceptionHandlers();
     if (handlers == null) {
       return;

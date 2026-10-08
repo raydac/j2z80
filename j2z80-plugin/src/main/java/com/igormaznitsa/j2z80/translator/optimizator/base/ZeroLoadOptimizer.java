@@ -45,8 +45,8 @@ public class ZeroLoadOptimizer implements AsmOptimizer {
       return false;
     }
 
-    final String[] arguments = line.getArgs();
-    if (arguments.length != 2 || !"A".equals(arguments[0]) || !"0".equals(arguments[1])) {
+    final List<String> arguments = line.getArgs();
+    if (arguments.size() != 2 || !"A".equals(arguments.get(0)) || !"0".equals(arguments.get(1))) {
       return false;
     }
 

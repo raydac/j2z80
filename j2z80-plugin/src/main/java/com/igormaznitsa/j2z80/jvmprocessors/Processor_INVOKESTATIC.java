@@ -32,36 +32,23 @@ package com.igormaznitsa.j2z80.jvmprocessors;
 
 
 import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
-
 import com.igormaznitsa.j2z80.translator.MethodTranslator;
-
 import com.igormaznitsa.j2z80.translator.utils.ClassUtils;
-
 import com.igormaznitsa.j2z80.utils.LabelAndFrameUtils;
-
 import com.igormaznitsa.j2z80.utils.Utils;
-
 import java.io.IOException;
-
 import java.io.Writer;
-
+import java.util.List;
 import org.apache.bcel.classfile.Method;
-
 import org.apache.bcel.generic.ClassGen;
-
 import org.apache.bcel.generic.INVOKESTATIC;
-
 import org.apache.bcel.generic.Instruction;
-
 import org.apache.bcel.generic.InstructionHandle;
-
 import org.apache.bcel.generic.MethodGen;
-
 import org.apache.bcel.generic.Type;
 
 
 // class to process INVOKESTATIC with code 184
-
 public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements NeedsMemoryManager {
 
 
@@ -69,30 +56,21 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
 
 
   public Processor_INVOKESTATIC() {
-
     super();
-
     template = loadResourceFileAsString("INVOKESTATIC.a80");
-
   }
 
 
   @Override
 
   public String getName() {
-
     return "INVOKESTATIC";
-
   }
 
 
-  public String[] generateCallForStaticInitalizer(final ClassGen classGen) {
-
+  public List<String> generateCallForStaticInitalizer(final ClassGen classGen) {
     MethodGen initingMethod = null;
-
-
     for (final Method method : ClassUtils.findBoostrapAwareMethods(classGen)) {
-
       if (method.isStatic() && "<clinit>".equals(method.getName()) &&
           method.getArgumentTypes().length == 0 &&
           method.getReturnType().getType() == Type.VOID.getType()) {
@@ -102,43 +80,26 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
         break;
 
       }
-
     }
 
-
     if (initingMethod == null) {
-
-      return new String[0];
-
+      return List.of();
     }
 
 
     final int argumentMemorySize = calculateArgumentBlockSize(initingMethod);
-
     final int totalMemorySize = calculateTotalFrameSizeWithLocals(initingMethod);
-
     String prefix = "";
-
     String postfix = "";
 
-
     final String labelForMethod = LabelAndFrameUtils.makeLabelNameForMethod(initingMethod);
-
-
     final boolean needsFrame = totalMemorySize != 0;
-
-
     assertLocalVariablesNumber(initingMethod);
 
-
     if (needsFrame) {
-
       prefix = generateFramePrefix(argumentMemorySize, totalMemorySize);
-
       postfix = generateFramePostfix(argumentMemorySize, totalMemorySize);
-
     }
-
 
     final String res =
         template.replace(MACROS_ADDRESS, labelForMethod).replace(MACROS_PREFIX, prefix)

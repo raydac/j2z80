@@ -40,8 +40,8 @@ public class AsmCommandSBC extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    final String argLeft = asm.getArgs()[0];
-    final String argRight = asm.getArgs()[1];
+    final String argLeft = asm.getArgs().get(0);
+    final String argRight = asm.getArgs().get(1);
 
     if ("A".equals(argLeft)) {
 
@@ -55,7 +55,7 @@ public class AsmCommandSBC extends AbstractAsmCommand {
             return argRight.startsWith("(IX") ? new byte[] {(byte) 0xDD, (byte) 0x9E, (byte) number}
                 : new byte[] {(byte) 0xFD, (byte) 0x9E, (byte) number};
           } else {
-            number = new LightExpression(context, this, asm, asm.getArgs()[1]).calculate();
+            number = new LightExpression(context, this, asm, asm.getArgs().get(1)).calculate();
             AsmAssertions.assertEncodableByte(number);
             return new byte[] {(byte) 0xDE, (byte) number};
           }

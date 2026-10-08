@@ -23,9 +23,8 @@ import static com.igormaznitsa.j2z80.translator.utils.MethodUtils.isStaticInitia
 import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.makeLabelForBinaryResource;
 import static com.igormaznitsa.j2z80.utils.LabelAndFrameUtils.makeLabelForClassSizeInfo;
 import static com.igormaznitsa.j2z80.utils.Utils.byteArrayToAsm;
-import static com.igormaznitsa.j2z80.utils.Utils.concatStringArrays;
+import static com.igormaznitsa.j2z80.utils.Utils.concatStringLists;
 import static com.igormaznitsa.j2z80.utils.Utils.intToString;
-import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
 
@@ -89,7 +88,7 @@ public class TranslatorImpl implements TranslatorContext {
 
   private final TranslatorLogger messageLogger;
   private final Set<MethodID> methodsUsedInInvokeInterface = new HashSet<>();
-  private final Map<ClassMethodInfo, String[]> asmForMethods = new LinkedHashMap<>();
+  private final Map<ClassMethodInfo, List<String>> asmForMethods = new LinkedHashMap<>();
   private final Set<Class<? extends J2ZAdditionalBlock>> registeredAdditions = new HashSet<>();
   private final Set<AbstractBootstrapClass> bootstrapClasses = new HashSet<>();
   private final Map<String, Constant> classPoolConstants = new HashMap<>();
@@ -97,7 +96,7 @@ public class TranslatorImpl implements TranslatorContext {
   private final Set<ClassID> classesForCheckCast = new HashSet<>();
   private final OptimizationLevel optimizationLevel;
   private int staticByteArrayTemplateCounter;
-  private String[] excludeResourcePatterns;
+  private List<String> excludeResourcePatterns;
 
   public TranslatorImpl(final TranslatorLogger logger,
                         final OptimizationLevel optimization,
@@ -184,7 +183,7 @@ public class TranslatorImpl implements TranslatorContext {
 
   @Override
   public List<String> translate(final String mainClassName, final int startAddress,
-                                final int stackTop, final String[] patternsExcludeBinResources,
+                                final int stackTop, final List<String> patternsExcludeBinResources,
                                 final ClassLoader bootstrapClassLoader)
       throws IOException {
     RecordSupport.rewrite(this.workingClassPath.getAllClasses(), this.messageLogger);
@@ -210,14 +209,20 @@ public class TranslatorImpl implements TranslatorContext {
         "Found main method: " + mainMethodID.getClassName() + "#" + mainMethodID.getMethodName());
 
     final ClassMethodInfo mainMethod = this.methodContext.findMethodInfo(mainMethodID);
-    final String[] mainMethodAsm = this.translateMethod(mainMethodID, bootstrapClassLoader);
+    final List<String> mainMethodAsm = this.translateMethod(mainMethodID, bootstrapClassLoader);
     final MainPrefixPostfixGenerator prefixPostfixGenerator =
         new MainPrefixPostfixGenerator(mainMethod, startAddress, stackTop);
-    final String[] staticInitBlocks = this.processStaticInitializingBlocks();
+    final List<String> staticInitBlocks = this.processStaticInitializingBlocks();
 
-    this.asmForMethods.put(mainMethod,
-        concatStringArrays(prefixPostfixGenerator.generatePrefix(), staticInitBlocks, mainMethodAsm,
-            prefixPostfixGenerator.generatePostfix()));
+    this.asmForMethods.put(
+        mainMethod,
+        concatStringLists(
+            prefixPostfixGenerator.generatePrefix(),
+            staticInitBlocks,
+            mainMethodAsm,
+            prefixPostfixGenerator.generatePostfix()
+        )
+    );
 
     this.getLogger().logDebug("Methods to process");
     this.getLogger().logDebug("-----------------------");
@@ -231,7 +236,7 @@ public class TranslatorImpl implements TranslatorContext {
     }
 
     final List<String> result = new ArrayList<>();
-    for (final String[] text : asmForMethods.values()) {
+    for (final List<String> text : asmForMethods.values()) {
       for (final String str : text) {
         final String trimmed = str.trim();
         if (trimmed.isEmpty()) {
@@ -270,7 +275,7 @@ public class TranslatorImpl implements TranslatorContext {
     }
   }
 
-  private String[] processStaticInitializingBlocks() {
+  private List<String> processStaticInitializingBlocks() {
     this.getLogger().logInfo("----PROCESS STATIC INITIALIZERS ----");
     final List<ClassID> classesContainStaticInitializing = new ArrayList<>();
     for (final Entry<ClassID, ClassMethodInfo> id : this.classContext.getAllFoundClasses()) {
@@ -286,7 +291,7 @@ public class TranslatorImpl implements TranslatorContext {
         classesContainStaticInitializing.size() + " class(es)");
 
     if (classesContainStaticInitializing.isEmpty()) {
-      return new String[0];
+      return List.of();
     }
 
     classesContainStaticInitializing.sort((arg0, arg1) -> {
@@ -306,12 +311,12 @@ public class TranslatorImpl implements TranslatorContext {
     final Processor_INVOKESTATIC invokeStaticProc =
         (Processor_INVOKESTATIC) AbstractJvmCommandProcessor.findProcessor(INVOKESTATIC.class);
 
-    String[] result = new String[] {";------ STATIC INITIALIZING BLOCK ------"};
+    List<String> result = new ArrayList<>();
+    result.add(";------ STATIC INITIALIZING BLOCK ------");
 
     for (final ClassID id : classesContainStaticInitializing) {
       final ClassGen classGen = classContext.findClassForID(id);
-      result =
-          concatStringArrays(result, invokeStaticProc.generateCallForStaticInitalizer(classGen));
+      result.addAll(invokeStaticProc.generateCallForStaticInitalizer(classGen));
     }
 
     return result;
@@ -391,8 +396,8 @@ public class TranslatorImpl implements TranslatorContext {
 
   private void processBootstrapClasses(final List<String> list) {
     for (final AbstractBootstrapClass processor : this.bootstrapClasses) {
-      final String[] text = processor.getAdditionalText();
-      list.addAll(asList(text));
+      final List<String> text = processor.getAdditionalText();
+      list.addAll(text);
     }
   }
 
@@ -416,7 +421,7 @@ public class TranslatorImpl implements TranslatorContext {
     final NativeClassProcessor processor = new NativeClassProcessor(this);
     for (final ClassID classInfo : classContext.getClassesWithJni()) {
       this.getLogger().logInfo("Process " + classInfo);
-      text.addAll(asList(processor.findNativeSources(classContext.findClassInfoForID(classInfo))));
+      text.addAll(processor.findNativeSources(classContext.findClassInfoForID(classInfo)));
     }
   }
 
@@ -432,7 +437,7 @@ public class TranslatorImpl implements TranslatorContext {
       final String path = binaryData.getKey();
 
       // check for exclusion
-      if (this.excludeResourcePatterns != null && this.excludeResourcePatterns.length > 0) {
+      if (this.excludeResourcePatterns != null && !this.excludeResourcePatterns.isEmpty()) {
         String matchedPattern = null;
         for (final String pattern : this.excludeResourcePatterns) {
           if (matchesResourcePattern(path, pattern)) {
@@ -455,8 +460,9 @@ public class TranslatorImpl implements TranslatorContext {
 
       final String label = makeLabelForBinaryResource(path);
       this.getLogger().logInfo("Added the binary resource " + path + " as " + label);
-      final String[] assembler = byteArrayToAsm(label + ": ; binary resource " + path, data, -1);
-      text.addAll(asList(assembler));
+      final List<String> assembler =
+          byteArrayToAsm(label + ": ; binary resource " + path, data, -1);
+      text.addAll(assembler);
     }
     text.add("; -------------------------------------");
     text.add("");
@@ -484,7 +490,7 @@ public class TranslatorImpl implements TranslatorContext {
       text.add("    DEFB #" + Integer.toHexString(length & 0xFF).toUpperCase(Locale.ENGLISH)
           + ",#" + Integer.toHexString((length >>> 8) & 0xFF).toUpperCase(Locale.ENGLISH)
           + " ; length");
-      text.addAll(asList(byteArrayToAsm(label + ": ; compacted static byte[] payload", data, -1)));
+      text.addAll(byteArrayToAsm(label + ": ; compacted static byte[] payload", data, -1));
     }
 
     text.add("; -------------------------------------");
@@ -512,7 +518,7 @@ public class TranslatorImpl implements TranslatorContext {
       final String assemblerText =
           Utils.readTextResource(AbstractJvmCommandProcessor.class, path.value());
       text.addAll(
-          asList(Utils.breakToLines(preprocessAdditionAssemblerText(addition, assemblerText))));
+          Utils.breakToLines(preprocessAdditionAssemblerText(addition, assemblerText)));
     }
 
     if (needMemoryManager) {
@@ -521,8 +527,8 @@ public class TranslatorImpl implements TranslatorContext {
       final String assemblerText = Utils.readTextResource(AbstractJvmCommandProcessor.class,
           (NeedsMemoryManager.class.getAnnotation(
               J2Z80AdditionPath.class)).value());
-      text.addAll(asList(Utils.breakToLines(
-          preprocessAdditionAssemblerText(NeedsMemoryManager.class, assemblerText))));
+      text.addAll(Utils.breakToLines(
+          preprocessAdditionAssemblerText(NeedsMemoryManager.class, assemblerText)));
     }
   }
 
@@ -548,13 +554,14 @@ public class TranslatorImpl implements TranslatorContext {
     return table.generateAsm();
   }
 
-  private String[] translateMethod(final MethodID methodId, final ClassLoader bootstrapClassLoader)
+  private List<String> translateMethod(final MethodID methodId,
+                                       final ClassLoader bootstrapClassLoader)
       throws IOException {
     final ClassMethodInfo method = this.methodContext.findMethodInfo(methodId);
     this.getLogger()
         .logInfo("Translating method: " + methodId.getClassName() + '#' + methodId.getMethodName());
 
-    String[] resultAsm = null;
+    List<String> resultAsm = null;
     try {
       if (!method.isNative()) {
         resultAsm = new MethodTranslator(this, method).translate(bootstrapClassLoader);

@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -34,35 +33,50 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * It is an Auxiliary class contains some useful methods.
+ * Utility methods for common string, collection, and resource handling tasks used throughout the
+ * translator and its runtime support. The class is intentionally static and does not maintain any
+ * mutable state.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public final class Utils {
-  private static final String[] EMPTY_STRING_ARRAY = {};
-
   private Utils() {
 
   }
 
-  public static String[] toStringArray(Collection<String> collection) {
-    return (!collection.isEmpty() ? collection.toArray(EMPTY_STRING_ARRAY) :
-        EMPTY_STRING_ARRAY);
+  /**
+   * Copies the strings from a collection into a list.
+   *
+   * @param collection the collection to convert, must not be {@code null}
+   * @return an immutable list containing all collection elements in iteration order
+   */
+  public static List<String> toStringList(final Collection<String> collection) {
+    return List.copyOf(collection);
   }
 
-  public static String[] tokenizeToStringArray(
-      String str,
-      String delimiters,
-      boolean trimTokens,
-      boolean ignoreEmptyTokens
+  /**
+   * Tokenizes a string using the supplied delimiter set while optionally trimming or dropping empty
+   * items.
+   *
+   * @param str               the source text, or {@code null} for an empty result
+   * @param delimiters        the delimiter characters used to split the text, must not be {@code null}
+   * @param trimTokens        if {@code true}, each token is trimmed before being returned
+   * @param ignoreEmptyTokens if {@code true}, blank tokens are omitted from the result
+   * @return the extracted tokens, or an empty list when the input is {@code null}
+   */
+  public static List<String> tokenizeToStringList(
+      final String str,
+      final String delimiters,
+      final boolean trimTokens,
+      final boolean ignoreEmptyTokens
   ) {
 
     if (str == null) {
-      return EMPTY_STRING_ARRAY;
+      return List.of();
     }
 
-    StringTokenizer st = new StringTokenizer(str, delimiters);
-    List<String> tokens = new ArrayList<>();
+    final StringTokenizer st = new StringTokenizer(str, delimiters);
+    final List<String> tokens = new ArrayList<>();
     while (st.hasMoreTokens()) {
       String token = st.nextToken();
       if (trimTokens) {
@@ -72,7 +86,7 @@ public final class Utils {
         tokens.add(token);
       }
     }
-    return toStringArray(tokens);
+    return List.copyOf(tokens);
   }
 
   /**
@@ -91,26 +105,26 @@ public final class Utils {
   }
 
   /**
-   * Read a text file into string array
+   * Reads a text file into a list of lines.
    *
    * @param file    the file to be read, must not be null
    * @param charSet the charset to be used to decode strings, must not be null
    * @return file content as list of strings
    * @throws IOException it will be thrown if there is any transport problem
    */
-  public static List<String> readTextFileAsStringArray(final File file, final Charset charSet)
+  public static List<String> readTextFileAsStringList(final File file, final Charset charSet)
       throws IOException {
     return FileUtils.readLines(file, charSet);
   }
 
   /**
-   * Break a string as string line array.
+   * Splits text into lines.
    *
-   * @param text a sold string to be broken, must not be null
-   * @return a string array where each line as an array element
+   * @param text the text to split, must not be {@code null}
+   * @return an immutable list containing one element for each line
    */
-  public static String[] breakToLines(final String text) {
-    return StringUtils.split(text, '\n');
+  public static List<String> breakToLines(final String text) {
+    return List.of(StringUtils.split(text, '\n'));
   }
 
   /**
@@ -135,17 +149,18 @@ public final class Utils {
   }
 
   /**
-   * Concatenate string arrays into a string array
+   * Concatenates string lists in argument order.
    *
-   * @param arrays string arrays, must not be null
-   * @return a string array contains all content of arrays as the arguments
+   * @param lists the string lists to concatenate, must not be {@code null}
+   * @return a list containing all elements of the argument lists
    */
-  public static String[] concatStringArrays(final String[]... arrays) {
+  @SafeVarargs
+  public static List<String> concatStringLists(final List<String>... lists) {
     final List<String> result = new ArrayList<>();
-    for (final String[] arg : arrays) {
-      result.addAll(Arrays.asList(arg));
+    for (final List<String> list : lists) {
+      result.addAll(list);
     }
-    return result.toArray(new String[0]);
+    return result;
   }
 
   /**
@@ -204,9 +219,9 @@ public final class Utils {
    * @param firstLine            the first line for the result text block, it can be null
    * @param array                a byte array to be converted, must not be null
    * @param maxValueItemsPerLine the number of values allowed per a line, if -1 then it will be default value
-   * @return asm string lines representing converted array data
+   * @return a list of assembly source lines representing the converted byte data
    */
-  public static String[] byteArrayToAsm(
+  public static List<String> byteArrayToAsm(
       final String firstLine,
       final byte[] array,
       final int maxValueItemsPerLine

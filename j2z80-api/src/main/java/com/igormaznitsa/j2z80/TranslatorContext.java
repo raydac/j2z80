@@ -25,109 +25,126 @@ import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.generic.Type;
 
 /**
- * The interface describes the translator context
+ * Describes the translator state and all requested runtime services needed while compiling a
+ * Java class hierarchy into Z80 assembly. Implementations keep the class/method registry,
+ * translation metadata, and generated resource references together so every code-generation step
+ * can inspect the same execution context.
+ *
+ * <p>This interface is the integration point between the translator core and bootstrap classes,
+ * generated resource labels, and runtime fragments such as heap management and virtual dispatch
+ * tables.</p>
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public interface TranslatorContext {
   /**
-   * The main method name.
+   * Reserved Java entry point name used by the Z80 translator for the generated main routine.
    */
   String Z80_MAIN_METHOD_NAME = "mainz";
 
   /**
-   * The main method signature.
+   * JVM signature of a zero-argument {@code void} method.
    */
   String Z80_MAIN_METHOD_SIGNATURE = Type.getMethodSignature(Type.VOID, new Type[0]);
 
   /**
-   * Translate compiled java classes into assembler text
+   * Translates a Java application or library entry point into a list of generated assembly
+   * source lines.
    *
-   * @param mainClassName         the main class name, it can be null
-   * @param startAddress          the start address for translation
-   * @param stackTopAddress       the stack top address to be used by the compiled code
-   * @param excludeBinResPatterns patterns to be used to exclude met resources in JAR files
-   * @param bootstrapClassLoader  bootstrap class loader, must not be null
-   * @return assembler text of translated Java classes
-   * @throws IOException it will be thrown if there is any transport problem
+   * @param mainClassName the fully qualified entry class name, or {@code null} when the
+   *                      caller is translating a class without a Java {@code main} entry
+   * @param startAddress the memory address where the generated code block begins in the final
+   *                     image
+   * @param stackTopAddress the top-of-stack address reserved for the translated program
+   * @param excludeBinResPatterns a list of Ant-style patterns used to suppress embedded binary
+   *                              resources from the generated output
+   * @param bootstrapClassLoader the class loader used to resolve bootstrap classes and runtime
+   *                            support types
+   * @return the generated Z80 assembly source as one line per statement
+   * @throws IOException if a class or resource cannot be loaded or read during translation
    */
   List<String> translate(String mainClassName, int startAddress, int stackTopAddress,
-                         String[] excludeBinResPatterns, ClassLoader bootstrapClassLoader)
+                         List<String> excludeBinResPatterns, ClassLoader bootstrapClassLoader)
       throws IOException;
 
   /**
-   * Get the current class context
+   * Returns the current class registry used during translation.
    *
-   * @return the current class context
+   * @return the active class context; never {@code null}
    */
   ClassContext getClassContext();
 
   /**
-   * Get the current method context
+   * Returns the method registry used during translation.
    *
-   * @return the current method context
+   * @return the active method context; never {@code null}
    */
   MethodContext getMethodContext();
 
   /**
-   * Get the logger for the context
+   * Returns the logger attached to this translator instance.
    *
-   * @return the logger for the context
+   * @return the configured logger; never {@code null}
    */
   TranslatorLogger getLogger();
 
   /**
-   * Register additions needed by a class
+   * Registers the translator additions required by a Java class. This allows the runtime to
+   * include the appropriate assembly manager for features such as memory management, checked
+   * exceptions, or virtual dispatch.
    *
-   * @param classToCheck the class contains additions in its definition
+   * @param classToCheck the class whose declaration is examined for additional runtime blocks
    */
   void registerAdditionsUsedByClass(Class<?> classToCheck);
 
   /**
-   * Register a class id to be used in cast check operations
+   * Registers a class identifier for later use in cast and instance checks.
    *
-   * @param classId the class id object of the class, must not be null
-   * @return the uid of the class as Integer or null if it can't be found
+   * @param classId the class identity to register, must not be {@code null}
+   * @return the generated class identifier, or {@code null} if the class is not known to the
+   *         translator yet
    */
   Integer registerClassForCastCheck(ClassID classId);
 
   /**
-   * Register a method id for invokeinterface operations
+   * Registers a virtual method identifier used by {@code INVOKEINTERFACE} dispatch.
    *
-   * @param methodId the method id to be registered, must not be null
-   * @return the uid of the method as Integer or null if it can't be found
+   * @param methodId the method identifier to register, must not be {@code null}
+   * @return the generated interface method identifier, or {@code null} if one is not available
    */
   Integer registerInterfaceMethodForINVOKEINTERFACE(MethodID methodId);
 
   /**
-   * Register a constant pool item to be translated
+   * Registers a constant-pool item that needs a generated label in the final assembly.
    *
-   * @param constantLabel the label for the constant, must not be null
-   * @param item          the constant pool item to be registered, must not be null
+   * @param constantLabel the unique label assigned to the constant, must not be {@code null}
+   * @param item the constant pool entry to be emitted into the output, must not be {@code null}
    */
   void registerConstantPoolItem(String constantLabel, Constant item);
 
   /**
-   * Register a ROM-resident static {@code byte[]} (header emitted before the payload label).
+   * Registers a ROM-resident {@code byte[]} array so the translator can emit a static table that
+   * is stored in the program image rather than allocated on the heap.
    *
-   * @param data the payload bytes, must not be null
-   * @return the assembler label of the first array element (the Java arrayref)
+   * @param data the payload bytes to embed, must not be {@code null}
+   * @return the generated assembler label for the first element in the array
    */
   String registerStaticByteArrayTemplate(byte[] data);
 
   /**
-   * Register a boot class processor to be translated
+   * Registers a bootstrap processor so its additional assembly fragments can be included in the
+   * generated program.
    *
-   * @param classProcessor a boot class processor, must not be null
+   * @param classProcessor the bootstrap class processor to register, must not be {@code null}
    */
   void registerCalledBootClassProcesser(AbstractBootstrapClass classProcessor);
 
   /**
-   * Load a resource from the inside virtual translation space
+   * Loads a resource from the translator's virtual resource space.
    *
-   * @param path the path of the resource, must not be null
-   * @return the found resource as a byte array or null if it is not found
-   * @throws IOException it will be thrown if there is any problem on the transport level
+   * @param path the resource path inside the translation package, must not be {@code null}
+   * @return the resource contents as raw bytes, or {@code null} if no matching resource exists
+   * @throws IOException if the resource cannot be read
    */
   byte[] loadResourceForPath(final String path) throws IOException;
 

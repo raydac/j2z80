@@ -24,8 +24,8 @@ public class AsmCommandSET extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, ParsedAsmLine asm) {
-    final int number = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
-    final String register = asm.getArgs()[1];
+    final int number = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
+    final String register = asm.getArgs().get(1);
 
     if ((number & ~0x7) != 0) {
       throw new IllegalArgumentException("Bit number is outbound [" + number + ']');

@@ -28,7 +28,6 @@ import com.igormaznitsa.j2z80.utils.Utils;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,14 +51,14 @@ import org.apache.bcel.generic.MethodGen;
  */
 public record MethodTranslator(TranslatorContext translatorContext, ClassMethodInfo method) {
 
-  public String[] translate(final ClassLoader bootstrapClassLoader) throws IOException {
+  public List<String> translate(final ClassLoader bootstrapClassLoader) throws IOException {
     final List<String> asm = this.method2asm(bootstrapClassLoader);
     final List<String> result = new ArrayList<>();
     for (final String str : asm) {
-      result.addAll(Arrays.asList(Utils.breakToLines(str)));
+      result.addAll(Utils.breakToLines(str));
     }
 
-    return result.toArray(new String[0]);
+    return result;
   }
 
   private List<String> method2asm(final ClassLoader bootstrapClassLoader) throws IOException {

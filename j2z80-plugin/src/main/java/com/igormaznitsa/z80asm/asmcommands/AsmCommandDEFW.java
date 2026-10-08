@@ -24,7 +24,7 @@ public class AsmCommandDEFW extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    final byte[] result = new byte[asm.getArgs().length << 1];
+    final byte[] result = new byte[asm.getArgs().size() << 1];
     int index = 0;
     for (final String arg : asm.getArgs()) {
       final int value = new LightExpression(context, this, asm, arg).calculate();

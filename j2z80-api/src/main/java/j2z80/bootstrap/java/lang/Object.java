@@ -18,13 +18,13 @@ package j2z80.bootstrap.java.lang;
 
 import com.igormaznitsa.j2z80.TranslatorContext;
 import com.igormaznitsa.j2z80.bootstrap.AbstractBootstrapClass;
+import java.util.List;
 import org.apache.bcel.generic.Type;
 
 /**
- * The class implements stub for the java.lang.Object class from the standard Java framework.
- * At present, it supports the constructor and hashCode.
- *
- * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
+ * Bootstrap emulator for {@link java.lang.Object}. It supplies the minimal object semantics
+ * required while translating Java code into Z80 assembly, including constructor handling and the
+ * default {@code hashCode()} contract used by the runtime.
  */
 public class Object extends AbstractBootstrapClass {
 
@@ -35,17 +35,18 @@ public class Object extends AbstractBootstrapClass {
   }
 
   @Override
-  public String[] generateInvocation(final TranslatorContext translator, final String methodName,
-                                     final Type[] methodArguments, final Type resultType) {
+  public List<String> generateInvocation(final TranslatorContext translator,
+                                         final String methodName,
+                                         final Type[] methodArguments, final Type resultType) {
     if (methodArguments.length == 0) {
       if (resultType.getType() == Type.VOID.getType()) {
         if (methodName.equals("<init>")) {
-          return new String[] {"POP BC ; call of Object.<init>, just drop the reference"};
+          return List.of("POP BC ; call of Object.<init>, just drop the reference");
         }
       } else if (resultType.getType() == Type.INT.getType()) {
         if (methodName.equals("hashCode")) {
-          return new String[] {
-              "; hashCode for Object just returns the object address which already on the stack"};
+          return List.of(
+              "; hashCode for Object just returns the object address which already on the stack");
         }
       }
     }
@@ -54,17 +55,17 @@ public class Object extends AbstractBootstrapClass {
   }
 
   @Override
-  public String[] generateFieldGetter(final TranslatorContext context, final String fieldName,
+  public List<String> generateFieldGetter(final TranslatorContext context, final String fieldName,
                                       final Type fieldType, final boolean isStatic) {
     this.throwBootClassExceptionForField(fieldName, fieldType);
-    return null;
+    return List.of();
   }
 
   @Override
-  public String[] generateFieldSetter(final TranslatorContext context, final String fieldName,
+  public List<String> generateFieldSetter(final TranslatorContext context, final String fieldName,
                                       final Type fieldType, final boolean isStatic) {
     this.throwBootClassExceptionForField(fieldName, fieldType);
-    return null;
+    return List.of();
   }
 
 }

@@ -91,7 +91,7 @@ public final class JavaZ80Run {
 
       final List<String> assembly =
           new TranslatorImpl(new SilentLogger(), OptimizationLevel.NONE, List.of(jar))
-              .translate(this.mainClassName, ORIGIN, STACK_TOP, new String[0],
+              .translate(this.mainClassName, ORIGIN, STACK_TOP, List.of(),
                   JavaZ80Run.class.getClassLoader());
       this.program = Program.assemble(assembly);
       this.machine = new Z80Machine();

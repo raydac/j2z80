@@ -47,8 +47,8 @@ public class RedundantCompareOptimizer implements AsmOptimizer {
       return false;
     }
 
-    final String[] arguments = line.getArgs();
-    return arguments.length == 1 && "0".equals(arguments[0])
+    final List<String> arguments = line.getArgs();
+    return arguments.size() == 1 && "0".equals(arguments.get(0))
         && Z80FlagUtils.overwritesAllFlags(lines.get(index + 1));
   }
 }

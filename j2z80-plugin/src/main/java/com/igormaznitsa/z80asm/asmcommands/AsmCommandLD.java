@@ -116,8 +116,8 @@ public class AsmCommandLD extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    final String leftPart = asm.getArgs()[0];
-    final String rightPart = asm.getArgs()[1];
+    final String leftPart = asm.getArgs().get(0);
+    final String rightPart = asm.getArgs().get(1);
 
     final boolean leftPartIsRegister = isRegisterName(leftPart) || "(HL)".equals(leftPart);
     final boolean rightPartIsRegister = isRegisterName(rightPart);

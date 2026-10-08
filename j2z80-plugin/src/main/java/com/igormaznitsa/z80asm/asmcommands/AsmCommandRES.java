@@ -24,13 +24,13 @@ public class AsmCommandRES extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    final int number = new LightExpression(context, this, asm, asm.getArgs()[0]).calculate();
+    final int number = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
 
     if ((number & ~0x7) != 0) {
       throw new IllegalArgumentException("Bit number is outbound [" + number + ']');
     }
 
-    final String register = asm.getArgs()[1];
+    final String register = asm.getArgs().get(1);
     final int baseCode = 0x80 + (number << 3);
     if (isIndexRegisterReference(register)) {
       final int offset =

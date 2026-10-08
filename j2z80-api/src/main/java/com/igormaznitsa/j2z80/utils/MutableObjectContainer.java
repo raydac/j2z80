@@ -17,30 +17,55 @@
 package com.igormaznitsa.j2z80.utils;
 
 /**
- * A Special object-wrapper allows to change an object and emulate changing of method arguments inside th method
+ * Mutable holder for an object reference that can be changed after construction. This utility is
+ * mainly used by translator internals that need to emulate by-reference argument updates without
+ * creating a dedicated wrapper type for each call site.
  *
- * @param <V> the type of the carried object
+ * @param <V> the type stored in the container
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 public class MutableObjectContainer<V> {
   private V value;
 
+  /**
+   * Creates an empty container whose current value is {@code null}.
+   */
   public MutableObjectContainer() {
     this(null);
   }
 
+  /**
+   * Creates a container with an initial value.
+   *
+   * @param value the initial value, or {@code null} for an empty container
+   */
   public MutableObjectContainer(final V value) {
     this.value = value;
   }
 
+  /**
+   * Returns the current value stored in the container.
+   *
+   * @return the current value, or {@code null}
+   */
   public V get() {
     return this.value;
   }
 
+  /**
+   * Replaces the stored value.
+   *
+   * @param value the new value, or {@code null}
+   */
   public void set(final V value) {
     this.value = value;
   }
 
+  /**
+   * Checks whether the container is currently empty.
+   *
+   * @return {@code true} when the stored value is {@code null}
+   */
   public boolean isNull() {
     return this.value == null;
   }

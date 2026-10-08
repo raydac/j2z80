@@ -1,4 +1,6 @@
 ## 1. Implementation Progress
+- Completed the String-list migration across translator inputs/outputs, JNI source aggregation, assembler parsed arguments, and related utility names/Javadocs; remaining String[] uses are limited to external BCEL data and Java varargs.
+- Added detailed Javadoc coverage across the public API in `j2z80-api/src/main/java`, including translator context interfaces, bootstrap runtime types, heap operations, and runtime support markers used by generated code.
 - Added the COMPACT assembly optimization profile: BASIC stack-pair cleanup, removal of JP/JR branches to the immediately following label, conservative flag-aware Z80 substitutions (LD A,0; redundant CP 0; LD A,r / NEG; groups of eight ADD HL,HL; adjacent immediate byte loads to word pairs; duplicate accumulator and repeated word-load cleanup; shared subroutine for repeated BC negation), and optimizer passes repeated until stable.
 - Added `docs/plugin.md` covering Maven plugin installation, build flow, goal usage, configuration parameters, and the generated heap-start placement.
 - Translator emits the memory manager as the final generated section after code, embedded data, and class-size symbols; when included, its initial heap pointer resolves to the generated image end.

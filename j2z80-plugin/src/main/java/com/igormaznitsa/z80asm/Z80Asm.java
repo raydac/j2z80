@@ -36,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * The class implements a small Z80 assembler translator.
@@ -52,23 +51,23 @@ public class Z80Asm implements AsmTranslator {
   private final LabelAddressContainer localLabelMap = new LabelAddressContainer(true);
   private final Map<String, List<LocalLabelExpectant>> localLabelExpectants = new HashMap<>();
   private final EquDirectiveContainer equContainer = new EquDirectiveContainer();
-  private final String[] sources;
+  private final List<String> sources;
   private int programCounter;
   private int entryPoint;
   private boolean firstPassFlag;
 
   public Z80Asm(final File file) throws IOException {
-    this(Utils.readTextFileAsStringArray(file, StandardCharsets.UTF_8));
+    this(Utils.readTextFileAsStringList(file, StandardCharsets.UTF_8));
   }
 
   public Z80Asm(final File file, final Charset charSet) throws IOException {
-    this(Utils.readTextFileAsStringArray(file, charSet));
+    this(Utils.readTextFileAsStringList(file, charSet));
   }
 
   public Z80Asm(final List<String> sourcesToCompile) {
-    requireNonNull((Object) sourcesToCompile, "Source array must not be null");
+    requireNonNull(sourcesToCompile, "Source list must not be null");
     this.sources = sourcesToCompile.stream()
-        .flatMap(x -> Stream.of(Utils.breakToLines(x))).toArray(String[]::new);
+        .flatMap(x -> Utils.breakToLines(x).stream()).toList();
   }
 
   private static boolean isLocalLabelName(final String labelName) {
@@ -145,8 +144,8 @@ public class Z80Asm implements AsmTranslator {
   }
 
   private void processSources() {
-    for (int strIndex = 0; strIndex < sources.length; strIndex++) {
-      final String line = sources[strIndex];
+    for (int strIndex = 0; strIndex < sources.size(); strIndex++) {
+      final String line = this.sources.get(strIndex);
       requireNonNull(line);
       try {
         if (this.processOneLine(line, strIndex + 1)) {
@@ -213,8 +212,12 @@ public class Z80Asm implements AsmTranslator {
     return result;
   }
 
-  private String[] registerNonAssignedLabels() {
-    List<String> result = null;
+  private List<String> registerNonAssignedLabels() {
+    if (this.nonAssignedLabels.isEmpty()) {
+      return List.of();
+    }
+
+    final List<String> result = new ArrayList<>();
     final int address = getPC();
     if (firstPassFlag) {
       for (final String lbl : nonAssignedLabels) {
@@ -223,9 +226,6 @@ public class Z80Asm implements AsmTranslator {
         } else {
           registerGlobalLabelAddress(lbl, address);
         }
-        if (result == null) {
-          result = new ArrayList<>();
-        }
         result.add(lbl);
       }
     } else {
@@ -233,15 +233,12 @@ public class Z80Asm implements AsmTranslator {
         if (isLocalLabelName(lbl)) {
           registerLocalLabelAddress(lbl, address);
         }
-        if (result == null) {
-          result = new ArrayList<>();
-        }
         result.add(lbl);
       }
     }
     nonAssignedLabels.clear();
 
-    return result == null ? new String[0] : result.toArray(new String[0]);
+    return result;
   }
 
   private boolean processSpecialDirective(final AbstractAsmCommand asmCommand,

@@ -17,25 +17,26 @@
 package com.igormaznitsa.j2z80.api.additional;
 
 /**
- * The addition shows that an implementing class needs to include the BREAKPOINT command
- * manager.
+ * Declares that a translated class depends on the debug breakpoint support in
+ * {@code BREAKPOINT_MANAGER.a80}. This runtime block allows the generated code to hook debug
+ * breakpoints without changing the normal execution path.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 @J2Z80AdditionPath("BREAKPOINT_MANAGER.a80")
 public interface NeedsBREAKPOINTManager extends J2ZAdditionalBlock {
   /**
-   * The label of the memory cells containing the current breakpoint processing subroutine address
+   * Address slot that stores the current breakpoint callback routine.
    */
   String BREAKPOINT_PROCESSING_SUB_ADDRESS = "___BREAKPOINT_PROCESSING_CODE_ADDRESS";
 
   /**
-   * The label of the breakpoint processing subroutine stub (it does nothing)
+   * No-op stub used when no breakpoint handler is active.
    */
   String BREAKPOINT_PROCESSING_STUB = "___BREAKPOINT_PROCESSING_STUB";
 
   /**
-   * The label of the breakpoint processing manager subroutine
+   * Runtime entry point for the breakpoint manager.
    */
   String BREAKPOINT_PROCESSING_MANAGER = "___BREAKPOINT_PROCESSING_MANAGER";
 }

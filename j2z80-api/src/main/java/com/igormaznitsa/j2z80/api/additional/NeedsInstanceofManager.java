@@ -17,22 +17,24 @@
 package com.igormaznitsa.j2z80.api.additional;
 
 /**
- * The addition shows that an implementing class needs to include the INSTANCEOF manager.
+ * Declares that a translated class depends on the runtime support used to implement Java
+ * {@code instanceof} checks. The manager emits and resolves the class-identity tables used by
+ * generated cast and type-check instructions.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 @J2Z80AdditionPath("INSTANCEOF_MANAGER.a80")
 public interface NeedsInstanceofManager extends J2ZAdditionalBlock {
   /**
-   * The macros to be replaced by an instanceof table represented as String.
+   * Marker used by the generator to substitute the generated {@code instanceof} table.
    */
   String MACRO_INSTANCEOFTABLE = "%instanceoftable%";
   /**
-   * The label of the memory address where the instanceof table will be placed
+   * Memory label where the generated {@code instanceof} table is written.
    */
   String INSTANCEOF_TABLE_POINTER = "___INSTANCEOF_TABLE";
   /**
-   * The label of the subroutine processing the instanceof logic
+   * Dispatch label for the runtime {@code instanceof} routine.
    */
   String SUB_INSTANCEOF = "___INSTANCE_OF";
 }

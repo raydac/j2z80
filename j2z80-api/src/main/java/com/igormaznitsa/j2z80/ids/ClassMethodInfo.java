@@ -22,7 +22,9 @@ import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.MethodGen;
 
 /**
- * The Class describes a class method for inside translating operations.
+ * A compact description of a method as it appears within a translated Java class. This value object
+ * keeps together the owning {@link ClassGen}, the original BCEL {@link Method}, and any optional
+ * lazily generated {@link MethodGen} representation used by the translator during code generation.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
@@ -34,11 +36,11 @@ public class ClassMethodInfo {
   private MethodGen lazyMethodGen;
 
   /**
-   * A Constructor
+   * Creates a method description with an explicit runtime identifier.
    *
-   * @param classInfo  the ClassGen object contains the method
-   * @param methodInfo the Method object
-   * @param id         the ID of the method object
+   * @param classInfo the class that contains the method, must not be {@code null}
+   * @param methodInfo the underlying BCEL method definition, must not be {@code null}
+   * @param id the runtime identifier assigned to this method
    */
   public ClassMethodInfo(final ClassGen classInfo, final Method methodInfo, final int id) {
     this.classInfo = classInfo;
@@ -47,21 +49,21 @@ public class ClassMethodInfo {
   }
 
   /**
-   * A Constructor
+   * Creates a method description without a runtime identifier.
    *
-   * @param classInfo  the ClassGen object contains the method
-   * @param methodInfo the Method object
+   * @param classInfo the class that contains the method, must not be {@code null}
+   * @param methodInfo the underlying BCEL method definition, must not be {@code null}
    */
   public ClassMethodInfo(final ClassGen classInfo, final Method methodInfo) {
     this(classInfo, methodInfo, -1);
   }
 
   /**
-   * A Constructor
+   * Creates a method description and binds a lazily created method generator for later use.
    *
-   * @param classInfo  the ClassGen object contains the method
-   * @param methodInfo the Method object describes the method
-   * @param methodGen  the MethodGen object for the method
+   * @param classInfo the class that contains the method, must not be {@code null}
+   * @param methodInfo the underlying BCEL method definition, must not be {@code null}
+   * @param methodGen the method generator to reuse, or {@code null} if one should be created on demand
    */
   public ClassMethodInfo(final ClassGen classInfo, final Method methodInfo,
                          final MethodGen methodGen) {
@@ -70,36 +72,36 @@ public class ClassMethodInfo {
   }
 
   /**
-   * Get UID for the method info
+   * Returns the numeric runtime identifier assigned to this method.
    *
-   * @return the UID as integer
+   * @return the method identifier, or {@code -1} when no identifier has been assigned yet
    */
   public int getUID() {
     return id;
   }
 
   /**
-   * Get the ClassGen object saved by the info
+   * Returns the class metadata associated with this method.
    *
-   * @return the ClassGen object saved bye the info
+   * @return the owner class definition
    */
   public ClassGen getClassInfo() {
     return this.classInfo;
   }
 
   /**
-   * Get the Method object saved by the info
+   * Returns the original BCEL method definition.
    *
-   * @return the Method for the info object
+   * @return the method description from the class file
    */
   public Method getMethodInfo() {
     return this.methodInfo;
   }
 
   /**
-   * Get the package name (without the class name) for the class contains the method
+   * Returns the package name portion of the owning class.
    *
-   * @return the class package information as String
+   * @return the package name, or an empty string when the class is in the default package
    */
   public String getPackageName() {
     final String fullClassName = this.classInfo.getClassName();
@@ -112,18 +114,18 @@ public class ClassMethodInfo {
   }
 
   /**
-   * Get the canonical class name.
+   * Returns the canonical class name.
    *
-   * @return the canonical class name as String
+   * @return the fully qualified owner class name
    */
   public String getCanonicalClassName() {
     return this.classInfo.getClassName();
   }
 
   /**
-   * Get only class name (package data excluded) for the class contains the method.
+   * Returns the simple class name without the package prefix.
    *
-   * @return the class name as String
+   * @return the unqualified class name
    */
   public String getOnlyClassName() {
     final String fullClassName = this.classInfo.getClassName();
@@ -136,27 +138,28 @@ public class ClassMethodInfo {
   }
 
   /**
-   * Get the method name
+   * Returns the method name.
    *
-   * @return the method name as String
+   * @return the method name, or {@code null} when the underlying definition is unavailable
    */
   public String getMethodName() {
     return this.methodInfo == null ? null : this.methodInfo.getName();
   }
 
   /**
-   * Get the method signature
+   * Returns the method signature in the JVM descriptor format.
    *
-   * @return the method signature as String
+   * @return the method signature, or {@code null} when the underlying definition is unavailable
    */
   public String getMethodSignature() {
     return this.methodInfo == null ? null : this.methodInfo.getSignature();
   }
 
   /**
-   * Get the MethodGen object linked to the method info
+   * Returns the lazily initialized method generator for this method.
    *
-   * @return null if saved method info is null, a MethodGen object if there is MethodGen linked to the info object
+   * @return the cached {@link MethodGen} instance, or {@code null} when the original method is
+   *         absent
    */
   public MethodGen getMethodGen() {
     if (methodInfo == null) {
@@ -182,8 +185,7 @@ public class ClassMethodInfo {
     if (obj == this) {
       return true;
     }
-    if (obj instanceof ClassMethodInfo) {
-      final ClassMethodInfo info = (ClassMethodInfo) obj;
+    if (obj instanceof ClassMethodInfo info) {
       return this.classInfo.equals(info.classInfo) && this.methodInfo.equals(info.methodInfo);
     }
     return false;
@@ -203,9 +205,9 @@ public class ClassMethodInfo {
   }
 
   /**
-   * Check that the method is a native one
+   * Determines whether the underlying method is declared as native.
    *
-   * @return returns true if the method is a native one
+   * @return {@code true} if the method is native, otherwise {@code false}
    */
   public boolean isNative() {
     return this.methodInfo != null && this.methodInfo.isNative();

@@ -24,8 +24,8 @@ public class AsmCommandBIT extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    final String arg0 = asm.getArgs()[0];
-    final String arg1 = asm.getArgs()[1];
+    final String arg0 = asm.getArgs().get(0);
+    final String arg1 = asm.getArgs().get(1);
 
     final int number = new LightExpression(context, this, asm, arg0).calculate();
 

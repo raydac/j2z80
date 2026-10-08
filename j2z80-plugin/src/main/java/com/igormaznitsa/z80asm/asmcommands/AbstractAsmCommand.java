@@ -24,6 +24,7 @@ import com.igormaznitsa.z80asm.AsmTranslator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -216,7 +217,7 @@ public abstract class AbstractAsmCommand {
     return COMMAND_MAP.get(name);
   }
 
-  protected void addCase(final String signature, final byte... codes) {
+  protected final void addCase(final String signature, final byte... codes) {
     requireNonNull(signature, "Signature must not be null");
     requireNonNull(codes, "Code block must not be null");
     if (codes.length == 0) {
@@ -267,16 +268,16 @@ public abstract class AbstractAsmCommand {
     TWO,
     ONE_OR_MORE;
 
-    public boolean check(final String[] args) {
+    public boolean check(final List<String> args) {
       return switch (this) {
-        case NONE -> args.length == 0;
-        case NONE_OR_ONE -> args.length == 0 || args.length == 1;
-        case ZERO_ONE_OR_TWO -> args.length == 0 || args.length == 1 || args.length == 2;
+        case NONE -> args.isEmpty();
+        case NONE_OR_ONE -> args.size() <= 1;
+        case ZERO_ONE_OR_TWO -> args.size() <= 2;
         case ANY -> args != null;
-        case ONE -> args.length == 1;
-        case ONE_OR_MORE -> args.length >= 1;
-        case ONE_OR_TWO -> args.length == 1 || args.length == 2;
-        case TWO -> args.length == 2;
+        case ONE -> args.size() == 1;
+        case ONE_OR_MORE -> !args.isEmpty();
+        case ONE_OR_TWO -> args.size() == 1 || args.size() == 2;
+        case TWO -> args.size() == 2;
       };
     }
   }

@@ -15,10 +15,10 @@
  */
 package com.igormaznitsa.z80asm.asmcommands;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
 
 public class AsmCommandLineTest {
 
@@ -27,10 +27,10 @@ public class AsmCommandLineTest {
     final ParsedAsmLine line = new ParsedAsmLine("  some_label   : ld  (  ix - # 4  )  , \"hello;world\"    ; comment");
     assertEquals("some_label", line.getLabel());
     assertEquals("LD", line.getCommand());
-    assertEquals(2, line.getArgs().length);
+    assertEquals(2, line.getArgs().size());
     assertEquals("(IX-#4),\"hello;world\"", line.getSignature());
-    assertEquals("(IX-#4)", line.getArgs()[0]);
-    assertEquals("\"hello;world\"", line.getArgs()[1]);
+    assertEquals("(IX-#4)", line.getArgs().get(0));
+    assertEquals("\"hello;world\"", line.getArgs().get(1));
   }
 
   @Test
@@ -38,7 +38,7 @@ public class AsmCommandLineTest {
     final ParsedAsmLine line = new ParsedAsmLine(" rl ");
     assertNull(line.getLabel());
     assertEquals("RL", line.getCommand());
-    assertEquals(0, line.getArgs().length);
+    assertEquals(0, line.getArgs().size());
   }
 
   @Test
@@ -46,7 +46,7 @@ public class AsmCommandLineTest {
     final ParsedAsmLine line = new ParsedAsmLine(" rl;hello ");
     assertNull(line.getLabel());
     assertEquals("RL", line.getCommand());
-    assertEquals(0, line.getArgs().length);
+    assertEquals(0, line.getArgs().size());
   }
 
   @Test
@@ -54,10 +54,10 @@ public class AsmCommandLineTest {
     final ParsedAsmLine line = new ParsedAsmLine(" ld   a , b   , c;hohohoh");
     assertNull(line.getLabel());
     assertEquals("LD", line.getCommand());
-    assertEquals(3, line.getArgs().length);
-    assertEquals("A", line.getArgs()[0]);
-    assertEquals("B", line.getArgs()[1]);
-    assertEquals("C", line.getArgs()[2]);
+    assertEquals(3, line.getArgs().size());
+    assertEquals("A", line.getArgs().get(0));
+    assertEquals("B", line.getArgs().get(1));
+    assertEquals("C", line.getArgs().get(2));
   }
 
   @Test
@@ -65,7 +65,7 @@ public class AsmCommandLineTest {
     final ParsedAsmLine line = new ParsedAsmLine("label ho:");
     assertEquals("labelho", line.getLabel());
     assertEquals("", line.getCommand());
-    assertEquals(0, line.getArgs().length);
+    assertEquals(0, line.getArgs().size());
   }
 
   @Test
@@ -73,6 +73,6 @@ public class AsmCommandLineTest {
     final ParsedAsmLine line = new ParsedAsmLine("label: ;jjj");
     assertEquals("label", line.getLabel());
     assertEquals("", line.getCommand());
-    assertEquals(0, line.getArgs().length);
+    assertEquals(0, line.getArgs().size());
   }
 }

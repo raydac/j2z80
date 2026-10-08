@@ -22,64 +22,70 @@ import java.util.Set;
 import org.apache.bcel.generic.ClassGen;
 
 /**
- * The interface describes context to work with classes
+ * Maintains the class graph and metadata used by the translator while it resolves inheritance,
+ * interfaces, and runtime identities. Through this context, generated code can ask which classes
+ * are reachable, which interfaces they implement, and which runtime identifiers have already been
+ * assigned.
  *
  * @author Igoe Manzitsa (igor.maznitsa@igormaznitsa.com)
  */
 public interface ClassContext {
   /**
-   * Get iterator for all translated java classes
+   * Returns all translated Java classes currently known to the translator.
    *
-   * @return an iterator for all translated java classes
+   * @return an iterable over class identities, never {@code null}
    */
   Iterable<ClassID> getAllClasses();
 
   /**
-   * Find all class ancestors
+   * Resolves the full inheritance chain for a class name.
    *
-   * @param className the canonical class name, must not be null
-   * @return the list contains class names of the class ancestors
+   * @param className the canonical class name to inspect, must not be {@code null}
+   * @return the ordered list of ancestor class names, beginning with the class itself and ending
+   *         with the root type; an empty list is returned when the class is unknown
    */
   List<String> findAllClassAncestors(final String className);
 
   /**
-   * Find all interfaces which are implemented by the class (also it finds interfaces implemented by all class ancestors)
+   * Finds every interface implemented by a class, including interfaces inherited through its
+   * ancestors.
    *
-   * @param className the canonical class name, must not be null
-   * @return the set of id of interfaces which are implemented by the class or one of its ancestor
+   * @param className the canonical class name to inspect, must not be {@code null}
+   * @return the set of interface identifiers implemented by the class and its ancestors
    */
   Set<ClassID> findAllClassesImplementInterface(String className);
 
   /**
-   * Find a ClassGen for class id
+   * Retrieves the BCEL description for a class identifier.
    *
-   * @param classId the class id object to be used in the search, must not be null
-   * @return found ClassGen or null
+   * @param classId the class identifier to locate, must not be {@code null}
+   * @return the matching {@link ClassGen}, or {@code null} if no such class is registered
    */
   ClassGen findClassForID(ClassID classId);
 
   /**
-   * Find all successors for a class
+   * Lists all known class successors reachable from the given class in the current hierarchy.
    *
-   * @param className the canonical class name, must not be null
-   * @return a list contains all found successors of the class
+   * @param className the canonical class name to inspect, must not be {@code null}
+   * @return the list of direct and indirect subtype names in the translator's current graph
    */
   List<String> findAllClassSuccessors(String className);
 
   /**
-   * Find the class uid for the class id
+   * Retrieves the runtime identifier assigned to the given class.
    *
-   * @param classId a class id object, must not be null
-   * @return found UID as Integer or null
+   * @param classId the class identifier to inspect, must not be {@code null}
+   * @return the assigned class ID, or {@code null} if the class has not been registered
    */
   Integer findClassUID(ClassID classId);
 
   /**
-   * Check that a super class is accessible from a ClassGen object
+   * Checks whether a superclass reference is valid in the current translated type graph.
    *
-   * @param classInfo      the class gen object, must not be null
-   * @param superClassName the canonical class name of the superclass to be checked for accessibility
-   * @return true if the superclass is accessible from the class gen object
+   * @param classInfo the class metadata being checked, must not be {@code null}
+   * @param superClassName the canonical superclass name to validate, must not be {@code null}
+   * @return {@code true} when the superclass is accessible to the given class, otherwise
+   *         {@code false}
    */
   boolean isAccessible(ClassGen classInfo, String superClassName);
 

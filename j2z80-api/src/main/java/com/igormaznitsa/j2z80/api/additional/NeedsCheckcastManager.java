@@ -17,15 +17,16 @@
 package com.igormaznitsa.j2z80.api.additional;
 
 /**
- * The addition shows that an implementing class needs to include the CHECKCAST
- * command manager.
+ * Declares that a translated class depends on the runtime support required for Java
+ * {@code checkcast} instructions. The manager resolves class references at runtime and verifies
+ * whether a value is assignable to the requested type.
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
 @J2Z80AdditionPath("CHECKCAST_MANAGER.a80")
 public interface NeedsCheckcastManager extends J2ZAdditionalBlock {
   /**
-   * The label of the subroutine processing checkcast commands
+   * Dispatch label for the runtime checkcast implementation.
    */
   String SUB_CHECKCAST = "___CHECKCAST";
 }
