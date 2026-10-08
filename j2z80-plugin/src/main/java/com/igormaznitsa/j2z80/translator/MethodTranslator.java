@@ -55,7 +55,7 @@ public record MethodTranslator(TranslatorContext translatorContext, ClassMethodI
     final List<String> asm = this.method2asm(bootstrapClassLoader);
     final List<String> result = new ArrayList<>();
     for (final String str : asm) {
-      result.addAll(Utils.breakToLines(str));
+      result.addAll(Utils.breakLines(str));
     }
 
     return result;

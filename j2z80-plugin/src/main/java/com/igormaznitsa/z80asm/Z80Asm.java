@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.io.FileUtils;
 
 /**
  * The class implements a small Z80 assembler translator.
@@ -57,17 +58,17 @@ public class Z80Asm implements AsmTranslator {
   private boolean firstPassFlag;
 
   public Z80Asm(final File file) throws IOException {
-    this(Utils.readTextFileAsStringList(file, StandardCharsets.UTF_8));
+    this(FileUtils.readLines(file, StandardCharsets.UTF_8));
   }
 
   public Z80Asm(final File file, final Charset charSet) throws IOException {
-    this(Utils.readTextFileAsStringList(file, charSet));
+    this(FileUtils.readLines(file, charSet));
   }
 
   public Z80Asm(final List<String> sourcesToCompile) {
     requireNonNull(sourcesToCompile, "Source list must not be null");
     this.sources = sourcesToCompile.stream()
-        .flatMap(x -> Utils.breakToLines(x).stream()).toList();
+        .flatMap(x -> Utils.breakLines(x).stream()).toList();
   }
 
   private static boolean isLocalLabelName(final String labelName) {

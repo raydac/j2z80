@@ -518,7 +518,7 @@ public class TranslatorImpl implements TranslatorContext {
       final String assemblerText =
           Utils.readTextResource(AbstractJvmCommandProcessor.class, path.value());
       text.addAll(
-          Utils.breakToLines(preprocessAdditionAssemblerText(addition, assemblerText)));
+          Utils.breakLines(preprocessAdditionAssemblerText(addition, assemblerText)));
     }
 
     if (needMemoryManager) {
@@ -527,7 +527,7 @@ public class TranslatorImpl implements TranslatorContext {
       final String assemblerText = Utils.readTextResource(AbstractJvmCommandProcessor.class,
           (NeedsMemoryManager.class.getAnnotation(
               J2Z80AdditionPath.class)).value());
-      text.addAll(Utils.breakToLines(
+      text.addAll(Utils.breakLines(
           preprocessAdditionAssemblerText(NeedsMemoryManager.class, assemblerText)));
     }
   }

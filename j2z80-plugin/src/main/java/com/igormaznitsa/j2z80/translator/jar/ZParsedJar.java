@@ -38,7 +38,7 @@ import org.apache.bcel.generic.ClassGen;
  *
  * @author Igor Maznitsa (igor.maznitsa@igormaznitsa.com)
  */
-public class ZParsedJar {
+public final class ZParsedJar {
 
   private final Path path;
   private final JarFile jarFile;
@@ -53,7 +53,7 @@ public class ZParsedJar {
       this.jarFile = new JarFile(jarFile.toFile());
       this.extractAll();
     } catch (IOException ex) {
-      throw new RuntimeException("Can't extract jar file: " + jarFile);
+      throw new IllegalArgumentException("Can't parse the jar file: " + jarFile);
     }
   }
 
@@ -72,7 +72,7 @@ public class ZParsedJar {
   }
 
   private void extractAll() throws IOException {
-    final Enumeration<JarEntry> entries = jarFile.entries();
+    final Enumeration<JarEntry> entries = this.jarFile.entries();
     while (entries.hasMoreElements()) {
       final JarEntry entry = entries.nextElement();
       if (!entry.isDirectory()) {
@@ -88,9 +88,9 @@ public class ZParsedJar {
           }
           this.classList.add(classGen);
         } else if (isNativeCodeFile(entry)) {
-          nativeCodeFiles.put(name, entryData);
+          this.nativeCodeFiles.put(name, entryData);
         } else {
-          binaryResources.put(name, entryData);
+          this.binaryResources.put(name, entryData);
         }
       }
     }

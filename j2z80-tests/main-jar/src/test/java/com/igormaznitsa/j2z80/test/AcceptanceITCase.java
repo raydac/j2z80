@@ -29,7 +29,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 
 public class AcceptanceITCase extends Z80 {
@@ -112,21 +112,17 @@ public class AcceptanceITCase extends Z80 {
 
   private void assertOnlyIncludedTextResource(final String message, final String text,
                                               final byte[] block) {
-    try {
-      final String str = new String(block, "US-ASCII");
-      int index = str.indexOf(text);
-      if (index < 0) {
-        fail("Resource string " + text + " must be presented");
-      }
-
-      index = str.indexOf(text, index + text.length());
-      if (index >= 0) {
-        fail("Resource string " + text + " has been met more than one time");
-      }
-
-    } catch (UnsupportedEncodingException ex) {
-      throw new RuntimeException("Unsupported encoding", ex);
+    final String str = new String(block, StandardCharsets.US_ASCII);
+    int index = str.indexOf(text);
+    if (index < 0) {
+      fail("Resource string " + text + " must be presented");
     }
+
+    index = str.indexOf(text, index + text.length());
+    if (index >= 0) {
+      fail("Resource string " + text + " has been met more than one time");
+    }
+
     System.out.println(message + ".....OK");
   }
 

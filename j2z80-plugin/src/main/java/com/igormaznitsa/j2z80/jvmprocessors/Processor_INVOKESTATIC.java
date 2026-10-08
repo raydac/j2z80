@@ -106,7 +106,7 @@ public class Processor_INVOKESTATIC extends AbstractInvokeProcessor implements N
             .replace(MACROS_POSTFIX, postfix) + '\n';
 
 
-    return Utils.breakToLines(res);
+    return Utils.breakLines(res);
 
   }
 

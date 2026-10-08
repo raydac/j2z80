@@ -51,7 +51,7 @@ public class PrintStream extends Object {
   public List<String> getAdditionalText() {
     final String fileName = this.getClass().getSimpleName() + ".a80";
     try {
-      return Utils.breakToLines(Utils.readTextResource(this.getClass(), fileName));
+      return Utils.breakLines(Utils.readTextResource(this.getClass(), fileName));
     } catch (IOException ex) {
       throw new RuntimeException("IOException [" + fileName + ']', ex);
     }

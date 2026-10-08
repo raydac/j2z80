@@ -129,7 +129,7 @@ public class NativeClassProcessor {
 
     if (result != null) {
       return addFirstString("; file " + readResourcePath,
-          Utils.breakToLines(new String(result, StandardCharsets.UTF_8)));
+          Utils.breakLines(new String(result, StandardCharsets.UTF_8)));
     }
 
     // find between bin files

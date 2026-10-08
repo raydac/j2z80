@@ -61,7 +61,7 @@ public class MainPrefixPostfixGenerator {
     result.append("LD SP,").append(initStack - frameStack).append('\n');
     result.append("LD BC,___MAINLOOP___\n").append("PUSH BC\n");
 
-    return Utils.breakToLines(result.toString());
+    return Utils.breakLines(result.toString());
   }
 
   /**
@@ -70,7 +70,7 @@ public class MainPrefixPostfixGenerator {
    * @return list of assembler lines to be used as the postfix for the main method
    */
   public List<String> generatePostfix() {
-    return Utils.breakToLines("___MAINLOOP___: JP ___MAINLOOP___");
+    return Utils.breakLines("___MAINLOOP___: JP ___MAINLOOP___");
   }
 
 }

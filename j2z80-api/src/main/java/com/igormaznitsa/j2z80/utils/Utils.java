@@ -17,18 +17,13 @@
 package com.igormaznitsa.j2z80.utils;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.StringTokenizer;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,51 +37,6 @@ import org.apache.commons.lang3.StringUtils;
 public final class Utils {
   private Utils() {
 
-  }
-
-  /**
-   * Copies the strings from a collection into a list.
-   *
-   * @param collection the collection to convert, must not be {@code null}
-   * @return an immutable list containing all collection elements in iteration order
-   */
-  public static List<String> toStringList(final Collection<String> collection) {
-    return List.copyOf(collection);
-  }
-
-  /**
-   * Tokenizes a string using the supplied delimiter set while optionally trimming or dropping empty
-   * items.
-   *
-   * @param str               the source text, or {@code null} for an empty result
-   * @param delimiters        the delimiter characters used to split the text, must not be {@code null}
-   * @param trimTokens        if {@code true}, each token is trimmed before being returned
-   * @param ignoreEmptyTokens if {@code true}, blank tokens are omitted from the result
-   * @return the extracted tokens, or an empty list when the input is {@code null}
-   */
-  public static List<String> tokenizeToStringList(
-      final String str,
-      final String delimiters,
-      final boolean trimTokens,
-      final boolean ignoreEmptyTokens
-  ) {
-
-    if (str == null) {
-      return List.of();
-    }
-
-    final StringTokenizer st = new StringTokenizer(str, delimiters);
-    final List<String> tokens = new ArrayList<>();
-    while (st.hasMoreTokens()) {
-      String token = st.nextToken();
-      if (trimTokens) {
-        token = token.trim();
-      }
-      if (!ignoreEmptyTokens || !token.isEmpty()) {
-        tokens.add(token);
-      }
-    }
-    return List.copyOf(tokens);
   }
 
   /**
@@ -105,25 +55,12 @@ public final class Utils {
   }
 
   /**
-   * Reads a text file into a list of lines.
-   *
-   * @param file    the file to be read, must not be null
-   * @param charSet the charset to be used to decode strings, must not be null
-   * @return file content as list of strings
-   * @throws IOException it will be thrown if there is any transport problem
-   */
-  public static List<String> readTextFileAsStringList(final File file, final Charset charSet)
-      throws IOException {
-    return FileUtils.readLines(file, charSet);
-  }
-
-  /**
    * Splits text into lines.
    *
    * @param text the text to split, must not be {@code null}
    * @return an immutable list containing one element for each line
    */
-  public static List<String> breakToLines(final String text) {
+  public static List<String> breakLines(final String text) {
     return List.of(StringUtils.split(text, '\n'));
   }
 
@@ -184,36 +121,6 @@ public final class Utils {
   }
 
   /**
-   * Convert a byte array into hex sequence like [#01 #02 #03]
-   *
-   * @param byteArray a byte array to be converted, must not be null
-   * @return a string represents the array as a hex values
-   */
-  public static String arrayToHexString(final byte[] byteArray) {
-    final StringBuilder result = new StringBuilder();
-    result.append('[');
-    boolean space = false;
-    for (final byte b : byteArray) {
-      if (space) {
-        result.append(' ');
-      } else {
-        space = true;
-      }
-
-      final String byteAsHex = Integer.toHexString(b & 0xFF).toUpperCase();
-
-      result.append('#');
-      if (byteAsHex.length() == 1) {
-        result.append('0');
-      }
-      result.append(byteAsHex);
-    }
-    result.append(']');
-
-    return result.toString();
-  }
-
-  /**
    * Convert a byte array into asm compatible representation (DEFB) with limit for values per line
    *
    * @param firstLine            the first line for the result text block, it can be null
@@ -254,7 +161,7 @@ public final class Utils {
       buffer.append('\n');
     }
 
-    return breakToLines(buffer.toString());
+    return breakLines(buffer.toString());
   }
 
 }
