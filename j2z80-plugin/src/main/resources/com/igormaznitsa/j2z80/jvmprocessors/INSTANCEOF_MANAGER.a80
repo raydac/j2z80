@@ -7,9 +7,9 @@ ___INSTANCE_OF: ; BC - object to be checked, DE - class id for check compatibili
 
     LD A,B
     OR C
-    JP NZ,@INSTANCEOF_NOTNULL
+    JR NZ,@INSTANCEOF_NOTNULL
     LD BC,0
-    JP @INSTANCEOF_END
+    JR @INSTANCEOF_END
 
 @INSTANCEOF_NOTNULL:
     LD HL,___INSTANCEOF_TABLE
@@ -26,15 +26,15 @@ ___INSTANCE_OF: ; BC - object to be checked, DE - class id for check compatibili
     LD A,(HL)
     INC HL
     CP E
-    JP Z,@INSTANCE_ROWS_CHECKD
+    JR Z,@INSTANCE_ROWS_CHECKD
     INC HL ; skip the next byte
-    JP @INSTANCEOF_NOT_SAME_ID
+    JR @INSTANCEOF_NOT_SAME_ID
 
 @INSTANCE_ROWS_CHECKD:
     LD A,(HL)
     INC HL
     CP D
-    JP Z,@INSTANCEOF_RIGHT_ID
+    JR Z,@INSTANCEOF_RIGHT_ID
 
 @INSTANCEOF_NOT_SAME_ID:
     ; skip records from the row
@@ -53,7 +53,7 @@ ___INSTANCE_OF: ; BC - object to be checked, DE - class id for check compatibili
     ; we have not found the class id, so it false
     POP BC ; remove the class id from the stack
     LD BC,#0000 ; make result false
-    JP @INSTANCEOF_END ; to the end
+    JR @INSTANCEOF_END ; to the end
     
 @INSTANCEOF_RIGHT_ID: ; we found the row for th class id in DE, now we must sequently check all cells
     POP DE ; now DE contains the Class ID  of checked object
@@ -64,22 +64,22 @@ ___INSTANCE_OF: ; BC - object to be checked, DE - class id for check compatibili
     LD A,(HL)
     INC HL
     CP E
-    JP Z,@INSTANCEOF_FIND_CLASSID_CELL_CHECKD
+    JR Z,@INSTANCEOF_FIND_CLASSID_CELL_CHECKD
     INC HL ; skip the next byte
-    JP @INSTANCEOF_FIND_CLASSID_CELL_ENDLOOP
+    JR @INSTANCEOF_FIND_CLASSID_CELL_ENDLOOP
 
 @INSTANCEOF_FIND_CLASSID_CELL_CHECKD:
     LD A,(HL)
     INC HL
     CP D
-    JP Z,@INSTANCEOF_SUCH_CELL_FOUND 
+    JR Z,@INSTANCEOF_SUCH_CELL_FOUND
     
 @INSTANCEOF_FIND_CLASSID_CELL_ENDLOOP:
     DJNZ @INSTANCEOF_FIND_CLASSID_CELL
  
    ; such cell is not found
     LD BC,0
-    JP @INSTANCEOF_END
+    JR @INSTANCEOF_END
 
 @INSTANCEOF_SUCH_CELL_FOUND:
     LD BC,1
@@ -88,6 +88,15 @@ ___INSTANCE_OF: ; BC - object to be checked, DE - class id for check compatibili
     POP HL
     POP AF
     POP DE
+    RET
+;--------------------------------------------------
+___INSTANCEOF_OBJECT: ; BC - object reference, pushes 1 for non-null and 0 for null
+    LD A,B
+    OR C
+    LD BC,0
+    JR Z,@INSTANCEOF_OBJECT_END
+    INC BC
+@INSTANCEOF_OBJECT_END:
     RET
 ;--------------------------------------------------
 ; records about class compatibilities, 

@@ -2,14 +2,17 @@ package com.igormaznitsa.j2z80.emulator;
 
 import static org.junit.Assert.assertEquals;
 
+import com.igormaznitsa.j2z80.api.additional.NeedsInstanceofManager;
+import com.igormaznitsa.j2z80.api.additional.NeedsMemoryManager;
 import com.igormaznitsa.j2z80.jvmprocessors.AbstractInvokeProcessor;
+import com.igormaznitsa.j2z80.utils.Utils;
 import org.apache.bcel.generic.Type;
 import org.junit.Test;
 
 public class Z80WideArgumentTest {
 
   @Test
-  public void doubleArgumentsArriveLowWordFirst() {
+  public void doubleArgumentsArriveLowWordFirst() throws Exception {
     final String source = """
         ORG #8000
         LD SP,#F000
@@ -46,7 +49,10 @@ public class Z80WideArgumentTest {
         LD (HL),B
         HALT
         SLOTS: DEFS 8
-        """;
+        """
+        + Utils.readTextResource(NeedsMemoryManager.class,
+            "/com/igormaznitsa/j2z80/jvmprocessors/MEMORY_MANAGER.a80")
+        .replace(NeedsInstanceofManager.MACRO_INSTANCEOFTABLE, "DEFB 0");
 
     final Program program = Program.assemble(source);
     final Z80Machine machine = new Z80Machine();

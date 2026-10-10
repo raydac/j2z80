@@ -50,11 +50,21 @@ public class Processor_INSTANCEOF extends AbstractJvmCommandProcessor
     final INSTANCEOF instof = (INSTANCEOF) instruction;
 
     final ObjectType objectType = instof.getLoadClassType(methodTranslator.getConstantPool());
+    if ("java.lang.Object".equals(objectType.getClassName())) {
+      out.write(template
+          .replace("%idload%", "")
+          .replace("%subroutine%", SUB_INSTANCEOF_OBJECT));
+      out.write(NEXT_LINE);
+      return;
+    }
+
     final ClassID targetClassID = new ClassID(objectType.getClassName());
 
     methodTranslator.translatorContext().registerClassForCastCheck(targetClassID);
 
-    out.write(template.replace(MACROS_ID, LabelAndFrameUtils.makeLabelForClassID(targetClassID)));
+    out.write(template
+        .replace("%idload%", "    LD DE," + LabelAndFrameUtils.makeLabelForClassID(targetClassID))
+        .replace("%subroutine%", SUB_INSTANCEOF));
     out.write(NEXT_LINE);
   }
 }

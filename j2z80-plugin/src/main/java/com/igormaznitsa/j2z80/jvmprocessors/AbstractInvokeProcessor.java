@@ -43,6 +43,16 @@ import org.apache.bcel.generic.Type;
 public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcessor
     implements NeedsMemoryManager {
 
+  private static final String PUSH_WORD_RETURN_TEMPLATE =
+      loadResourceFileAsString("INVOKE_PUSH_WORD_RETURN.a80");
+  private static final String PUSH_DWORD_RETURN_TEMPLATE =
+      loadResourceFileAsString("INVOKE_PUSH_DWORD_RETURN.a80");
+  private static final String FRAME_PREFIX_TEMPLATE =
+      loadResourceFileAsString("INVOKE_FRAME_PREFIX.a80");
+  private static final String FRAME_POSTFIX_TEMPLATE =
+      loadResourceFileAsString("INVOKE_FRAME_POSTFIX.a80");
+  private static final String SWAP_WIDE_ARGUMENT_TEMPLATE =
+      loadResourceFileAsString("INVOKE_SWAP_WIDE_ARGUMENT.a80");
   /**
    * Calculate the size of memory block in bytes to keep arguments for a method.
    *
@@ -74,9 +84,9 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
       return "";
     }
     if (returnType.getSize() == 2) {
-      return "PUSH DE" + NEXT_LINE + "PUSH BC" + NEXT_LINE;
+      return PUSH_DWORD_RETURN_TEMPLATE;
     }
-    return "PUSH BC" + NEXT_LINE;
+    return PUSH_WORD_RETURN_TEMPLATE;
   }
 
   public static String pushReturnedValueAndCheckException(
@@ -119,9 +129,10 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @return the string containing the prefix code for the method invocation
    */
   public static String generateFramePrefix(final int argMemorySize, final int frameMemSize) {
-    return "LD A," + argMemorySize + NEXT_LINE
-        + "LD BC," + frameMemSize + NEXT_LINE
-        + "CALL " + SUB_BEFORE_INVOKE + NEXT_LINE;
+    return FRAME_PREFIX_TEMPLATE
+        .replace("%argumentarealen%", Integer.toString(argMemorySize))
+        .replace("%framesize%", Integer.toString(frameMemSize))
+        .replace("%beforeinvoke%", SUB_BEFORE_INVOKE);
   }
 
   /**
@@ -143,22 +154,8 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
   }
 
   private static String swapStackPair(final int offset) {
-    return "LD HL," + offset + NEXT_LINE
-        + "ADD HL,SP" + NEXT_LINE
-        + "LD E,(HL)" + NEXT_LINE
-        + "INC HL" + NEXT_LINE
-        + "LD D,(HL)" + NEXT_LINE
-        + "INC HL" + NEXT_LINE
-        + "LD C,(HL)" + NEXT_LINE
-        + "INC HL" + NEXT_LINE
-        + "LD B,(HL)" + NEXT_LINE
-        + "LD (HL),D" + NEXT_LINE
-        + "DEC HL" + NEXT_LINE
-        + "LD (HL),E" + NEXT_LINE
-        + "DEC HL" + NEXT_LINE
-        + "LD (HL),B" + NEXT_LINE
-        + "DEC HL" + NEXT_LINE
-        + "LD (HL),C" + NEXT_LINE;
+    return SWAP_WIDE_ARGUMENT_TEMPLATE
+        .replace("%stackoffset%", Integer.toString(offset));
   }
 
   /**
@@ -169,7 +166,7 @@ public abstract class AbstractInvokeProcessor extends AbstractJvmCommandProcesso
    * @return the string containing the postfix code for the method invocation
    */
   public static String generateFramePostfix(final int argMemorySize, final int frameMemSize) {
-    return "CALL " + SUB_AFTER_INVOKE + NEXT_LINE;
+    return FRAME_POSTFIX_TEMPLATE.replace("%afterinvoke%", SUB_AFTER_INVOKE);
   }
 
   /**

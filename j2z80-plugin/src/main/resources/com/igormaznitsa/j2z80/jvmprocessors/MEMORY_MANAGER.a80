@@ -38,6 +38,26 @@ ___AFTER_INVOKE: ; restore IX; BC and DE keep an int, float, long, or double res
     LD DE,(___AFTER_INVOKE_DE)
     RET
 ;-----------------------------------------------------------
+___INVOKE_SWAP_WIDE_ARGUMENT: ; HL - stack byte offset from first argument
+    ADD HL,SP
+    INC HL
+    INC HL
+    LD E,(HL)
+    INC HL
+    LD D,(HL)
+    INC HL
+    LD C,(HL)
+    INC HL
+    LD B,(HL)
+    LD (HL),D
+    DEC HL
+    LD (HL),E
+    DEC HL
+    LD (HL),B
+    DEC HL
+    LD (HL),C
+    RET
+;-----------------------------------------------------------
 ___MEMORY_ALLOCATE_OBJECT: ; BC - size in cells, DE - class id, the address in BC
     PUSH HL
     PUSH DE

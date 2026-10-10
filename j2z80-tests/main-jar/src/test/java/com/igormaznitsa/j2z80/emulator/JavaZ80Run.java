@@ -119,6 +119,10 @@ public final class JavaZ80Run {
     return this.machine.wordAt(this.program.addressOf(label));
   }
 
+  public int wordAtAddress(final int address) {
+    return this.machine.wordAt(address);
+  }
+
   private void writeSources(final Path sourcesDir) throws IOException {
     for (final Map.Entry<String, String> source : this.sources.entrySet()) {
       final Path file = sourcesDir.resolve(source.getKey());

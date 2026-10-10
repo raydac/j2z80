@@ -1,0 +1,2 @@
+    LD HL,%stackoffset%
+    CALL ___INVOKE_SWAP_WIDE_ARGUMENT

@@ -37,4 +37,8 @@ public interface NeedsInstanceofManager extends J2ZAdditionalBlock {
    * Dispatch label for the runtime {@code instanceof} routine.
    */
   String SUB_INSTANCEOF = "___INSTANCE_OF";
+  /**
+   * Dispatch label for the non-null {@code instanceof java.lang.Object} check.
+   */
+  String SUB_INSTANCEOF_OBJECT = "___INSTANCEOF_OBJECT";
 }

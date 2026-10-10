@@ -20,7 +20,7 @@ public class SwitchDispatchTest {
     final JavaZ80Run run = JavaZ80Run.mainClass("demo.switchy.Dispatch")
         .file("demo/switchy/Dispatch.java", """
             package demo.switchy;
-            
+
             public class Dispatch {
               public static int tableBreak;
               public static int tableFall;
@@ -134,6 +134,62 @@ public class SwitchDispatchTest {
     assertEquals(11, run.staticInt("demo.switchy.Dispatch", "lookupHigh"));
     assertEquals(1, run.staticInt("demo.switchy.Dispatch", "lookupDefault"));
     assertEquals(411, run.staticInt("demo.switchy.Dispatch", "loopTotal"));
+  }
+
+  @Test
+  public void switchHandlesSignedIntegerExtremesAndCharValues() {
+    final JavaZ80Run run = JavaZ80Run.mainClass("demo.switchy.Boundaries")
+        .file("demo/switchy/Boundaries.java", """
+            package demo.switchy;
+            
+            public class Boundaries {
+              public static int minimum;
+              public static int maximum;
+              public static int belowMinimum;
+              public static int aboveMaximum;
+              public static int charMinimum;
+              public static int charBoundary;
+            
+              public static void mainz() {
+                minimum = fromInt(-32767 - 1);
+                maximum = fromInt(32767);
+                belowMinimum = fromInt(-32767);
+                aboveMaximum = fromInt(32766);
+                charMinimum = fromChar((char) 0);
+                charBoundary = fromChar((char) 255);
+              }
+            
+              private static int fromInt(final int value) {
+                switch (value) {
+                  case -32768:
+                    return 1;
+                  case 32767:
+                    return 2;
+                  default:
+                    return 9;
+                }
+              }
+            
+              private static int fromChar(final char value) {
+                switch (value) {
+                  case 0:
+                    return 3;
+                  case 255:
+                    return 4;
+                  default:
+                    return 8;
+                }
+              }
+            }
+            """)
+        .execute();
+
+    assertEquals(1, run.staticInt("demo.switchy.Boundaries", "minimum"));
+    assertEquals(2, run.staticInt("demo.switchy.Boundaries", "maximum"));
+    assertEquals(9, run.staticInt("demo.switchy.Boundaries", "belowMinimum"));
+    assertEquals(9, run.staticInt("demo.switchy.Boundaries", "aboveMaximum"));
+    assertEquals(3, run.staticInt("demo.switchy.Boundaries", "charMinimum"));
+    assertEquals(4, run.staticInt("demo.switchy.Boundaries", "charBoundary"));
   }
 
   private boolean containsSwitch(final JavaClass compiled, final boolean table) {

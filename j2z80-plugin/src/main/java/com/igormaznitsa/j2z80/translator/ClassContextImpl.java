@@ -95,7 +95,8 @@ class ClassContextImpl implements ClassContext {
         for (final String name : c.getInterfaceNames()) {
           if (interfaceName.equals(name)) {
             if (c.isInterface()) {
-              final Set<ClassID> thatInterface = this.findAllClassesImplementInterface(name);
+              final Set<ClassID> thatInterface =
+                  this.findAllClassesImplementInterface(c.getClassName());
               result.addAll(thatInterface);
             } else {
               result.add(new ClassID(c));
