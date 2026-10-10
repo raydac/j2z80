@@ -31,7 +31,7 @@ public class ForgetHeapTest {
         .file("demo/ForgetHeap.java", """
             package demo;
             
-            import j2z80.Heap;
+            import j2z80.ZSystem;
             
             public class ForgetHeap {
               public static int anchorAddress;
@@ -45,7 +45,7 @@ public class ForgetHeapTest {
               public static int topRewound;
             
               public static void mainz() {
-                topAtStart = Heap.top();
+                topAtStart = ZSystem.top();
             
                 final Cell anchor = new Cell();
                 anchor.value = 11;
@@ -64,17 +64,17 @@ public class ForgetHeapTest {
                 }
                 created = index;
                 lastAddress = last.hashCode();
-                topAfter = Heap.top();
+                topAfter = ZSystem.top();
             
-                Heap.forget(middle);
+                ZSystem.forget(middle);
             
                 final Cell reused = new Cell();
                 reused.value = 22;
                 reusedAddress = reused.hashCode();
                 anchorValue = anchor.value;
             
-                Heap.forget(anchor);
-                topRewound = Heap.top();
+                ZSystem.forget(anchor);
+                topRewound = ZSystem.top();
               }
             }
             """.formatted(EXTRA_OBJECTS))

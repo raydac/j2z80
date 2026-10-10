@@ -1,6 +1,6 @@
 package com.igormaznitsa.test.helloworld;
 
-import j2z80.Heap;
+import j2z80.ZSystem;
 import j2z80.spectrum.Keyboard;
 import j2z80.spectrum.Screen;
 import j2z80.spectrum.Sound;
@@ -28,8 +28,9 @@ public class main {
     Screen.border(Screen.YELLOW);
     Portrait.draw(Portrait.PORTRAIT);
     Screen.border(Screen.GREEN);
+    Portrait.inverse();
     caption("press space (top #");
-    printAddress(Heap.top());
+    printAddress(ZSystem.top());
     Screen.print(')');
     Sound.tone(80, 400);
   }
@@ -59,7 +60,7 @@ public class main {
       Screen.frame();
     }
 
-    Heap.forget(sky);
+    ZSystem.forget(sky);
   }
 
   private static void showCurves() {

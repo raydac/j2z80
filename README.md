@@ -15,8 +15,8 @@ The program entry point is `public static void mainz()`. The plugin reads a JAR 
 its classes, and writes assembler (`.a80`), a raw binary (`.bin`), or a ZX Spectrum 48K snapshot (`.sna`). Output
 formats, the start address, and the stack top are described in [docs/configuration.txt](docs/configuration.txt).
 
-The ZX Spectrum example draws a line-art portrait, an attribute Mandelbrot, a star field that `Heap.forget` releases,
-and float/double curves. SPACE moves from one picture to the next. The portrait line shows the current `Heap.top()`
+The ZX Spectrum example draws a line-art portrait, an attribute Mandelbrot, a star field that `ZSystem.forget` releases,
+and float/double curves. SPACE moves from one picture to the next. The portrait line shows the current `ZSystem.top()`
 in hex (`press space (top #FAD0)`), so a later pass can be checked against the same address.
 
 ![Screenshot](docs/j2z80_hello_world.gif)
@@ -42,9 +42,10 @@ Classes, fields, constructors, virtual and interface calls, `instanceof`, and `c
 A `long` or a `double` occupies two slots. Records and enums are translated, with the limits in
 [Records](#records) and [Enums](#enums). `synchronized` is ignored: the machine is
 single-threaded, and `monitorenter` / `monitorexit` only drop the reference. The standard Java library is absent.
-`java.lang.Object` provides `<init>` and `hashCode` (the object address). `j2z80.Heap` rewinds the bump heap; see
-[Objects and the heap](#objects-and-the-heap). There is no `String` type with methods; a
-string literal is a length byte followed by raw 8-bit characters, at most 255 of them, and every character must fit in 8
+`java.lang.Object` provides `<init>` and `hashCode` (the object address). `j2z80.ZSystem` provides low-level system
+operations: bump-heap management, 16-bit memory access, byte I/O, interrupt-mode selection, and CPU halt. See
+[Objects and the heap](#objects-and-the-heap). There is no `String` type with methods; a string literal is a length byte
+followed by raw 8-bit characters, at most 255 of them, and every character must fit in 8
 bits.
 
 ## Data types
@@ -128,7 +129,7 @@ Nothing checks the index or the reference. An index past the end writes whatever
 ## Objects and the heap
 
 `new` allocates an instance on a bump heap. The heap grows upward from a fixed start, and the stack grows downward from
-the stack top. The free memory is the gap between `Heap.top()` and the stack. When the heap meets the stack, further
+the stack top. The free memory is the gap between `ZSystem.top()` and the stack. When the heap meets the stack, further
 allocation overwrites the stack. There is no check and no exception.
 
 Each instance starts with a 4-byte header: a word that counts field cells (one cell is two bytes), then a word that
@@ -152,33 +153,36 @@ Point point = new Point(10, 20);
 ```
 
 Nothing collects garbage. Dropping the last reference does not release memory, and there is no finalizer. The release
-is `j2z80.Heap.forget`, which rewinds the bump pointer. `java.lang.Object` has no `forget()`.
+is `j2z80.ZSystem.forget`, which rewinds the bump pointer. `java.lang.Object` has no `forget()`.
 
 ```java
-import j2z80.Heap;
+import j2z80.ZSystem;
 
-int mark = Heap.top();
+int mark = ZSystem.top();
 StarField sky = new StarField();
-Heap.forget(sky);
+ZSystem.forget(sky);
 ```
 
-`Heap.forget(sky)` sets the bump pointer back to the address it had before `sky` was created. That address is the
+`ZSystem.forget(sky)` sets the bump pointer back to the address it had before `sky` was created. That address is the
 instance reference minus 4, and it is the same value `mark` holds. That instance and every instance allocated after it
 are released, and the next `new` reuses the space. Instances allocated earlier stay where they are.
-`Heap.forget(null)` does nothing. A forgotten reference is still a bit pattern in a local or a field: do not use it,
+`ZSystem.forget(null)` does nothing. A forgotten reference is still a bit pattern in a local or a field: do not use it,
 and do not use anything that was allocated after it.
 
-`Heap.forget` applies to a class instance from `new`. An array has a 3-byte header (a size byte and a length word), so
-passing an array does not rewind to that array. A heap array stays until a later `Heap.forget` on an instance allocated
+`ZSystem.forget` applies to a class instance from `new`. An array has a 3-byte header (a size byte and a length word),
+so
+passing an array does not rewind to that array. A heap array stays until a later `ZSystem.forget` on an instance
+allocated
 before it rewinds over the array, or until the program ends. Allocate the owner first, then the arrays and the child
 instances. Forgetting the owner releases all of them.
 
-`Heap.top()` returns the bump pointer, the address where the next instance will be allocated, in the same signed 16-bit
+`ZSystem.top()` returns the bump pointer, the address where the next instance will be allocated, in the same signed
+16-bit
 form as `hashCode()`.
 
 The Spectrum star field follows this pattern. `new StarField()` runs first, and its constructor then allocates
-`Star[256]` and 256 `Star` objects. SPACE calls `Heap.forget` on that `StarField`, which releases the array and every
-star. The portrait line prints `Heap.top()` in hex, so the address after that rewind can be compared with the address
+`Star[256]` and 256 `Star` objects. SPACE calls `ZSystem.forget` on that `StarField`, which releases the array and every
+star. The portrait line prints `ZSystem.top()` in hex, so the address after that rewind can be compared with the address
 from the previous pass.
 
 ## Records

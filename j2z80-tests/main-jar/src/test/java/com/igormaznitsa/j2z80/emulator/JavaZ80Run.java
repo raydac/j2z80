@@ -123,6 +123,18 @@ public final class JavaZ80Run {
     return this.machine.wordAt(address);
   }
 
+  int lastInputPort() {
+    return this.machine.lastInputPort();
+  }
+
+  int lastOutputPort() {
+    return this.machine.lastOutputPort();
+  }
+
+  int lastOutputValue() {
+    return this.machine.lastOutputValue();
+  }
+
   private void writeSources(final Path sourcesDir) throws IOException {
     for (final Map.Entry<String, String> source : this.sources.entrySet()) {
       final Path file = sourcesDir.resolve(source.getKey());

@@ -1,8 +1,10 @@
 - 2.0.0 (SNAPSHOT)
     - enum constants, fields, ordinal, values, and switch translate; name and valueOf are rejected because String is not supported
     - record classes translate, including constructors, accessors, equals, and hashCode; record toString returns null
-    - Heap.forget(Object) rewinds the bump heap to that instance, releasing it and every object allocated after it; Heap.top() returns that address
-    - ZX Spectrum example replaces the zoomed Mandelbrot with a scattered 256-star field that Heap.forget releases on SPACE; the portrait line shows Heap.top() in hex
+    - ZSystem.forget(Object) rewinds the bump heap to that instance, releasing it and every object allocated after it; ZSystem.top() returns that address
+    - ZSystem exposes 16-bit memory peek/poke, Z80 halt, port in/out, interrupt-mode control, and interrupt enable/disable
+    - Renamed the low-level API from Heap to ZSystem to reflect its broader system-control operations
+    - ZX Spectrum example replaces the zoomed Mandelbrot with a scattered 256-star field that ZSystem.forget releases on SPACE; the portrait line shows ZSystem.top() in hex
     - large static byte[] field initializers use compact in-place ROM data instead of huge fill code
     - ZX Spectrum example opens with a line-art portrait drawn pixel-by-pixel instead of greeting text
     - ZX Spectrum example drives the 48K screen, keyboard, and beeper, and draws a Mandelbrot set

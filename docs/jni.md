@@ -224,7 +224,7 @@ wraparound are therefore possible if the program exhausts available memory.
 Native code that allocates dynamic memory must coordinate its memory range with
 the Java heap; the translator does not reserve or track native-managed buffers.
 
-`j2z80.Heap.forget(Object)` is only valid for a non-null ordinary object
+`j2z80.ZSystem.forget(Object)` is only valid for a non-null ordinary object
 allocated on the Java heap. It rewinds to that object's header and releases it
 and all later allocations. Do not pass arrays, ROM-resident data, or references
 owned by native code: the runtime does not validate the reference or its

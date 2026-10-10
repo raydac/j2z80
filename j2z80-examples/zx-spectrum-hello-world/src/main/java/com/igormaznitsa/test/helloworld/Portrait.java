@@ -1,5 +1,6 @@
 package com.igormaznitsa.test.helloworld;
 
+import j2z80.ZSystem;
 import j2z80.spectrum.Screen;
 
 public class Portrait {
@@ -236,6 +237,12 @@ public class Portrait {
   };
 
   private Portrait() {
+  }
+
+  public static void inverse() {
+    for (int a = 0x4000; a < 0x5800; a++) {
+      ZSystem.poke(a, (byte) (ZSystem.peek(a) ^ 0xFF));
+    }
   }
 
   public static void draw(final byte[] array) {

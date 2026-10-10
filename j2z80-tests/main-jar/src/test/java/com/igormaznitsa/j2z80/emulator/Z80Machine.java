@@ -11,6 +11,9 @@ public final class Z80Machine implements IMemory, IBaseDevice {
 
   private final byte[] memory = new byte[ADDRESS_SPACE];
   private final Z80Core cpu = new Z80Core(this, this);
+  private int lastInputPort = -1;
+  private int lastOutputPort = -1;
+  private int lastOutputValue = -1;
 
   public void load(final Program program) {
     final int origin = program.origin();
@@ -61,6 +64,18 @@ public final class Z80Machine implements IMemory, IBaseDevice {
     return this.cpu.getRegisterValue(name) & 0xFFFF;
   }
 
+  public int lastInputPort() {
+    return this.lastInputPort;
+  }
+
+  public int lastOutputPort() {
+    return this.lastOutputPort;
+  }
+
+  public int lastOutputValue() {
+    return this.lastOutputValue;
+  }
+
   public int wordAt(final int address) {
     return this.readWord(address);
   }
@@ -90,10 +105,13 @@ public final class Z80Machine implements IMemory, IBaseDevice {
 
   @Override
   public int IORead(final int port) {
+    this.lastInputPort = port & 0xFFFF;
     return 0xFF;
   }
 
   @Override
   public void IOWrite(final int port, final int value) {
+    this.lastOutputPort = port & 0xFFFF;
+    this.lastOutputValue = value & 0xFF;
   }
 }

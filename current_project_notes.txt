@@ -1,6 +1,9 @@
 ## 1. Implementation Progress
 - Completed the String-list migration across translator inputs/outputs, JNI source aggregation, assembler parsed arguments, and related utility names/Javadocs; remaining String[] uses are limited to external BCEL data and Java varargs.
 - Added detailed Javadoc coverage across the public API in `j2z80-api/src/main/java`, including translator context interfaces, bootstrap runtime types, heap operations, and runtime support markers used by generated code.
+- `j2z80.ZSystem` is the expanded low-level API; `ZSystem.im(int)` selects Z80 interrupt modes 0–2 and ignores other values.
+- `ZSystem.ei()` and `ZSystem.di()` emit the Z80 instructions to enable and disable maskable interrupts.
+- `ZSystem` exposes unsigned 16-bit memory `peek`/`poke`, CPU `halt`, and 16-bit port `in`/`out`; byte results are sign-extended on the Z80 stack.
 - Added the COMPACT assembly optimization profile: BASIC stack-pair cleanup, removal of JP/JR branches to the immediately following label, conservative flag-aware Z80 substitutions (LD A,0; redundant CP 0; LD A,r / NEG; groups of eight ADD HL,HL; adjacent immediate byte loads to word pairs; duplicate accumulator and repeated word-load cleanup; shared subroutine for repeated BC negation), and optimizer passes repeated until stable.
 - Added `docs/plugin.md` covering Maven plugin installation, build flow, goal usage, configuration parameters, and the generated heap-start placement.
 - Translator emits the memory manager as the final generated section after code, embedded data, and class-size symbols; when included, its initial heap pointer resolves to the generated image end.
@@ -10,10 +13,10 @@
 - Added plugin JUnit coverage for TranslatorMojo format output and missing JAR handling, SNA snapshot address/header layout, and class constant-pool compatibility boundaries.
 - Added end-to-end Java-to-Z80 coverage for mixed-width long/double/float method calls, fields, arithmetic (including double remainder), arrays, NaN comparison, and multidimensional arrays with empty and partially allocated dimensions.
 - Added numeric boundary integration checks for byte/short/char narrowing, 16-bit integer wrap, 32-bit long overflow and shift counts, binary16 float overflow/underflow/subnormals, conversion clamps, NaN conversion, and signed zero.
-- README Objects and the heap: 4-byte instance header, bump pointer, Heap.forget rewind (owner first, then children), Heap.top() as a signed 16-bit address, arrays not rewind targets. Also narrowed types, checked exceptions, ROM-resident static byte[], and the JNI frame.
-- j2z80.Heap.forget(Object) rewinds ___MEMORY_MANAGER_TOP_POINTER to the instance header (reference minus 4). That instance and everything allocated after it are released. Earlier instances stay. null is a no-op. Arrays are not this header. Heap.top() returns that pointer as a signed 16-bit int. java.lang.Object has no forget().
+- README Objects and the heap: 4-byte instance header, bump pointer, ZSystem.forget rewind (owner first, then children), ZSystem.top() as a signed 16-bit address, arrays not rewind targets. Also narrowed types, checked exceptions, ROM-resident static byte[], and the JNI frame.
+- j2z80.ZSystem.forget(Object) rewinds ___MEMORY_MANAGER_TOP_POINTER to the instance header (reference minus 4). That instance and everything allocated after it are released. Earlier instances stay. null is a no-op. Arrays are not this header. ZSystem.top() returns that pointer as a signed 16-bit int. java.lang.Object has no forget().
 - Contiguous static byte[] fills in <clinit> (n>=16) become ROM-resident arrays (header+DEFB); the static field points at that payload (no heap copy).
-- ZX Spectrum 48 library: border, ink/paper/bright/flash, lower-screen colors, clear, pixel plot/unplot/point, attribute cells, print position, one lower-screen character (Screen.print), frame sync, keyboard matrix, and beeper. Hello-world draws a line-art portrait, an attribute Mandelbrot, a 256-star field released with forget(), then float and double curves. The portrait caption prints Heap.top() as four hex digits.
+- ZX Spectrum 48 library: border, ink/paper/bright/flash, lower-screen colors, clear, pixel plot/unplot/point, attribute cells, print position, one lower-screen character (Screen.print), frame sync, keyboard matrix, and beeper. Hello-world draws a line-art portrait, an attribute Mandelbrot, a 256-star field released with forget(), then float and double curves. The portrait caption prints ZSystem.top() as four hex digits.
 - Portrait.DATA format: [n,x0,y0,...] where n=0 point, n=1 line, n>1 polyline segment count. Source: iam_line.svg path coords. Regenerate: `python3 tools/export_portrait_from_svg.py`.
 - SpotBugs 4.10.4.1 runs on j2z80-plugin during verify (medium and higher). Endemic patterns are listed in src/main/spotbugs/exclude.xml.
 - Fixed the embedded Z80 assembler: signed IX/IY displacements, byte immediates in -128..255 (so CP -128 assembles), rejection of LD (SP),n, case-insensitive (BC)/(DE)/(IX)/(IY), forward EQU chains, and DEFM as raw bytes.
@@ -50,7 +53,7 @@
 - The ZX Spectrum sample has 10 matching negate sequences. Extraction reduces its previous COMPACT binary from 16,635 to 16,603 bytes (32 bytes net) and emits 7,971 assembly lines / 121,737 text bytes.
 - The example POM selects `<optimization>COMPACT</optimization>`.
 - Static `byte[] DATA = {…}` is not a class-file blob: javac emits unrolled NEWARRAY+BASTORE in `<clinit>`. StaticByteArrayInitRewriter detects contiguous 0..n-1 fills (n>=16) ending in PUTSTATIC; MethodTranslator emits a ROM-resident array (size byte + length word + payload) and points the static field at the payload — no allocate/LDIR. Writes mutate the image in place.
-- ZX Spectrum 48 API is j2z80.spectrum.Screen, Keyboard, and Sound in zx-spectrum-demo-lib, with native bodies in matching .a80 resources. Pixel y=0 is the bottom scanline; attribute row 0 is the top character row. border() matches ROM BORDER: light papers keep black ink in BORDCR. frame() is a short delay with interrupts left disabled; HALT let the ROM keyboard scan treat space as a BASIC key and restart the machine. Before ROM calls, ERR-NR is set to #FF and the new-key flag is cleared. tone() calls ROM BEEPER #03B5 then DI. The first stage draws Portrait.DATA ([n,x0,y0,...]: n=0 point, n=1 line, n>1 polyline) from iam_line.svg path coordinates (Bezier sampled, y flip, centered on 256x192). Regenerate: `python3 tools/export_portrait_from_svg.py`. Keep DATA under ~2.5KB so translate stays under 0xFFFF. The Mandelbrot is 32 by 22 attribute cells in 1/64 fixed point; multiplies stay within +/-170 so the 16-bit product fits. Each cell's color is the paper color, because the bitmap is cleared. The next stage is a StarField: the instance is allocated first, then Star[256] and 256 Star objects (x, y, speed), plotted as pixels that wrap on X. Across and down each use their own 15-bit stir, so the points are not a diagonal. SPACE calls j2z80.Heap.forget on the StarField, rewinding the bump heap over the array and every star. Heap.forget is a bootstrap static call to ___MEMORY_FORGET_OBJECT. After the stars, a float sine and a double Lissajous are plotted. The portrait caption is "press space (top #" plus four hex digits of Heap.top() plus ")". SPACE steps portrait, overview, stars, curves, then repeats. Mandelbrot zoom constants remain for tests.
+- ZX Spectrum 48 API is j2z80.spectrum.Screen, Keyboard, and Sound in zx-spectrum-demo-lib, with native bodies in matching .a80 resources. Pixel y=0 is the bottom scanline; attribute row 0 is the top character row. border() matches ROM BORDER: light papers keep black ink in BORDCR. frame() is a short delay with interrupts left disabled; HALT let the ROM keyboard scan treat space as a BASIC key and restart the machine. Before ROM calls, ERR-NR is set to #FF and the new-key flag is cleared. tone() calls ROM BEEPER #03B5 then DI. The first stage draws Portrait.DATA ([n,x0,y0,...]: n=0 point, n=1 line, n>1 polyline) from iam_line.svg path coordinates (Bezier sampled, y flip, centered on 256x192). Regenerate: `python3 tools/export_portrait_from_svg.py`. Keep DATA under ~2.5KB so translate stays under 0xFFFF. The Mandelbrot is 32 by 22 attribute cells in 1/64 fixed point; multiplies stay within +/-170 so the 16-bit product fits. Each cell's color is the paper color, because the bitmap is cleared. The next stage is a StarField: the instance is allocated first, then Star[256] and 256 Star objects (x, y, speed), plotted as pixels that wrap on X. Across and down each use their own 15-bit stir, so the points are not a diagonal. SPACE calls j2z80.ZSystem.forget on the StarField, rewinding the bump heap over the array and every star. ZSystem.forget is a bootstrap static call to ___MEMORY_FORGET_OBJECT. After the stars, a float sine and a double Lissajous are plotted. The portrait caption is "press space (top #" plus four hex digits of ZSystem.top() plus ")". SPACE steps portrait, overview, stars, curves, then repeats. Mandelbrot zoom constants remain for tests.
 - Double runtime is DOUBLE_ARITHMETIC_MANAGER.a80. Same two-slot stack order as long: low word on top. Values are binary32, so results match Java float, not full float64.
 - Long runtime is LONG_ARITHMETIC_MANAGER.a80. Low word is on top of the stack and in the first local slot; high word is beneath it. Argument area size counts long as two slots. A long return leaves the low word in BC and the high word in DE. Divide by zero throws. Constants outside signed 32-bit are rejected.
 - Float runtime is FLOAT_ARITHMETIC_MANAGER.a80, pulled in by NeedsFloatArithmeticManager. Arithmetic is software binary16 (round-to-nearest-even, subnormals, signed zero, inf, NaN). IY points at a 16-byte workspace and is saved/restored. IX is not used.
@@ -68,6 +71,8 @@
 - Assembler labels run method and field names through normalizeString. `$` in synthetic names (`$VALUES`, `$values`, `$SwitchMap`, `EnumUse$1`) becomes `S`, because `$` is the assembler's location counter. `#` remains the field/method signature separator.
 - Maven plugin resource exclusion uses `org.codehaus.plexus.util.SelectorUtils.matchPath`; the Plexus utility is provided by Maven at runtime.
 - `Utils.readTextResource` reads classpath resources with Apache Commons IO and normalizes each line to LF, appending a final LF for non-empty content.
+- ZSystem memory access uses `(HL)` and ports use Z80 `IN A,(C)` / `OUT (C),A`, preserving the full 16-bit address/port; byte arguments and results use the low byte of their JVM stack word.
+- Interrupt mode is selected at runtime with a shared helper because the Z80 `IM` instructions encode the selected mode as an opcode immediate.
 
 ## 3. Technical Debt & Refactoring
 - Processor_ISTORE uses raw `index << 1` instead of prepareLocalVariableIndex (missing bounds check).
@@ -75,20 +80,20 @@
 - WithLocals invoke tests historically did not set maxLocals on MethodGen (fixed in registerMockMethod).
 
 ## 4. Current Work In Progress
-- Star field stage calls j2z80.Heap.forget. Object has no forget(); the rewind lives only on Heap.
-- Portrait lower line is "press space (top #" plus Heap.top() as four hex digits plus ")".
+- Star field stage calls j2z80.ZSystem.forget. Object has no forget(); the rewind lives only on ZSystem.
+- Portrait lower line is "press space (top #" plus ZSystem.top() as four hex digits plus ")".
 
 ## 5. Known Issues & Limitations
 - float is half precision, not Java float32. double is binary32, not Java float64. long is 32-bit, not Java's 64-bit long. drem truncates toward zero. Logical long shift is a 32-bit unsigned shift. multianewarray of long or double is not supported.
 - IX displacement limits locals to index 0..64 (assertLocalVariablesNumber uses 64).
-- Memory allocation is an unchecked bump pointer: exhaustion can collide with the downward-growing stack or wrap the 16-bit address space. Heap.forget also trusts its argument; only a valid ordinary live heap object is safe (not arrays, ROM data, or native-owned references).
+- Memory allocation is an unchecked bump pointer: exhaustion can collide with the downward-growing stack or wrap the 16-bit address space. ZSystem.forget also trusts its argument; only a valid ordinary live heap object is safe (not arrays, ROM data, or native-owned references).
 - Only documented Z80 instructions in the embedded assembler.
 - 16-bit int model: mul/div wrap in 16 bits; shifts are 16-bit (IUSHR does not match a 32-bit Java >>>). No array bounds or null checks on field/array access.
 - char is stored as an 8-bit element.
 - Only checked exceptions are supported. Unchecked exceptions (RuntimeException, Error, subclasses) cannot be declared, thrown, caught, or subclassed. Runtime faults (e.g. divide by zero) still reset via ATHROW processing address.
 - Enum.name and Enum.valueOf are rejected at translate time (no String). compareTo and getDeclaringClass are unsupported. Record toString returns null. Record equals uses identity for reference components that are not themselves records. Lambdas (invokedynamic) inside a method are still unsupported.
 - Portrait DATA / static byte[] still count toward the 64K image; compacted byte[] costs ≈ 3 + payload bytes in the program image (field points there; no second heap copy).
-- Heap.forget is a stack rewind, not a tracing collector. A forgotten reference is still a bit pattern in a local or field. Arrays use a 3-byte header, so Heap.forget does not rewind to an array. java.lang.Object has no forget().
+- ZSystem.forget is a stack rewind, not a tracing collector. A forgotten reference is still a bit pattern in a local or field. Arrays use a 3-byte header, so ZSystem.forget does not rewind to an array. java.lang.Object has no forget().
 
 ## 6. Open Questions & Pending Decisions
 - None.
@@ -110,6 +115,7 @@
 - j2z80-plugin/.../DOUBLE_ARITHMETIC_MANAGER.a80 — binary32 add/sub/mul/div, compare, conversions
 - Z80 emulation tests live in j2z80-tests/main-jar, not in the plugin. Z80Machine runs raw assembly. JavaZ80Run compiles sources, translates them with the plugin, and checks static int fields after mainz. Dependency is com.codingrodent.microprocessor:Z80Processor:4.2.0. Version 5.0.0 needs Java 25; mvn22 runs on JDK 22, and 4.2.0 is the newest jar that JDK can load. Those tests compile with release 17; translated fixtures and the plugin stay release 11, except RecordRunTest which compiles fixtures at release 17.
 - mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=ForgetHeapTest test
+- mvn22 -pl j2z80-tests/main-jar -am -Dsurefire.failIfNoSpecifiedTests=false -Dtest=ZSystemTest test
 - mvn22 -pl j2z80-tests/main-jar -am -Dtest=JavaZ80RunTest,Z80CommandTest,Z80WideArgumentTest test
 - mvn22 -pl j2z80-plugin -DskipTests spotbugs:check
 - mvn22 -pl j2z80-tests/main-jar -am verify
