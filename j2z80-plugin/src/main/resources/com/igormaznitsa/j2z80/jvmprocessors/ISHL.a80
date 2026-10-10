@@ -3,6 +3,7 @@
     POP BC
     POP HL
     LD A,C
+    AND 31
     OR A
     JR Z,@ISHLOOPEND
     LD B,A

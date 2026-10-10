@@ -6,6 +6,7 @@
 - Translator emits the memory manager as the final generated section after code, embedded data, and class-size symbols; when included, its initial heap pointer resolves to the generated image end.
 - Added Java-to-Z80 `instanceof` coverage for null, class/interface inheritance, unrelated interfaces, and primitive/reference/nested arrays against `Object`; fixed inherited-interface lookup recursion and `Object` checks. Both `instanceof` forms use the single `INSTANCEOF.a80` template and call shared manager routines.
 - Added switch dispatch edge cases for signed 16-bit integer endpoints and char values 0/255; Java `char` storage remains 8-bit.
+- Exhaustively checked every masked shift count for the supported 16-bit int and 32-bit long runtimes, across representative zero, sign, bit-boundary, and alternating-bit values. Fixed int shift count masking to match JVM low-5-bit semantics.
 - Added plugin JUnit coverage for TranslatorMojo format output and missing JAR handling, SNA snapshot address/header layout, and class constant-pool compatibility boundaries.
 - Added end-to-end Java-to-Z80 coverage for mixed-width long/double/float method calls, fields, arithmetic (including double remainder), arrays, NaN comparison, and multidimensional arrays with empty and partially allocated dimensions.
 - Added numeric boundary integration checks for byte/short/char narrowing, 16-bit integer wrap, 32-bit long overflow and shift counts, binary16 float overflow/underflow/subnormals, conversion clamps, NaN conversion, and signed zero.
