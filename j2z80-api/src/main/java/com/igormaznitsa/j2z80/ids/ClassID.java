@@ -30,7 +30,7 @@ import org.apache.bcel.generic.ClassGen;
  * regardless of where they were created.</p>
  */
 public class ClassID {
-  // inside storage of the full class name
+
   private final String className;
 
   /**

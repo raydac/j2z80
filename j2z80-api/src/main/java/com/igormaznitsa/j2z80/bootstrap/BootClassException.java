@@ -25,7 +25,6 @@ package com.igormaznitsa.j2z80.bootstrap;
  * @see AbstractBootstrapClass
  */
 public class BootClassException extends RuntimeException {
-  private static final long serialVersionUID = 982394812L;
 
   private final String className;
   private final String methodOrFieldName;
