@@ -36,7 +36,7 @@ public class AsmCommandRLC extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    final String arg = asm.getArgs().get(0);
+    final String arg = asm.getArgs().getFirst();
     if (isIndexRegisterReference(arg)) {
       final byte prefix = arg.startsWith("(IX") ? (byte) 0xDD : (byte) 0xFD;
       final int offset =

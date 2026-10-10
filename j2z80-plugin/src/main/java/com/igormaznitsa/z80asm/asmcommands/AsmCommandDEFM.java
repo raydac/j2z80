@@ -52,7 +52,7 @@ public class AsmCommandDEFM extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    return toByteValues(unescape(asm.getArgs().get(0)));
+    return toByteValues(unescape(asm.getArgs().getFirst()));
   }
 
   @Override

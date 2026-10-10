@@ -36,7 +36,7 @@ public class AsmCommandAND extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, ParsedAsmLine asm) {
-    final String arg = asm.getArgs().get(0);
+    final String arg = asm.getArgs().getFirst();
     if (doesNeedCalculation(arg)) {
       if (!isRegisterName(arg)) {
         int number;

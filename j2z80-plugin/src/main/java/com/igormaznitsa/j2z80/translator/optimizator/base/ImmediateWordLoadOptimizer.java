@@ -60,7 +60,7 @@ public class ImmediateWordLoadOptimizer implements AsmOptimizer {
       final ParsedAsmLine lowByteLoad = lines.get(index + 1);
       final String registerPair =
           WORD_REGISTER_BY_BYTES.get(
-              highByteLoad.getArgs().get(0) + ',' + lowByteLoad.getArgs().get(0));
+              highByteLoad.getArgs().getFirst() + ',' + lowByteLoad.getArgs().getFirst());
       result.add(new ParsedAsmLine(highByteLoad.getLabel(), "LD", registerPair,
           String.format(Locale.ROOT, "#%04X", wordValue)));
       index += 2;

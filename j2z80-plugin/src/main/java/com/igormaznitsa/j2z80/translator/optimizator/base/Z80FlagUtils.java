@@ -31,6 +31,6 @@ final class Z80FlagUtils {
       return "AND".equals(command) || "OR".equals(command) || "XOR".equals(command)
           || "CP".equals(command) || "SUB".equals(command);
     }
-    return arguments.size() == 2 && "ADD".equals(command) && "A".equals(arguments.get(0));
+    return arguments.size() == 2 && "ADD".equals(command) && "A".equals(arguments.getFirst());
   }
 }

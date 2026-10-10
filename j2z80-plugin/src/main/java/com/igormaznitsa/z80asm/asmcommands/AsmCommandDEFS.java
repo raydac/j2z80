@@ -24,7 +24,7 @@ public class AsmCommandDEFS extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    final int value = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
+    final int value = new LightExpression(context, this, asm, asm.getArgs().getFirst()).calculate();
     AsmAssertions.assertUnsignedShort(value);
     return new byte[value];
   }

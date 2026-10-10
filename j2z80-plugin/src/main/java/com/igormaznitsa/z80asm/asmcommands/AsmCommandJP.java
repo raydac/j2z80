@@ -27,8 +27,8 @@ public class AsmCommandJP extends AbstractAsmCommand {
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, ParsedAsmLine asm) {
     if (asm.getArgs().size() == 1) {
-      if (isInBrakes(asm.getArgs().get(0))) {
-        final String arg = asm.getArgs().get(0);
+      if (isInBrakes(asm.getArgs().getFirst())) {
+        final String arg = asm.getArgs().getFirst();
 
         byte[] result = null;
 
@@ -45,7 +45,7 @@ public class AsmCommandJP extends AbstractAsmCommand {
         return result;
       } else {
         final int address =
-            new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
+            new LightExpression(context, this, asm, asm.getArgs().getFirst()).calculate();
         AsmAssertions.assertAddress(address);
         return new byte[] {(byte) 0xC3, (byte) address, (byte) (address >>> 8)};
       }

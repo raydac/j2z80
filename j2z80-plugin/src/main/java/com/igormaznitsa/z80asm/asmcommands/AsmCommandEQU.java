@@ -29,7 +29,8 @@ public class AsmCommandEQU extends AbstractAsmCommand {
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
     requireNonNull(asm.getLabel(), "EQU must have a label");
-    final int address = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
+    final int address =
+        new LightExpression(context, this, asm, asm.getArgs().getFirst()).calculate();
     AsmAssertions.assertAddress(address);
 
     context.registerGlobalLabelAddress(asm.getLabel(), address);

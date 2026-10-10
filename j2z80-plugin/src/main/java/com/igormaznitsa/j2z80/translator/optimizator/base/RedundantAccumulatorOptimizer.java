@@ -74,8 +74,7 @@ public class RedundantAccumulatorOptimizer implements AsmOptimizer {
     }
 
     return switch (first.getCommand()) {
-      case "XOR" -> first.getSignature().equals("A");
-      case "OR", "AND" -> first.getSignature().equals("A");
+      case "XOR", "OR", "AND" -> first.getSignature().equals("A");
       case "LD" -> first.getSignature().equals("A,0");
       default -> false;
     };

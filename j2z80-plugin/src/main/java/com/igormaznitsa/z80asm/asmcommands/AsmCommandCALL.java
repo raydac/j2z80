@@ -25,7 +25,8 @@ public class AsmCommandCALL extends AbstractAsmCommand {
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, ParsedAsmLine asm) {
     if (asm.getArgs().size() == 1) {
-      final int address = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
+      final int address =
+          new LightExpression(context, this, asm, asm.getArgs().getFirst()).calculate();
       AsmAssertions.assertAddress(address);
       return new byte[] {(byte) 0xCD, (byte) address, (byte) (address >>> 8)};
     } else {

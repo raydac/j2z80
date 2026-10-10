@@ -52,7 +52,7 @@ public class RepeatedWordLoadOptimizer implements AsmOptimizer {
 
   private static boolean isLoad(final ParsedAsmLine line, final String register) {
     return "LD".equals(line.getCommand()) && line.getArgs().size() == 2
-        && register.equals(line.getArgs().get(0));
+        && register.equals(line.getArgs().getFirst());
   }
 
   private static boolean isPush(final ParsedAsmLine line, final String register) {

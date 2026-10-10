@@ -32,7 +32,7 @@ public class FallThroughJumpOptimizer implements AsmOptimizer {
       final ParsedAsmLine line = lines.get(index);
       if (index + 1 < lines.size() && this.targetsNextLine(line, lines.get(index + 1))) {
         if (line.getLabel() != null) {
-          result.add(new ParsedAsmLine(line.getLabel(), "", new String[0]));
+          result.add(new ParsedAsmLine(line.getLabel(), ""));
         }
       } else {
         result.add(line);
@@ -53,7 +53,7 @@ public class FallThroughJumpOptimizer implements AsmOptimizer {
 
     final List<String> arguments = line.getArgs();
     if (arguments.size() == 1) {
-      return arguments.get(0).equals(nextLine.getLabel());
+      return arguments.getFirst().equals(nextLine.getLabel());
     }
     if (arguments.size() == 2) {
       return arguments.get(1).equals(nextLine.getLabel());

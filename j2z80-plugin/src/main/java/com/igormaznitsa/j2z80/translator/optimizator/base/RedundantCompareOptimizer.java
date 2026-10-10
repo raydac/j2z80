@@ -32,7 +32,7 @@ public class RedundantCompareOptimizer implements AsmOptimizer {
       final ParsedAsmLine line = lines.get(index);
       if (this.isRedundantCompare(line, index, lines)) {
         if (line.getLabel() != null) {
-          result.add(new ParsedAsmLine(line.getLabel(), "", new String[0]));
+          result.add(new ParsedAsmLine(line.getLabel(), ""));
         }
       } else {
         result.add(line);
@@ -48,7 +48,7 @@ public class RedundantCompareOptimizer implements AsmOptimizer {
     }
 
     final List<String> arguments = line.getArgs();
-    return arguments.size() == 1 && "0".equals(arguments.get(0))
+    return arguments.size() == 1 && "0".equals(arguments.getFirst())
         && Z80FlagUtils.overwritesAllFlags(lines.get(index + 1));
   }
 }

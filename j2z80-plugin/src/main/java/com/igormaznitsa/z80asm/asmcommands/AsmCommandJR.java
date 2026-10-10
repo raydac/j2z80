@@ -24,7 +24,8 @@ public class AsmCommandJR extends AbstractAsmCommand {
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
     if (asm.getArgs().size() == 1) {
-      final int address = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
+      final int address =
+          new LightExpression(context, this, asm, asm.getArgs().getFirst()).calculate();
       final int offset = calculateAddressOffset(address, context.getPC());
       return new byte[] {(byte) 0x18, (byte) offset};
     } else {

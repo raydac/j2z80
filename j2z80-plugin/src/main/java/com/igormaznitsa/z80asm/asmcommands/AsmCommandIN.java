@@ -39,7 +39,7 @@ public class AsmCommandIN extends AbstractAsmCommand {
     if ("(C)".equals(port)) {
       return getPatternCase(asm.getSignature());
     } else {
-      final String leftPart = asm.getArgs().get(0);
+      final String leftPart = asm.getArgs().getFirst();
       if (!isInBrakes(port)) {
         throw new IllegalArgumentException("The port must be in brakes [" + port + ']');
       }

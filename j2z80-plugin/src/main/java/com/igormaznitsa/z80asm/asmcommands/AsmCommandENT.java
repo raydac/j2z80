@@ -24,7 +24,8 @@ public class AsmCommandENT extends AbstractAsmCommand {
 
   @Override
   public byte[] makeMachineCode(final AsmTranslator context, final ParsedAsmLine asm) {
-    final int address = new LightExpression(context, this, asm, asm.getArgs().get(0)).calculate();
+    final int address =
+        new LightExpression(context, this, asm, asm.getArgs().getFirst()).calculate();
     AsmAssertions.assertAddress(address);
     context.setEntryPoint(address);
     return EMPTY_ARRAY;
