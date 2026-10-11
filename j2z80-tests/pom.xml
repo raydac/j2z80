@@ -5,16 +5,12 @@
     <parent>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>j2z80-pom</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>2.0.0</version>
     </parent>
 
     <artifactId>j2z80-tests</artifactId>
     <packaging>pom</packaging>
     <version>0-SNAPSHOT</version>
-
-    <properties>
-        <j2z80.test.version>2.0.0-SNAPSHOT</j2z80.test.version>
-    </properties>
 
     <modules>
         <module>ext-jar</module>

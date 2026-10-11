@@ -5,6 +5,7 @@
 - `ZSystem.ei()` and `ZSystem.di()` emit the Z80 instructions to enable and disable maskable interrupts.
 - `ZSystem` exposes unsigned 16-bit memory `peek`/`poke`, CPU `halt`, and 16-bit port `in`/`out`; byte results are sign-extended on the Z80 stack.
 - Added the COMPACT assembly optimization profile: BASIC stack-pair cleanup, removal of JP/JR branches to the immediately following label, conservative flag-aware Z80 substitutions (LD A,0; redundant CP 0; LD A,r / NEG; groups of eight ADD HL,HL; adjacent immediate byte loads to word pairs; duplicate accumulator and repeated word-load cleanup; shared subroutine for repeated BC negation), and optimizer passes repeated until stable.
+- `README.md` and `docs/plugin.md` show the 2.0.0 consumer setup: `j2z80-api` as a provided dependency and plugin configuration using COMPACT with A80/BIN/SNA outputs.
 - Added `docs/plugin.md` covering Maven plugin installation, build flow, goal usage, configuration parameters, and the generated heap-start placement.
 - Translator emits the memory manager as the final generated section after code, embedded data, and class-size symbols; when included, its initial heap pointer resolves to the generated image end.
 - Added Java-to-Z80 `instanceof` coverage for null, class/interface inheritance, unrelated interfaces, and primitive/reference/nested arrays against `Object`; fixed inherited-interface lookup recursion and `Object` checks. Both `instanceof` forms use the single `INSTANCEOF.a80` template and call shared manager routines.
@@ -20,7 +21,7 @@
 - Portrait.DATA format: [n,x0,y0,...] where n=0 point, n=1 line, n>1 polyline segment count. Source: iam_line.svg path coords. Regenerate: `python3 tools/export_portrait_from_svg.py`.
 - SpotBugs 4.10.4.1 runs on j2z80-plugin during verify (medium and higher). Endemic patterns are listed in src/main/spotbugs/exclude.xml.
 - Fixed the embedded Z80 assembler: signed IX/IY displacements, byte immediates in -128..255 (so CP -128 assembles), rejection of LD (SP),n, case-insensitive (BC)/(DE)/(IX)/(IY), forward EQU chains, and DEFM as raw bytes.
-- Project version is 2.0.0-SNAPSHOT.
+- Project version is 2.0.0.
 - Added double support. Each Java double is two 16-bit slots holding IEEE binary32. Arithmetic, compare, i2d/l2d/f2d/d2i/d2l/d2f, fields, and double[] are implemented. drem is truncating remainder. multianewarray of double is rejected.
 - Added long support. Each Java long is two 16-bit slots holding a signed 32-bit value (low word in the first slot). Arithmetic, shifts, compare, i2l/l2i/l2f/f2l, ldc2_w, fields, and long[] are implemented. multianewarray of long is rejected.
 - Added float support. Each Java float is one 16-bit slot holding IEEE 754 binary16. Opcodes: fconst, fload/fstore, faload/fastore, fadd/fsub/fmul/fdiv/frem/fneg, i2f/f2i, fcmpl/fcmpg, freturn, ldc/ldc_w of ConstantFloat, newarray float.

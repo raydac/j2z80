@@ -8,7 +8,7 @@ Artifact coordinates:
 ```xml
 <groupId>com.igormaznitsa</groupId>
 <artifactId>j2z80-plugin</artifactId>
-<version>2.0.0-SNAPSHOT</version>
+<version>2.0.0</version>
 ```
 
 Goal:
@@ -21,15 +21,25 @@ The goal is normally bound to the `install` phase, but you can bind it to any li
 
 ## Add the plugin to a project
 
-Add the plugin under `<build><plugins>` and configure the execution:
+Add `j2z80-api` as a `provided` dependency so your application can compile against the translator API without packaging
+it as a runtime library. Then add the plugin under `<build><plugins>` and configure the execution:
 
 ```xml
+<dependencies>
+  <dependency>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>j2z80-api</artifactId>
+    <version>2.0.0</version>
+    <scope>provided</scope>
+  </dependency>
+</dependencies>
+
 <build>
   <plugins>
     <plugin>
       <groupId>com.igormaznitsa</groupId>
       <artifactId>j2z80-plugin</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>2.0.0</version>
 
       <executions>
         <execution>
@@ -48,10 +58,7 @@ Add the plugin under `<build><plugins>` and configure the execution:
       </executions>
 
       <configuration>
-        <optimization>BASIC</optimization>
-        <startAddress>28672</startAddress>
-        <stackTop>65533</stackTop>
-        <logAsmText>false</logAsmText>
+        <optimization>COMPACT</optimization>
         <excludeResources>
           <value>/**/*.xml</value>
           <value>/**/*.properties</value>

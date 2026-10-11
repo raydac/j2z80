@@ -15,6 +15,63 @@ The program entry point is `public static void mainz()`. The plugin reads a JAR 
 its classes, and writes assembler (`.a80`), a raw binary (`.bin`), or a ZX Spectrum 48K snapshot (`.sna`). Output
 formats, the start address, and the stack top are described in [docs/configuration.txt](docs/configuration.txt).
 
+## Release 2.0.0
+
+Version 2.0.0 adds the main language features and runtime support for a real Z80 target: enums and records,
+checked-exception handling, float/long/double arithmetic, the broader `ZSystem` API, the `COMPACT` optimizer, and the
+ZX Spectrum demo flow with `ZSystem.forget`-driven heap cleanup. Add the API as a provided dependency so it is available
+when compiling your Java source but is not packaged as a runtime library, then configure the plugin to translate the
+project JAR:
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>com.igormaznitsa</groupId>
+    <artifactId>j2z80-api</artifactId>
+    <version>2.0.0</version>
+    <scope>provided</scope>
+  </dependency>
+</dependencies>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.igormaznitsa</groupId>
+      <artifactId>j2z80-plugin</artifactId>
+      <version>2.0.0</version>
+      <executions>
+        <execution>
+          <phase>install</phase>
+          <goals>
+            <goal>translate</goal>
+          </goals>
+          <configuration>
+            <formats>
+              <!-- To get ASM sources -->
+              <format>A80</format>
+              <!-- To get compiled binary data -->
+              <format>BIN</format>
+              <!-- To get SNA snapshot for a ZXSpectrum  emulator -->
+              <format>SNA</format>
+            </formats>
+          </configuration>
+        </execution>
+      </executions>
+      <configuration>
+        <optimization>COMPACT</optimization>
+        <excludeResources>
+          <value>/**/*.xml</value>
+          <value>/**/*.properties</value>
+          <value>/**/*.mf</value>
+        </excludeResources>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+```
+
+For the full parameter reference, see [the Maven plugin guide](docs/plugin.md).
+
 The ZX Spectrum example draws a line-art portrait, an attribute Mandelbrot, a star field that `ZSystem.forget` releases,
 and float/double curves. SPACE moves from one picture to the next. The portrait line shows the current `ZSystem.top()`
 in hex (`press space (top #FAD0)`), so a later pass can be checked against the same address.
