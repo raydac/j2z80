@@ -1,35 +1,12 @@
-- 2.0.0
-    - enum constants, fields, ordinal, values, and switch translate; name and valueOf are rejected because String is not supported
-    - record classes translate, including constructors, accessors, equals, and hashCode; record toString returns null
-    - ZSystem.forget(Object) rewinds the bump heap to that instance, releasing it and every object allocated after it; ZSystem.top() returns that address
-    - ZSystem exposes 16-bit memory peek/poke, Z80 halt, port in/out, interrupt-mode control, and interrupt enable/disable
-    - Renamed the low-level API from Heap to ZSystem to reflect its broader system-control operations
-    - ZX Spectrum example replaces the zoomed Mandelbrot with a scattered 256-star field that ZSystem.forget releases on SPACE; the portrait line shows ZSystem.top() in hex
-    - large static byte[] field initializers use compact in-place ROM data instead of huge fill code
-    - ZX Spectrum example opens with a line-art portrait drawn pixel-by-pixel instead of greeting text
-    - ZX Spectrum example drives the 48K screen, keyboard, and beeper, and draws a Mandelbrot set
-    - fixed ZX Spectrum text printing so a string is shown as text instead of BASIC keywords
-    - fixed the Spectrum greeting so the beeper no longer resets the machine
-    - Mandelbrot cells use the paper color so the picture is visible on a cleared screen
-    - Space on the last Spectrum picture starts the demo again
-    - Spectrum demo draws a float sine and a double Lissajous after the seahorse view
-    - fixed long and double method calls so both words arrive in order and the result survives the return
-    - try/catch/finally for checked exceptions only: methods with throws return a hidden pending-exception cell; unchecked exceptions are rejected at translate time
-    - fixed Z80 assembler index offsets, 8-bit immediates, indirect registers, and forward EQU
-    - added float values as 16-bit IEEE binary16, including arithmetic, loads, stores, conversions, and float arrays
-    - added long values as signed 32-bit integers in two slots, including arithmetic, shifts, loads, stores, and long arrays
-    - added double values as 32-bit IEEE floats in two slots, including arithmetic, comparisons, conversions, and double arrays
-    - fixed signed greater-than so equal values do not take the branch
-    - fixed jsr and jsr_w so ret continues after the call
-    - fixed far not-equal branches, negative byte loads, checkcast of null, and divide-by-zero
-    - fixed array sizing, free memory, cleared new objects and arrays, and empty multi-array dimensions
-    - fixed stack frame size for method calls so local variables (e.g. nested loops) are reserved
-    - added SNA as a target format
-    - added COMPACT optimization profile for redundant branches and flag-safe Z80 instruction substitutions, including repeated word loads between pushes and shared repeated BC-negation code; optimizer passes repeat until stable and remove newly exposed duplicates
-    - adaptation for JDK 11 and Maven 3.8+
-    - updated dependencies
-    - minor fix
-    - restructurisation of project
+- 2.0.0 (11-oct-2026)
+    - Added Java `float` (binary16), `long` (signed 32-bit), and `double` (binary32) arithmetic, conversions, and arrays.
+    - Added checked-exception handling with `try`/`catch`/`finally`; unsupported unchecked exceptions are rejected during translation.
+    - Added translation support for records and enums, including enum `switch`.
+    - Expanded `ZSystem` with heap rewind and inspection, memory and port I/O, interrupt controls, and CPU halt.
+    - Added the `COMPACT` optimizer and ZX Spectrum 48K snapshot output.
+    - Embedded large contiguous static `byte[]` initializers in the program image instead of generating heap-fill code.
+    - Fixed method frame sizing, wide-value calling conventions, array allocation, and several Z80 instruction translations.
+    - Improved the embedded assembler with index displacements, expanded immediate ranges, indirect-register syntax, and forward `EQU` resolution.
 
 - 1.0.1 (may 2012) hot fix
     - removed the 'aux' word which was used as a package name, it has been changed to 'utils' because Windows doesn't support the folder name.
