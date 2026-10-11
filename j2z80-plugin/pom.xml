@@ -11,8 +11,8 @@
     <artifactId>j2z80-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
-    <name>J2Z80 bytecode translator</name>
-    <description>Experimental maven plugin to translate Java byte code into Z80 assembler instructions</description>
+    <name>J2Z80 Translator</name>
+    <description>Maven plugin to translate JVM bytecodes into Z80 instructions.</description>
 
     <prerequisites>
         <maven>${mvn.version}</maven>

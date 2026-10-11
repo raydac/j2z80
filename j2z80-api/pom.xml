@@ -11,6 +11,9 @@
     <artifactId>j2z80-api</artifactId>
     <packaging>jar</packaging>
 
+    <name>J2Z80 API</name>
+    <description>API for J2Z80 bytecode translator.</description>
+
     <profiles>
         <profile>
             <id>publish</id>
