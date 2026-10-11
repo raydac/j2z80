@@ -1,7 +1,7 @@
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Java 22+](https://img.shields.io/badge/java-22%2b-green.svg)](https://bell-sw.com/pages/downloads/#jdk-25-lts)
-[![Maven 3.8+](https://img.shields.io/badge/maven-3.8%2b-green.svg)](https://maven.apache.org/)      
-[![Maven central](https://img.shields.io/badge/j2z80--plugin2.0.0-green.svg)](https://search.maven.org/artifact/com.igormaznitsa/j2z80-plugin/2.0.0/jar)   
+[![Maven 3.8+](https://img.shields.io/badge/maven-3.8%2b-green.svg)](https://maven.apache.org/)
+[![Maven central](https://img.shields.io/badge/j2z80--plugin-2.0.0-green.svg)](https://search.maven.org/artifact/com.igormaznitsa/j2z80-plugin/2.0.0/jar)   
 [![Arthur's Acres Animal Sanctuary — donate](docs/arthur_sanctuary_banner.png)](https://www.arthursacresanimalsanctuary.org/donate)
 
 # j2z80
