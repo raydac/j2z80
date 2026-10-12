@@ -38,47 +38,46 @@ Add the API as a `provided` dependency and configure the plugin in your Maven pr
 translation and writes the selected output formats under the project's build directory.
 
 ```xml
-<dependencies>
-  <dependency>
-    <groupId>com.igormaznitsa</groupId>
-    <artifactId>j2z80-api</artifactId>
-    <version>2.0.0</version>
-    <scope>provided</scope>
-  </dependency>
-</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.igormaznitsa</groupId>
+            <artifactId>j2z80-api</artifactId>
+            <version>2.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
-<build>
-  <plugins>
-    <plugin>
-      <groupId>com.igormaznitsa</groupId>
-      <artifactId>j2z80-plugin</artifactId>
-      <version>2.0.0</version>
-      <executions>
-        <execution>
-          <phase>install</phase>
-          <goals>
-            <goal>translate</goal>
-          </goals>
-          <configuration>
-            <formats>
-              <format>A80</format>
-              <format>BIN</format>
-              <format>SNA</format>
-            </formats>
-          </configuration>
-        </execution>
-      </executions>
-      <configuration>
-        <optimization>COMPACT</optimization>
-        <excludeResources>
-          <value>/**/*.xml</value>
-          <value>/**/*.properties</value>
-          <value>/**/*.mf</value>
-        </excludeResources>
-      </configuration>
-    </plugin>
-  </plugins>
-</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.igormaznitsa</groupId>
+                <artifactId>j2z80-plugin</artifactId>
+                <version>2.0.0</version>
+                <executions>
+                    <execution>
+                        <id>translate-z80</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>translate</goal>
+                        </goals>
+                        <configuration>
+                            <optimization>COMPACT</optimization>
+                            <formats>
+                                <format>A80</format>
+                                <format>BIN</format>
+                                <format>SNA</format>
+                            </formats>
+                            <excludeResources>
+                                <value>/**/*.xml</value>
+                                <value>/**/*.properties</value>
+                                <value>/**/*.mf</value>
+                            </excludeResources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 ```
 
 ## What it supports
