@@ -18,6 +18,22 @@ that can run on a Z80 machine or emulator; it does not include a JVM or bytecode
 
 ## Quick start
 
+Let's imagine that you want just fill whole ZX-Spectrum screen by the same value as its low address byte, then your
+program may look like the snippet.
+
+```java
+import j2z80.ZSystem;
+
+public class FillScreen {
+  public static void mainz() {
+    for(int a = 0x4000; a < 0x5800; a++) {
+      ZSystem.poke(a, (byte)a);
+    }
+    ZSystem.halt();
+  }
+}
+```
+
 Add the API as a `provided` dependency and configure the plugin in your Maven project. The `install` phase runs
 translation and writes the selected output formats under the project's build directory.
 
